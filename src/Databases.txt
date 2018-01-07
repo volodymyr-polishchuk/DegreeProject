@@ -1,0 +1,2 @@
+localhost@Volodymyr; localhost; 3306; Volodymyr; db1
+localhost@root; localhost; 3306; root; mydata
