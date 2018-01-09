@@ -24,8 +24,7 @@ public class WeekList {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM weeks");
             list.clear();
             while (resultSet.next()) {
-                Week week = new Week(resultSet.getString(1).charAt(0), resultSet.getString(2), Color.decode(resultSet.getString(3)), resultSet.getString(4));
-                list.add(week);
+                list.add(new Week(resultSet));
             }
         } catch (SQLException e) {
             //Тут треба буде якось кидати явну помилку

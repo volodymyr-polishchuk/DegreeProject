@@ -1,6 +1,8 @@
 package app;
 
 import java.awt.Color;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Created by Vladimir on 03/01/18.
@@ -16,6 +18,13 @@ public class Week {
         this.name = name;
         this.color = color;
         this.abbreviation = abbreviation;
+    }
+
+    public Week(ResultSet resultSet) throws SQLException {
+        this.mark = resultSet.getString(1).charAt(0);
+        this.name = resultSet.getString(2);
+        this.color = Color.decode(resultSet.getString(3));
+        this.abbreviation = resultSet.getString(4);
     }
 
     public Week(WeekList list, String name) {
