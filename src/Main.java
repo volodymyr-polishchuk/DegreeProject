@@ -1,8 +1,6 @@
-import Frame.ConnectionForm;
-import com.mysql.jdbc.Connection;
+import frame.ConnectionForm;
 
 import java.io.*;
-import java.sql.SQLException;
 
 /**
  * Created by Vladimir on 01/01/18.

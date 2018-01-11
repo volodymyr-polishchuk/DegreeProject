@@ -1,11 +1,9 @@
-package Frame;
+package frame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.*;
 
 /**
  * Created by Vladimir on 26/12/17.

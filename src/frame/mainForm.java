@@ -1,7 +1,8 @@
-package Frame;
+package frame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -36,8 +37,6 @@ public class mainForm extends JFrame {
     private void InitJToolBar(JToolBar jToolBar) {
         try {
             jToolBar.add(new JToggleButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
-//            jToolBar.add(new JToggleButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
-            //Додання панелі інструментів
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,15 +75,12 @@ class myMenuBar extends JMenuBar {
 class Test000 {
     public static void main(String[] args) {
         mainForm form = new mainForm();
-        form.setStatusBar("Всі дані завантажені до програми");
-        JPanel panel = new JPanel();
-        String[][] data = {{"Завірюха В. П.", "402", "Основи програмування"},
-                {"Харченко О. О.", "403", "ІСТО"},
-                {"Заболотній Ю. Л.", "407", "WEB"}};
-        String[] col = {"Викладач", "Аудиторія", "Предмет"};
-        JTable table = new JTable(data, col);
-        panel.add(table);
-        panel.setName("Викладачі");
-        form.addTab(panel);
+        form.addTab(new shedularPanel("Графік навчання"));
+        form.addTab(new shedularPanel("Графік навчання2"));
+        form.addTab(new shedularPanel("Графік навчання3"));
+//        JPanel panel = new JPanel(new BorderLayout());
+//        panel.add(new Button("1 text"));
+//        panel.add(new Label("Soem text"));
+//        form.addTab(panel);
     }
 }
