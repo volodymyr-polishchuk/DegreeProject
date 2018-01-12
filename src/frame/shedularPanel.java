@@ -1,9 +1,17 @@
 package frame;
 
+import app.Period;
+
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import java.awt.*;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 
 /**
@@ -22,8 +30,13 @@ public class shedularPanel extends JPanel{
         setLayout(new GridLayout());
         add(panel1);
         table1.setModel(new SchedulerTableModel());
-        table1.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        table1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table1.getTableHeader().setReorderingAllowed(false);
+        table1.getTableHeader().setResizingAllowed(false);
+        table1.setRowHeight(0, 70);
+        table1.setDefaultRenderer(String.class, new SchedulerTableCellRenderer());
         Enumeration<TableColumn> e = table1.getColumnModel().getColumns();
+
         while (e.hasMoreElements()) {
             TableColumn column = e.nextElement();
             if (column.getModelIndex() == 0) {
@@ -36,30 +49,33 @@ public class shedularPanel extends JPanel{
 }
 
 class SchedulerTableModel implements TableModel {
+    private ArrayList<Period> periods = app.OtherFunction.GetWeekList(new Date(System.currentTimeMillis()));
+    private Calendar c = Calendar.getInstance();
 
     @Override
     public int getRowCount() {
-        return 10;
+        return 5;
     }
 
     @Override
     public int getColumnCount() {
-        return 10;
+        return 53;
     }
 
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0: return "Група";
-            default: return String.valueOf(columnIndex);
+            default: return "";
         }
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
-            case 0: return String.class;
-            default: return Character.class;
+//            case 0: return String.class;
+// Треба буде добавити під Week
+            default: return String.class;
         }
     }
 
@@ -70,13 +86,35 @@ class SchedulerTableModel implements TableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+
         switch (columnIndex) {
             case 0: switch (rowIndex) {
-                case 0: return "ПС-46";
-                default: return "ПС-47";
+                case 0: return "<html><b>Період</b></html>";
+                case 1: return "<html><b>Тиждень</b></html>";
+                case 2: return "ПС-46";
+                case 3: return "ПС-47";
+                case 4: return "ПС-48";
+                default: return "";
             }
-            default: return 'Н';
+            default: switch (rowIndex) {
+                case 0:  {
+                    String line = "<html>";
+                    c.setTime(periods.get(columnIndex - 1).getStartDate());
+                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br><u>";
+                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) +  "</u><br>";
+                    c.setTime(periods.get(columnIndex - 1).getLastDate());
+                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br>";
+                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) + "</html>";
+                    return line;
+                }
+                case 1: return columnIndex;
+                default: return "";
+            }
         }
+    }
+
+    private String AddZeroBefore(int i) {
+        return i<10?"0"+i:""+i;
     }
 
     @Override
@@ -92,5 +130,27 @@ class SchedulerTableModel implements TableModel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
 
+    }
+
+
+}
+
+class SchedulerTableCellRenderer extends DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        JLabel label = (JLabel)super.getTableCellRendererComponent(
+                table, value, isSelected, hasFocus, row, column);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+//        if (row % 2 == 0) {
+//            label.setBackground(new Color(240, 240, 240));
+//        } else {
+//            label.setBackground(new Color(255, 255, 255));
+//        }
+//        if ((row > 1) && (column > 0)) {
+//            label.setBackground(((Integer) value) % 2 == 0 ? Color.cyan : Color.WHITE);
+//        } else {
+//            label.setBackground(Color.WHITE);
+//        }
+        return label;
     }
 }
