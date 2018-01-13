@@ -21,10 +21,10 @@ public class Week {
     }
 
     public Week(ResultSet resultSet) throws SQLException {
-        this.mark = resultSet.getString(1).charAt(0);
-        this.name = resultSet.getString(2);
-        this.color = Color.decode(resultSet.getString(3));
-        this.abbreviation = resultSet.getString(4);
+        this.mark = resultSet.getString("mark").charAt(0);
+        this.name = resultSet.getString("name");
+        this.color = new Color(resultSet.getInt("color"));
+        this.abbreviation = resultSet.getString("abbreviation");
     }
 
     public Week(WeekList list, String name) {

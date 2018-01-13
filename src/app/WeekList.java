@@ -52,34 +52,6 @@ public class WeekList {
         return null;
     }
 
-    public void addWeek(char mark, String name, Color color, String abbreviation) throws SQLException {
-        //Створює новий тиждень, додає його до бази даних
-        Statement statement = connection.createStatement();
-        statement.execute("INSERT INTO weeks(mark, name, color, abbreviation) VALUE (" +
-                "'" + mark + "', " +
-                "'" + name + "', " +
-                "'" + OtherFunction.ColorToHexString(color) + "', " +
-                "'" + abbreviation + "');");
-        loadFromDatabase();
-        // TODO Треба б отимізувати тут. Замість повної загрузки даних можна працювати тільки зі списком
-    }
-
-    public void removeWeekByMark(char mark) throws SQLException {
-        //Видаляємо тиждень із бази дани за назвою і повертаємо видалений елемент
-        Statement statement = connection.createStatement();
-        statement.execute("DELETE FROM weeks WHERE mark = '" + mark + "';");
-        loadFromDatabase();
-        // TODO Треба б отимізувати тут. Замість повної загрузки даних можна працювати тільки зі списком
-    }
-
-    public void removeWeekByName(String name) throws SQLException {
-        //Видаляємо тиждень із бази дани за назвою і повертаємо видалений елемент
-        Statement statement = connection.createStatement();
-        statement.execute("DELETE FROM weeks WHERE name = '" + name + "';");
-        loadFromDatabase();
-        // TODO Треба б отимізувати тут. Замість повної загрузки даних можна працювати тільки зі списком
-    }
-
     public ArrayList<Week> GetAllWeek() {
         return list;
     }
@@ -87,26 +59,4 @@ public class WeekList {
     public boolean isEmpty() {
         return list.isEmpty();
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        connection.close();
-    }
 }
-
-//class Test {
-//    public static void main(String[] args) {
-//        try {
-//            WeekList weekList = new WeekList(DriverManager.getConnection("jdbc:mysql://localhost:3306/mydata?useSSL=false", "Volodymyr", "0000"));
-//            weekList.addWeek('9', "Настановча сесія", Color.DARK_GRAY, "НС");
-//            Week week = weekList.getWeekByName("Настановча сесія");
-//            if (week != null) {
-//                System.out.println(week.getAbbreviation());
-//            }
-//            weekList.removeWeekByMark('9');
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}

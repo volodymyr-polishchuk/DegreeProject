@@ -10,6 +10,11 @@ public class Period {
     private Date lDate;
     private int workDay;
 
+    /**
+     * @param sDate дата початку періоду
+     * @param lDate дата кінця періоду
+     * @param workDay кількість робочих днів періоду
+     */
     public Period(Date sDate, Date lDate, int workDay) {
         this.sDate = sDate;
         this.lDate = lDate;

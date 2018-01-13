@@ -1,6 +1,7 @@
 package frame;
 
 import app.Period;
+import app.Week;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -8,7 +9,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +34,7 @@ public class shedularPanel extends JPanel{
         table1.getTableHeader().setReorderingAllowed(false);
         table1.getTableHeader().setResizingAllowed(false);
         table1.setRowHeight(0, 70);
-        table1.setDefaultRenderer(String.class, new SchedulerTableCellRenderer());
+        table1.setDefaultRenderer(String.class, new SchedulerTableCellRenderer()); // Тут не правильно вказано, треба для кожного класу окремо назначати обробник
         Enumeration<TableColumn> e = table1.getColumnModel().getColumns();
 
         while (e.hasMoreElements()) {
@@ -113,6 +113,11 @@ class SchedulerTableModel implements TableModel {
         }
     }
 
+    /**
+     * Перетвоює одноцифрове число у форма двох цифрового
+     * @param i число 0, 1, 2, ..., 9, 10, 11, ...
+     * @return повертає число у форматі 00, 01, 02, ..., 09, 10, 11, ...
+     */
     private String AddZeroBefore(int i) {
         return i<10?"0"+i:""+i;
     }
@@ -141,16 +146,17 @@ class SchedulerTableCellRenderer extends DefaultTableCellRenderer {
         JLabel label = (JLabel)super.getTableCellRendererComponent(
                 table, value, isSelected, hasFocus, row, column);
         label.setHorizontalAlignment(SwingConstants.CENTER);
-//        if (row % 2 == 0) {
-//            label.setBackground(new Color(240, 240, 240));
-//        } else {
-//            label.setBackground(new Color(255, 255, 255));
-//        }
-//        if ((row > 1) && (column > 0)) {
-//            label.setBackground(((Integer) value) % 2 == 0 ? Color.cyan : Color.WHITE);
-//        } else {
-//            label.setBackground(Color.WHITE);
-//        }
+
+        label.setBackground(Color.WHITE);
+        if (row >= 2 && column >= 1) {
+            try {
+                Week week = (Week)value;
+                label.setBackground(week.getColor());
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+            }
+        }
+
         return label;
     }
 }

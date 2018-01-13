@@ -76,8 +76,6 @@ class Test000 {
     public static void main(String[] args) {
         mainForm form = new mainForm();
         form.addTab(new shedularPanel("Графік навчання"));
-//        form.addTab(new shedularPanel("Графік навчання2"));
-//        form.addTab(new shedularPanel("Графік навчання3"));
 //        JPanel panel = new JPanel(new BorderLayout());
 //        panel.add(new Button("1 text"));
 //        panel.add(new Label("Soem text"));

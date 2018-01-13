@@ -36,7 +36,7 @@ public class OtherFunction {
         }
         return arr;
     }
-
+    @Deprecated
     public static Period GetPeriodByNumber(Date firstDate, int searchPeriod) {
         Calendar c = Calendar.getInstance();
         Date tempDate = new Date(firstDate.getTime());
@@ -44,13 +44,6 @@ public class OtherFunction {
         final long DAY = 1000*60*60*24;
         tempDate.setTime(tempDate.getTime() + DAY*(2 - c.get(Calendar.DAY_OF_WEEK)) + DAY*7*(searchPeriod - 1));
         return new Period(tempDate, new Date(tempDate.getTime() + DAY*4), 5);
-
-    }
-
-    public static void main(String[] args) {
-        ArrayList<Period> arr = GetWeekList(new Date(System.currentTimeMillis()));
-        System.out.println(arr.get(3).getStartDate());
-        System.out.println(arr.get(3).getLastDate());
 
     }
 }
