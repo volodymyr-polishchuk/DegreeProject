@@ -8,10 +8,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -22,9 +19,10 @@ public class schedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
     private JList jList;
-    private JButton встановитиДаніButton;
+    private JButton змінитиПідписиButton;
     private JButton додатиГрупуButton;
-    private JButton видалитиГрупуButton;
+    private JButton вилучитиГрупуButton;
+    private JButton зберегтиЗміниButton;
 
     private SchedulerTableModel tableModel;
 
@@ -39,20 +37,20 @@ public class schedulePanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 Group group = new Group("Програмування", "ПС-46");
                 ScheduleUnit unit = new ScheduleUnit(group);
-                unit.setWeek(0, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(1, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(2, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(3, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(4, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(5, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-                unit.setWeek(6, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-                unit.setWeek(7, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-                unit.setWeek(8, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-                unit.setWeek(9, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-                unit.setWeek(10, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-                unit.setWeek(11, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-                unit.setWeek(12, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-                unit.setWeek(13, DegreeProject.WEEKLIST.getWeekByName("Технологічна практика"));
+//                unit.setWeek(0, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(1, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(2, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(3, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(4, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(5, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
+//                unit.setWeek(6, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
+//                unit.setWeek(7, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
+//                unit.setWeek(8, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
+//                unit.setWeek(9, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
+//                unit.setWeek(10, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
+//                unit.setWeek(11, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
+//                unit.setWeek(12, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
+//                unit.setWeek(13, DegreeProject.WEEKLIST.getWeekByName("Технологічна практика"));
                 tableModel.addScheduleUnit(unit);
             }
         });
@@ -96,6 +94,10 @@ public class schedulePanel extends JPanel{
         jTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (jList.getSelectedIndex() < 1) {
+                    // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
+                    return;
+                }
                 Week week = DegreeProject.WEEKLIST.getWeekByName(
                         (String) jList.getModel().getElementAt(
                                 jList.getSelectedIndex()
@@ -124,6 +126,31 @@ public class schedulePanel extends JPanel{
 
             }
         });
+//Скрипт який виводить підсказки, хаває сильно багато процесорного часу
+//        jTable.addMouseMotionListener(new MouseMotionListener() {
+//            @Override
+//            public void mouseDragged(MouseEvent e) {
+//
+//            }
+//
+//            @Override
+//            public void mouseMoved(MouseEvent e) {
+//                String result = "";
+//                int column = jTable.columnAtPoint(e.getPoint());
+//                int row = jTable.rowAtPoint(e.getPoint());
+//                if (column != - 1 || row != -1) {
+//                    Object o = jTable.getValueAt(row, column);
+//                    if (o.getClass() == Week.class) {
+//                        result = ((Week)o).getName();
+//                    } else if (o.getClass() == Integer.class) {
+//                        result = String.valueOf(o);
+//                    } else {
+//                        result = (String)o;
+//                    }
+//                }
+//                jTable.setToolTipText(result);
+//            }
+//        });
     }
 }
 

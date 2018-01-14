@@ -18,6 +18,7 @@ class SchedulerTableModel extends AbstractTableModel {
     private ArrayList<Period> periods = Period.GetWeekList(new Date(System.currentTimeMillis()));
     private ArrayList<ScheduleUnit> units = new ArrayList<>();
     private Calendar c = Calendar.getInstance();
+    private final String[] MONTHS = {"СІЧЕНЬ","Л","Б","К","Т","Ч","Л","С","В","Ж","Л","Г"};
 
     @Override
     public int getRowCount() {
@@ -32,8 +33,15 @@ class SchedulerTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
-            case 0: return "Група";
-            default: return "";
+            case 0: return "Місяць";
+            default: {
+                c.setTime(periods.get(columnIndex - 1).getStartDate());
+                if (c.get(Calendar.MONTH) % 2 == 0) {
+                    return MONTHS[c.get(Calendar.MONTH)];
+                } else {
+                    return "<html><b>" + MONTHS[c.get(Calendar.MONTH)] + "</b></html>";
+                }
+            }
         }
     }
 
@@ -64,11 +72,11 @@ class SchedulerTableModel extends AbstractTableModel {
                 case 0:  {
                     String line = "<html>";
                     c.setTime(periods.get(columnIndex - 1).getStartDate());
-                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br><u>";
-                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) +  "</u><br>";
+                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br><b><u>";
+                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) +  "</u></b><br>";
                     c.setTime(periods.get(columnIndex - 1).getLastDate());
-                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br>";
-                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) + "</html>";
+                    line += AddZeroBefore(c.get(Calendar.DATE)) + "<br><b>";
+                    line += AddZeroBefore(c.get(Calendar.MONTH) + 1) + "</b></html>";
                     return line;
                 }
                 case 1: return periods.get(columnIndex - 1).getWorkDay();
