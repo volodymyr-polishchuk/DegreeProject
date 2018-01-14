@@ -1,6 +1,8 @@
 package app;
 
-import java.awt.Color;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -12,6 +14,13 @@ public class Week {
     private String name;
     private Color color;
     private String abbreviation;
+
+    public Week() {
+        this.mark = '?';
+        this.name = "Не визначено";
+        this.color = Color.WHITE;
+        this.abbreviation = "?";
+    }
 
     public Week(char mark, String name, Color color, String abbreviation) {
         this.mark = mark;
@@ -25,14 +34,6 @@ public class Week {
         this.name = resultSet.getString("name");
         this.color = new Color(resultSet.getInt("color"));
         this.abbreviation = resultSet.getString("abbreviation");
-    }
-
-    public Week(WeekList list, String name) {
-        this(list.getWeekByName(name));
-    }
-
-    public Week(WeekList list, char mark) {
-        this(list.getWeekByMark(mark));
     }
 
     private Week (Week week) {
@@ -55,6 +56,38 @@ public class Week {
     }
 
     public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public static DefaultTableCellRenderer getInstanceTableCellRendererComponent() {
+        return new TableCellRendererComponent();
+    }
+
+    // Для визначення того як потрібно відмальовувати цей компонент в таблиці JTable
+    private static class TableCellRendererComponent extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            label.setHorizontalAlignment(CENTER);
+            if (row >= 3 && column >= 1) {
+                try {
+                    Week w = (Week)value;
+                    label.setBackground(w.getColor());
+                } catch (ClassCastException e) {
+                    label.setBackground(Color.WHITE);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                label.setBackground(new Color(235, 235, 235));
+            }
+
+            return label;
+        }
+    }
+
+    @Override
+    public String toString() {
         return abbreviation;
     }
 }

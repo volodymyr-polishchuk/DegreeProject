@@ -7,7 +7,18 @@ import java.util.Date;
  **/
 public class Group {
     private String department; // Відділення
-    private Date dateOfCreation; // Дата стоворення
-    private int apprenticeship; // Тривалість навчання
     private String groupName; // Назва групи
+
+    public Group(String department, String groupName) {
+        this.department = department;
+        this.groupName = groupName;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
 }

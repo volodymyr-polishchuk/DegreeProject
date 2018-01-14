@@ -1,6 +1,7 @@
 package app;
 
-import frame.ConnectionForm;
+import frame.mainForm;
+import frame.schedulePanel;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -9,17 +10,23 @@ import java.sql.SQLException;
  * Created by Vladimir on 01/01/18.
  **/
 public class DegreeProject {
-    public static DatabaseData dd;
-    public static WeekList weekList = new WeekList(dd.getConnection());
+    public static DatabaseData databaseData;
+    public static WeekList WEEKLIST;
 
     public static void main(String[] args) throws IOException {
         try {
-            dd = new app.DatabaseData("localhost", "3306", "Volodymyr", "0000");
-            dd.CreateDatabase();
+            databaseData = new app.DatabaseData("localhost", "3306", "Volodymyr", "0000", "mydata");
+            WEEKLIST = new WeekList(databaseData.getConnection());
+//            databaseData.CreateDatabase();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        ConnectionForm connectionForm = new ConnectionForm();
-        connectionForm.setVisible(true);
+
+//        System.out.println(WEEKLIST.GetAllWeek());
+//        ConnectionForm connectionForm = new ConnectionForm();
+//        connectionForm.setVisible(true);
+
+        mainForm form = new mainForm();
+        form.addTab(new schedulePanel("Графік навчання"));
     }
 }

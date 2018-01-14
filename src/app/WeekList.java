@@ -39,7 +39,7 @@ public class WeekList {
                 return week;
             }
         }
-        return null;
+        return new Week();
     }
 
     public Week getWeekByMark(char mark) {
@@ -49,7 +49,7 @@ public class WeekList {
                 return week;
             }
         }
-        return null;
+        return new Week();
     }
 
     public ArrayList<Week> GetAllWeek() {

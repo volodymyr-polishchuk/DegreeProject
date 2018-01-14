@@ -15,27 +15,6 @@ public class OtherFunction {
         return "#" + Integer.toHexString(color.getRGB()).substring(2);
     }
 
-    @Contract("_ -> !null")
-    public static ArrayList<Period> GetWeekList(Date date) {
-        Calendar c = Calendar.getInstance();
-        Date tempDate = new Date(date.getTime());
-        Date first;
-        Date second;
-        int workDay;
-        ArrayList<Period> arr = new ArrayList<>(52);
-
-        for (int i = 0; i < 52; i++) {
-            c.setTime(tempDate);
-            first = new Date(tempDate.getTime());
-            tempDate.setTime(tempDate.getTime() + 1000*60*60*24*(6 - c.get(Calendar.DAY_OF_WEEK)));
-            workDay = (6 - c.get(Calendar.DAY_OF_WEEK)) + 1;
-            c.setTime(tempDate);
-            second = new Date(tempDate.getTime());
-            tempDate.setTime(tempDate.getTime() + 1000*60*60*24*3);
-            arr.add(new Period(first, second, workDay));
-        }
-        return arr;
-    }
     @Deprecated
     public static Period GetPeriodByNumber(Date firstDate, int searchPeriod) {
         Calendar c = Calendar.getInstance();

@@ -9,9 +9,8 @@ public class ScheduleUnit {
 
     public ScheduleUnit(Group group) {
         this.group = group;
-        for (Week i :
-                weeks) {
-            i = DegreeProject.weekList.getWeekByName("Навчання");
+        for (int i = 0; i < 52; i++) {
+            weeks[i] = new Week();
         }
     }
 

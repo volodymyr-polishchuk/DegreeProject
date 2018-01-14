@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="frame.shedularPanel">
-  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="frame.schedulePanel">
+  <grid id="27dc6" binding="mainPanel" default-binding="true" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="5" left="5" bottom="5" right="5"/>
     <constraints>
       <xy x="20" y="20" width="559" height="400"/>
@@ -93,7 +93,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="bdb02" class="javax.swing.JList" binding="list1" default-binding="true">
+              <component id="bdb02" class="javax.swing.JList" binding="jList">
                 <constraints/>
                 <properties>
                   <model>
@@ -128,7 +128,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="e6107" class="javax.swing.JTable" binding="table1" default-binding="true">
+          <component id="e6107" class="javax.swing.JTable" binding="jTable" default-binding="true">
             <constraints/>
             <properties/>
           </component>
