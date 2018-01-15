@@ -1,7 +1,5 @@
 package app;
 
-import java.awt.*;
-import java.sql.Connection;
 import java.util.ArrayList;
 
 /**
@@ -10,6 +8,10 @@ import java.util.ArrayList;
 public class StudySchedule {
     private int Year;
     private ArrayList<ScheduleUnit> units;
+
+    public StudySchedule(int year) {
+        Year = year;
+    }
 }
 
 

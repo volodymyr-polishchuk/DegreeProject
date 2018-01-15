@@ -1,6 +1,9 @@
 package frame;
 
-import app.*;
+import app.DegreeProject;
+import app.Group;
+import app.ScheduleUnit;
+import app.Week;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -8,7 +11,10 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -19,10 +25,14 @@ public class schedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
     private JList jList;
-    private JButton змінитиПідписиButton;
     private JButton додатиГрупуButton;
     private JButton вилучитиГрупуButton;
     private JButton зберегтиЗміниButton;
+    private JTextField authorTextField;
+    private JButton prevYearButton;
+    private JButton nextYearButton;
+    private JLabel YearsLabel;
+    private JList list1;
 
     private SchedulerTableModel tableModel;
 
@@ -32,27 +42,24 @@ public class schedulePanel extends JPanel{
         add(mainPanel);
         InitialTable();
         InitialList();
-        додатиГрупуButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Group group = new Group("Програмування", "ПС-46");
-                ScheduleUnit unit = new ScheduleUnit(group);
-//                unit.setWeek(0, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(1, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(2, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(3, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(4, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(5, DegreeProject.WEEKLIST.getWeekByName("Канікули"));
-//                unit.setWeek(6, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-//                unit.setWeek(7, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-//                unit.setWeek(8, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-//                unit.setWeek(9, DegreeProject.WEEKLIST.getWeekByName("Навчання"));
-//                unit.setWeek(10, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-//                unit.setWeek(11, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-//                unit.setWeek(12, DegreeProject.WEEKLIST.getWeekByName("Екзаменаційна сесія"));
-//                unit.setWeek(13, DegreeProject.WEEKLIST.getWeekByName("Технологічна практика"));
-                tableModel.addScheduleUnit(unit);
-            }
+        додатиГрупуButton.addActionListener(e ->
+                tableModel.addScheduleUnit(new ScheduleUnit(new Group("Програмування", authorTextField.getText())))
+        );
+        InitialButtons();
+    }
+
+    private void InitialButtons() {
+        prevYearButton.addActionListener(e -> {
+            String[] lines = YearsLabel.getText().split("-");
+            lines[0] = String.valueOf(Integer.parseInt(lines[0]) - 1);
+            lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
+            YearsLabel.setText(lines[0] + "-" + lines[1]);
+        });
+        nextYearButton.addActionListener(e -> {
+            String[] lines = YearsLabel.getText().split("-");
+            lines[0] = String.valueOf(Integer.parseInt(lines[0]) + 1);
+            lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
+            YearsLabel.setText(lines[0] + "-" + lines[1]);
         });
     }
 
@@ -94,7 +101,7 @@ public class schedulePanel extends JPanel{
         jTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (jList.getSelectedIndex() < 1) {
+                if (jList.getSelectedIndex() < 0) {
                     // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
                     return;
                 }
@@ -108,12 +115,10 @@ public class schedulePanel extends JPanel{
 
             @Override
             public void mousePressed(MouseEvent e) {
-
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
             }
 
             @Override

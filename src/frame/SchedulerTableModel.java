@@ -3,10 +3,12 @@ package frame;
 import app.Period;
 import app.ScheduleUnit;
 import app.Week;
+import javafx.scene.input.DataFormat;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,10 +17,17 @@ import java.util.Date;
  * Created by Vladimir on 14/01/18.
  **/
 class SchedulerTableModel extends AbstractTableModel {
-    private ArrayList<Period> periods = Period.GetWeekList(new Date(System.currentTimeMillis()));
+    private ArrayList<Period> periods;
     private ArrayList<ScheduleUnit> units = new ArrayList<>();
     private Calendar c = Calendar.getInstance();
-    private final String[] MONTHS = {"СІЧЕНЬ","Л","Б","К","Т","Ч","Л","С","В","Ж","Л","Г"};
+    private final String[] MONTHS = {"С","Л","Б","К","Т","Ч","Л","С","В","Ж","Л","Г"};
+
+    public SchedulerTableModel() {
+        super();
+        Calendar c = Calendar.getInstance();
+        c.set(2017, Calendar.SEPTEMBER, 1);
+        periods = Period.GetWeekList(c.getTime());
+    }
 
     @Override
     public int getRowCount() {

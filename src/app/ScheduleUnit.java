@@ -25,4 +25,25 @@ public class ScheduleUnit {
     public void setWeek(int index, Week week) {
         this.weeks[index] = week;
     }
+
+    public String decode() {
+        String line = "";
+        for (Week week :
+                weeks) {
+            line += week.getMark();
+        }
+        return line;
+    }
+
+    public boolean encode(WeekList list, String line) {
+        if (line.length() > 52) return false;
+        for (int i = 0; i < 52; i++) {
+            try {
+                weeks[i] = list.getWeekByMark(line.charAt(i));
+            } catch (ArrayIndexOutOfBoundsException e) {
+                weeks[i] = new Week();
+            }
+        }
+        return true;
+    }
 }
