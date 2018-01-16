@@ -1,18 +1,12 @@
 package frame;
 
-import app.DegreeProject;
-import app.Group;
-import app.ScheduleUnit;
-import app.Week;
+import app.*;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -26,13 +20,11 @@ public class schedulePanel extends JPanel{
     private JPanel mainPanel;
     private JList jList;
     private JButton додатиГрупуButton;
-    private JButton вилучитиГрупуButton;
     private JButton зберегтиЗміниButton;
     private JTextField authorTextField;
     private JButton prevYearButton;
     private JButton nextYearButton;
     private JLabel YearsLabel;
-    private JList list1;
 
     private SchedulerTableModel tableModel;
 
@@ -95,8 +87,7 @@ public class schedulePanel extends JPanel{
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTable.getTableHeader().setReorderingAllowed(false);
         jTable.getTableHeader().setResizingAllowed(false);
-        jTable.setDefaultRenderer(Week.class, Week.getInstanceTableCellRendererComponent());
-        jTable.setDefaultRenderer(String.class, new Temp());
+        jTable.setDefaultRenderer(Object.class, Week.getInstanceTableCellRendererComponent());
         tableModel.fireTableDataChanged();
         jTable.addMouseListener(new MouseListener() {
             @Override
@@ -158,13 +149,3 @@ public class schedulePanel extends JPanel{
 //        });
     }
 }
-
-class Temp extends DefaultTableCellRenderer {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setBackground(new Color(235, 235, 235));
-        return label;
-    }
-}
-

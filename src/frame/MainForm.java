@@ -2,19 +2,22 @@ package frame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
  * Created by Vladimir on 09/01/18.
  **/
-public class mainForm extends JFrame {
+public class MainForm extends JFrame {
     private JPanel mainPanel;
     private JTabbedPane tabbedPane;
     private JLabel statusBar;
     private JToolBar toolBar;
 
-    public mainForm() {
-        setJMenuBar(new myMenuBar());
+    public MainForm() {
+        setJMenuBar(new myMenuBar(this));
 
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -40,10 +43,16 @@ public class mainForm extends JFrame {
             e.printStackTrace();
         }
     }
+
+    public void StudyProcessAdd() {
+        addTab(new schedulePanel("Графік навчального процесу"));
+    }
 }
 
 class myMenuBar extends JMenuBar {
-    myMenuBar() {
+    MainForm mainForm;
+    myMenuBar(MainForm mainForm) {
+        this.mainForm = mainForm;
 // Створення головного меню програми
         JMenu m1 = new JMenu("Програма");
         m1.add(new JMenuItem("Виконати підключення до іншого сервера"));
@@ -52,7 +61,11 @@ class myMenuBar extends JMenuBar {
         m1.add(new JMenuItem("Вихід"));
         add(m1);
         JMenu m2 = new JMenu("Навчальний графік");
-        m2.add(new JMenuItem("Створити навчальний графік"));
+        JMenuItem item = new JMenuItem("Створити навчальний графік");
+        item.addActionListener(e -> {
+            this.mainForm.StudyProcessAdd();
+        });
+        m2.add(item);
         m2.add(new JMenuItem("Редагувати існуючий графік"));
         m2.add(new JMenuItem("Видалити або архівувати графік"));
         add(m2);
@@ -73,7 +86,7 @@ class myMenuBar extends JMenuBar {
 
 class Test000 {
     public static void main(String[] args) {
-        mainForm form = new mainForm();
+        MainForm form = new MainForm();
         form.addTab(new schedulePanel("Графік навчання"));
 //        JPanel panel = new JPanel(new BorderLayout());
 //        panel.add(new Button("1 text"));

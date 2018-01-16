@@ -1,6 +1,7 @@
 package app;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.sql.ResultSet;
@@ -79,9 +80,11 @@ public class Week {
                     e.printStackTrace();
                 }
             } else {
-                label.setBackground(new Color(235, 235, 235));
+                label.setBackground(new Color(238, 238, 238));
             }
-
+            if (isSelected && row >= 3) {
+                label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(122, 138, 153)));
+            }
             return label;
         }
     }

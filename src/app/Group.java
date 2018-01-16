@@ -21,4 +21,12 @@ public class Group {
     public String getGroupName() {
         return groupName;
     }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "d='" + department + '\'' +
+                ", n='" + groupName + '\'' +
+                '}';
+    }
 }

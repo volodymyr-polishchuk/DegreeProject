@@ -1,4 +1,4 @@
-package frame;
+package app;
 
 import app.Period;
 import app.ScheduleUnit;
@@ -16,7 +16,7 @@ import java.util.Date;
 /**
  * Created by Vladimir on 14/01/18.
  **/
-class SchedulerTableModel extends AbstractTableModel {
+public class SchedulerTableModel extends AbstractTableModel {
     private ArrayList<Period> periods;
     private ArrayList<ScheduleUnit> units = new ArrayList<>();
     private Calendar c = Calendar.getInstance();
@@ -57,8 +57,9 @@ class SchedulerTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
-            case 0: return String.class;
-            default: return Week.class;
+//            case 0: return String.class;
+//            default: return Week.class;
+            default: return Object.class;
         }
     }
 

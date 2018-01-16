@@ -17,22 +17,22 @@ public class DatabaseData {
 
     private Connection connection;
 
-    public DatabaseData(String address, String port, String user, String password, String databaseName) throws SQLException {
+    public DatabaseData(String address, String port, String user, char[] password, String databaseName) throws SQLException {
         this.address = address;
         this.port = port;
         this.user = user;
-        this.password = password;
+        this.password = String.valueOf(password);
         this.databaseName = databaseName;
 
         connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "/" + this.databaseName + "?useSSL=false",
                 this.user, this.password);
     }
 
-    public DatabaseData(String address, String port, String user, String password) throws SQLException {
+    public DatabaseData(String address, String port, String user, char[] password) throws SQLException {
         this.address = address;
         this.port = port;
         this.user = user;
-        this.password = password;
+        this.password = String.valueOf(password);
 
         connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "?useSSL=false", this.user, this.password);
     }
