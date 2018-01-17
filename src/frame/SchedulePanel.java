@@ -10,12 +10,13 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 
 /**
  * Created by Vladimir on 10/01/18.
  **/
-public class schedulePanel extends JPanel{
+public class SchedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
     private JList jList;
@@ -24,11 +25,11 @@ public class schedulePanel extends JPanel{
     private JTextField authorTextField;
     private JButton prevYearButton;
     private JButton nextYearButton;
-    private JLabel YearsLabel;
+    private JLabel yearsLabel;
 
     private SchedulerTableModel tableModel;
 
-    public schedulePanel(String name) {
+    public SchedulePanel(String name) {
         setName(name);
         setLayout(new GridLayout());
         add(mainPanel);
@@ -36,22 +37,24 @@ public class schedulePanel extends JPanel{
         InitialList();
         додатиГрупуButton.addActionListener(e ->
                 tableModel.addScheduleUnit(new ScheduleUnit(new Group("Програмування", authorTextField.getText())))
+
         );
-        InitialButtons();
+        InitialYearsPanel();
     }
 
-    private void InitialButtons() {
+    private void InitialYearsPanel() {
+        yearsLabel.setText(Calendar.getInstance().get(Calendar.YEAR) + "-" + (Calendar.getInstance().get(Calendar.YEAR) + 1));
         prevYearButton.addActionListener(e -> {
-            String[] lines = YearsLabel.getText().split("-");
+            String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) - 1);
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
-            YearsLabel.setText(lines[0] + "-" + lines[1]);
+            yearsLabel.setText(lines[0] + "-" + lines[1]);
         });
         nextYearButton.addActionListener(e -> {
-            String[] lines = YearsLabel.getText().split("-");
+            String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) + 1);
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
-            YearsLabel.setText(lines[0] + "-" + lines[1]);
+            yearsLabel.setText(lines[0] + "-" + lines[1]);
         });
     }
 

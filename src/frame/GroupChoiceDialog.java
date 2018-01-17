@@ -22,7 +22,7 @@ public class GroupChoiceDialog extends JDialog {
     private JButton buttonAllRight;
     private GroupChoiceListener listener;
 
-    private GroupChoiceDialog(List<Group> list, int [] choice, GroupChoiceListener listener) {
+    public GroupChoiceDialog(List<Group> list, int [] choice, GroupChoiceListener listener) {
         this.listener = listener;
         setContentPane(contentPane);
         setModal(true);

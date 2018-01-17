@@ -2,9 +2,6 @@ package frame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
@@ -45,7 +42,7 @@ public class MainForm extends JFrame {
     }
 
     public void StudyProcessAdd() {
-        addTab(new schedulePanel("Графік навчального процесу"));
+        addTab(new SchedulePanel("Графік навчального процесу"));
     }
 }
 
@@ -87,7 +84,7 @@ class myMenuBar extends JMenuBar {
 class Test000 {
     public static void main(String[] args) {
         MainForm form = new MainForm();
-        form.addTab(new schedulePanel("Графік навчання"));
+        form.addTab(new SchedulePanel("Графік навчання"));
 //        JPanel panel = new JPanel(new BorderLayout());
 //        panel.add(new Button("1 text"));
 //        panel.add(new Label("Soem text"));

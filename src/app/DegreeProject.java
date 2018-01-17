@@ -2,9 +2,9 @@ package app;
 
 import frame.ConnectionForm;
 import frame.MainForm;
-import frame.schedulePanel;
 
 import java.io.*;
+import java.sql.SQLException;
 
 /**
  * Created by Vladimir on 01/01/18.
@@ -12,22 +12,20 @@ import java.io.*;
 public class DegreeProject {
     public static DatabaseData databaseData;
     public static WeekList WEEKLIST;
+    public static GroupList GROUPLIST;
 
     public static void main(String[] args) throws IOException {
-//        try {
-//            databaseData = new DatabaseData("localhost", "3306", "Volodymyr", "0000", "mydata");
-//            WEEKLIST = new WeekList(databaseData.getConnection());
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-
-//        System.out.println(WEEKLIST.GetAllWeek());
-//        ConnectionForm connectionForm = new ConnectionForm();
-//        connectionForm.setVisible(true);
-
-//        MainForm form = new MainForm();
-//        form.addTab(new schedulePanel("Графік навчання"));
         ConnectionForm connectionForm = new ConnectionForm();
         connectionForm.setVisible(true);
+    }
+
+    public static void InitialMainFrame() {
+        MainForm mainForm = new MainForm();
+        try {
+            WEEKLIST = new WeekList(databaseData.getConnection());
+            GROUPLIST = new GroupList(databaseData.getConnection());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

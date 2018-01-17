@@ -68,9 +68,14 @@ public class DatabaseData {
     public void CreateDatabase() {
         try {
             Statement st = connection.createStatement();
-            st.execute("CREATE DATABASE db1");
-            st.execute("USE db1;");
-            st.execute("CREATE TABLE tb1(k INTEGER, name VARCHAR(256));");
+            st.execute("CREATE DATABASE DegreeProjectBase");
+            st.execute("USE DegreeProjectBase;");
+            // Create table weeks
+            st.execute("CREATE TABLE weeks(mark VARCHAR(1)," +
+                    " name VARCHAR(256), " +
+                    " color INTEGER, " +
+                    " abbreviation VARCHAR(16));");
+            // TODO треба описати створення всіх баз даних
         } catch (SQLException e) {
             e.printStackTrace();
         }

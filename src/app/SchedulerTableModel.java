@@ -1,17 +1,8 @@
 package app;
 
-import app.Period;
-import app.ScheduleUnit;
-import app.Week;
-import javafx.scene.input.DataFormat;
-
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Vladimir on 14/01/18.
@@ -76,7 +67,7 @@ public class SchedulerTableModel extends AbstractTableModel {
                 case 0: return "<html><b>Період</b></html>";
                 case 1: return "<html><b>Робочих днів</b></html>";
                 case 2: return "<html><b>Тиждень</b></html>";
-                default: return units.get(rowIndex - 3).getGroup().getGroupName();
+                default: return units.get(rowIndex - 3).getGroup().getName();
             }
             default: switch (rowIndex) {
                 case 0:  {

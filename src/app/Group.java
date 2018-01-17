@@ -1,5 +1,6 @@
 package app;
 
+import java.sql.ResultSet;
 import java.util.Date;
 
 /**
@@ -14,11 +15,20 @@ public class Group {
         this.groupName = groupName;
     }
 
+    public Group(ResultSet resultSet) {
+
+    }
+
+    public Group() {
+        department = "Не визначено";
+        groupName = "Не визначено";
+    }
+
     public String getDepartment() {
         return department;
     }
 
-    public String getGroupName() {
+    public String getName() {
         return groupName;
     }
 

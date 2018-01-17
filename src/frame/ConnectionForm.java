@@ -6,6 +6,8 @@ import app.WeekList;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import static app.DegreeProject.WEEKLIST;
@@ -21,6 +23,7 @@ public class ConnectionForm extends JFrame{
     private JPasswordField passwordField;
     private JButton connectButton;
     private JTextField databaseField;
+    private JCheckBox запамЯтатиCheckBox;
 
     public ConnectionForm() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -29,17 +32,6 @@ public class ConnectionForm extends JFrame{
         setResizable(false);
         setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize().getWidth() - this.getWidth()) / 2),
                 (int) ((Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight()) / 2));
-
-//      JList
-//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("Databases.txt")));
-//        DefaultListModel<String> listModel = new DefaultListModel<>();
-//        bufferedReader.lines().forEach(s -> listModel.addElement(s.split(";")[0]));
-//        list1.setModel(listModel);
-//        list1.addListSelectionListener(e -> {
-//            System.out.println(list1.getModel().getElementAt(list1.getSelectedIndex()));
-//            Шукає перший елемент з таким іменем з'єднання і виводимо дані в поля
-//        });
-
 
         connectButton.addActionListener(e -> {
             try {
@@ -52,8 +44,7 @@ public class ConnectionForm extends JFrame{
                 e1.printStackTrace();
                 return;
             }
-            MainForm mainForm = new MainForm();
-            WEEKLIST = new WeekList(DegreeProject.databaseData.getConnection());
+            DegreeProject.InitialMainFrame();
         });
     }
 

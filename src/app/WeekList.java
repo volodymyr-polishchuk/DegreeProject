@@ -12,23 +12,18 @@ public class WeekList {
     private ArrayList<Week> list = new ArrayList<>();
     private Connection connection;
 
-    public WeekList(Connection connection) {
+    public WeekList(Connection connection) throws SQLException {
         this.connection = connection;
         loadFromDatabase();
     }
 
-    private void loadFromDatabase() {
+    private void loadFromDatabase() throws SQLException {
         //Завантажуємо з бази даних дані
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM weeks");
-            list.clear();
-            while (resultSet.next()) {
-                list.add(new Week(resultSet));
-            }
-        } catch (SQLException e) {
-            //Тут треба буде якось кидати явну помилку
-            e.printStackTrace();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM weeks");
+        list.clear();
+        while (resultSet.next()) {
+            list.add(new Week(resultSet));
         }
     }
 
