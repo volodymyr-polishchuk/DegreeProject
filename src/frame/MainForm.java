@@ -47,7 +47,7 @@ public class MainForm extends JFrame {
 }
 
 class myMenuBar extends JMenuBar {
-    MainForm mainForm;
+    private MainForm mainForm;
     myMenuBar(MainForm mainForm) {
         this.mainForm = mainForm;
 // Створення головного меню програми
@@ -59,9 +59,7 @@ class myMenuBar extends JMenuBar {
         add(m1);
         JMenu m2 = new JMenu("Навчальний графік");
         JMenuItem item = new JMenuItem("Створити навчальний графік");
-        item.addActionListener(e -> {
-            this.mainForm.StudyProcessAdd();
-        });
+        item.addActionListener(e -> this.mainForm.StudyProcessAdd());
         m2.add(item);
         m2.add(new JMenuItem("Редагувати існуючий графік"));
         m2.add(new JMenuItem("Видалити або архівувати графік"));

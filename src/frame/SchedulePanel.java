@@ -19,7 +19,7 @@ import java.util.Enumeration;
 public class SchedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
-    private JList jList;
+    private JList<String> jList;
     private JButton додатиГрупуButton;
     private JButton зберегтиЗміниButton;
     private JTextField authorTextField;
@@ -70,18 +70,15 @@ public class SchedulePanel extends JPanel{
 
     private void InitialTable() {
         tableModel = new SchedulerTableModel();
-        tableModel.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent event) {
-                jTable.setRowHeight(0, 70);
-                Enumeration<TableColumn> e = jTable.getColumnModel().getColumns();
-                while (e.hasMoreElements()) {
-                    TableColumn column = e.nextElement();
-                    if (column.getModelIndex() == 0) {
-                        column.setMinWidth(50);
-                    } else {
-                        column.setMinWidth(5);
-                    }
+        tableModel.addTableModelListener(event -> {
+            jTable.setRowHeight(0, 70);
+            Enumeration<TableColumn> e = jTable.getColumnModel().getColumns();
+            while (e.hasMoreElements()) {
+                TableColumn column = e.nextElement();
+                if (column.getModelIndex() == 0) {
+                    column.setMinWidth(50);
+                } else {
+                    column.setMinWidth(5);
                 }
             }
         });
@@ -100,7 +97,7 @@ public class SchedulePanel extends JPanel{
                     return;
                 }
                 Week week = DegreeProject.WEEKLIST.getWeekByName(
-                        (String) jList.getModel().getElementAt(
+                        jList.getModel().getElementAt(
                                 jList.getSelectedIndex()
                         )
                 );
