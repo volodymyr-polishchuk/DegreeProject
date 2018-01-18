@@ -112,4 +112,12 @@ public class SchedulerTableModel extends AbstractTableModel {
         units.add(scheduleUnit);
         fireTableDataChanged();
     }
+
+    public ScheduleUnit getScheduleUnit(int index) {
+        return units.get(index);
+    }
+
+    public ArrayList<ScheduleUnit> getAllScheduleUnits() {
+        return units;
+    }
 }

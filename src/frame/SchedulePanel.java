@@ -1,15 +1,15 @@
 package frame;
 
 import app.*;
+import com.sun.org.apache.bcel.internal.generic.DREM;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 
@@ -20,7 +20,7 @@ public class SchedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
     private JList<String> jList;
-    private JButton додатиГрупуButton;
+    private JButton settingGroupButton;
     private JButton зберегтиЗміниButton;
     private JTextField authorTextField;
     private JButton prevYearButton;
@@ -35,9 +35,27 @@ public class SchedulePanel extends JPanel{
         add(mainPanel);
         InitialTable();
         InitialList();
-        додатиГрупуButton.addActionListener(e ->
-                tableModel.addScheduleUnit(new ScheduleUnit(new Group("Програмування", authorTextField.getText())))
-
+        settingGroupButton.addActionListener(e ->  {
+                int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
+                int count = 0;
+                ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
+                for (int i = 0; i < tList.size(); i++) {
+                    for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
+                        if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getGroup().getName())) {
+                            choice[count++] = i;
+                        }
+                    }
+                }
+                choice = Arrays.copyOf(choice, count);
+                new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) e1 -> {
+                    for (Group group: e1) {
+                        tableModel.addScheduleUnit(new ScheduleUnit(group));
+                        System.err.println("замість того щоб постійно добавляти нові юніти краще передавати новий список і тих кого ще немає добавляти, а тих що лишні видаляти");
+                        // TODO замість того щоб постійно добавляти нові юніти краще передавати новий список і тих кого ще немає добавляти, а тих що лишні видаляти
+                    }
+                });
+            }
+//                tableModel.addScheduleUnit(new ScheduleUnit(new Group("Програмування", authorTextField.getText())))
         );
         InitialYearsPanel();
     }

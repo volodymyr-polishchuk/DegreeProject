@@ -15,8 +15,14 @@ public class DegreeProject {
     public static GroupList GROUPLIST;
 
     public static void main(String[] args) throws IOException {
-        ConnectionForm connectionForm = new ConnectionForm();
-        connectionForm.setVisible(true);
+//        ConnectionForm connectionForm = new ConnectionForm();
+//        connectionForm.setVisible(true);
+        try {
+            databaseData = new DatabaseData("localhost", "3306", "Volodymyr", new char[]{'0', '0', '0', '0'}, "mydata");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        InitialMainFrame();
     }
 
     public static void InitialMainFrame() {

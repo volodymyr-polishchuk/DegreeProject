@@ -29,7 +29,6 @@ public class GroupChoiceDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
         pack();
         setResizable(false);
-        setVisible(true);
 
         InitialList(list, choice);
 
@@ -60,6 +59,7 @@ public class GroupChoiceDialog extends JDialog {
                 listLeftModel.addElement(listRightModel.remove(i));
             }
         });
+        setVisible(true);
     }
 
     private void InitialList(List<Group> list, int [] choice) {

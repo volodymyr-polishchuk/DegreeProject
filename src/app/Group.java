@@ -1,6 +1,7 @@
 package app;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -15,8 +16,9 @@ public class Group {
         this.groupName = groupName;
     }
 
-    public Group(ResultSet resultSet) {
-
+    public Group(ResultSet resultSet) throws SQLException {
+        this.groupName = resultSet.getString("name");
+        this.department = resultSet.getInt("department") == 1 ? "Економіки-програмування" : "Будівельне";
     }
 
     public Group() {

@@ -8,7 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import static app.DegreeProject.WEEKLIST;
 
@@ -23,7 +27,7 @@ public class ConnectionForm extends JFrame{
     private JPasswordField passwordField;
     private JButton connectButton;
     private JTextField databaseField;
-    private JCheckBox запамЯтатиCheckBox;
+    private JCheckBox rememberCheckBox;
 
     public ConnectionForm() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -44,7 +48,27 @@ public class ConnectionForm extends JFrame{
                 e1.printStackTrace();
                 return;
             }
+            if (rememberCheckBox.isSelected()) {
+                try {
+                    BufferedWriter writer = new BufferedWriter(
+                            new OutputStreamWriter(
+                                    new FileOutputStream(
+                                            new File(
+                                                    new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/databases.txt")
+                                            ))));
+                    writer.write(addressTextField.getText() + ";");
+                    writer.write(portTextField.getText() + ";");
+                    writer.write(userTextField.getText() + ";");
+                    writer.write(String.valueOf(passwordField.getPassword()) + ";");
+                    writer.write(databaseField.getText());
+                    writer.flush();
+                    writer.close();
+                } catch (IOException | URISyntaxException e1) {
+                    e1.printStackTrace();
+                }
+            }
             DegreeProject.InitialMainFrame();
+            dispose();
         });
     }
 
