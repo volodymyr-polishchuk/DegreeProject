@@ -2,19 +2,13 @@ package frame;
 
 import app.DatabaseData;
 import app.DegreeProject;
-import app.WeekList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Arrays;
-
-import static app.DegreeProject.WEEKLIST;
 
 /**
  * Created by Vladimir on 26/12/17.

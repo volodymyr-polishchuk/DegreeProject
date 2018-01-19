@@ -1,10 +1,9 @@
 package app;
 
-import javafx.collections.transformation.SortedList;
-
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 
 /**
  * Created by Vladimir on 14/01/18.
@@ -69,7 +68,7 @@ public class SchedulerTableModel extends AbstractTableModel {
                 case 0: return "<html><b>Період</b></html>";
                 case 1: return "<html><b>Робочих днів</b></html>";
                 case 2: return "<html><b>Тиждень</b></html>";
-                default: return units.get(rowIndex - 3).getGroup().getName();
+                default: return units.get(rowIndex - 3).getName();
             }
             default: switch (rowIndex) {
                 case 0:  {
@@ -112,6 +111,7 @@ public class SchedulerTableModel extends AbstractTableModel {
 
     public void addScheduleUnit(ScheduleUnit scheduleUnit) {
         units.add(scheduleUnit);
+        Collections.sort(units);
         fireTableDataChanged();
     }
 

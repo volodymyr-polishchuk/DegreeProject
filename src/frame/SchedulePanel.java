@@ -1,7 +1,6 @@
 package frame;
 
 import app.*;
-import com.sun.org.apache.bcel.internal.generic.DREM;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -41,7 +40,7 @@ public class SchedulePanel extends JPanel{
                 ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
                 for (int i = 0; i < tList.size(); i++) {
                     for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
-                        if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getGroup().getName())) {
+                        if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getName())) {
                             choice[count++] = i;
                         }
                     }
@@ -60,7 +59,7 @@ public class SchedulePanel extends JPanel{
         for (int i = tableModel.getSizeScheduleUnits() - 1; i >= 0; i--) {
             tScheduleUnit = tableModel.removeScheduleUnit(i);
             for (Group aListFromFrame : list) {
-                if (tScheduleUnit.getGroup().getName().equals(aListFromFrame.getName())) {
+                if (tScheduleUnit.getName().equals(aListFromFrame.getName())) {
                     listFromTable.add(tScheduleUnit);
                 }
             }
@@ -71,7 +70,7 @@ public class SchedulePanel extends JPanel{
         for (Group aListFromFrame : list) {
             tGroup = aListFromFrame;
             for (ScheduleUnit aListFromTable : listFromTable) {
-                if (aListFromTable.getGroup().getName().equals(tGroup.getName())) {
+                if (aListFromTable.getName().equals(tGroup.getName())) {
                     b = true;
                 }
             }

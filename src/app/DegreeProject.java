@@ -1,6 +1,5 @@
 package app;
 
-import frame.ConnectionForm;
 import frame.MainForm;
 
 import java.io.*;

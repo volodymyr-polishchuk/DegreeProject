@@ -1,6 +1,5 @@
 package app;
 
-import java.awt.Color;
 import java.sql.*;
 import java.util.ArrayList;
 

@@ -1,13 +1,7 @@
 package app;
 
-import org.jetbrains.annotations.Contract;
-
-import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Vladimir on 03/01/18.
