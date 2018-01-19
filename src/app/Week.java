@@ -16,10 +16,10 @@ public class Week {
     private String abbreviation;
 
     public Week() {
-        this.mark = '?';
+        this.mark = 'X';
         this.name = "Не визначено";
         this.color = Color.WHITE;
-        this.abbreviation = "?";
+        this.abbreviation = "X";
     }
 
     public Week(char mark, String name, Color color, String abbreviation) {

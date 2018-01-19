@@ -42,6 +42,15 @@ public class GroupList {
         return new Group();
     }
 
+    public int getIndexByName(String name) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName().equals(name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public ArrayList<Group> GetAllWeek() {
         return list;
     }
