@@ -1,9 +1,11 @@
 package app;
 
+import java.util.Objects;
+
 /**
  * Created by Vladimir on 03/01/18.
  **/
-public class ScheduleUnit {
+public class ScheduleUnit implements Comparable {
     private Group group;
     private Week[] weeks = new Week[52];
 
@@ -45,5 +47,10 @@ public class ScheduleUnit {
             }
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.getGroup().getName().compareTo(((ScheduleUnit)o).getGroup().getName());
     }
 }

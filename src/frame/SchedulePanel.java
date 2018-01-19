@@ -47,17 +47,41 @@ public class SchedulePanel extends JPanel{
                     }
                 }
                 choice = Arrays.copyOf(choice, count);
-                new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) e1 -> {
-                    for (Group group: e1) {
-                        tableModel.addScheduleUnit(new ScheduleUnit(group));
-                        System.err.println("замість того щоб постійно добавляти нові юніти краще передавати новий список і тих кого ще немає добавляти, а тих що лишні видаляти");
-                        // TODO замість того щоб постійно добавляти нові юніти краще передавати новий список і тих кого ще немає добавляти, а тих що лишні видаляти
-                    }
-                });
+                new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) this::afterSettingGroup);
             }
-//                tableModel.addScheduleUnit(new ScheduleUnit(new Group("Програмування", authorTextField.getText())))
         );
         InitialYearsPanel();
+    }
+
+    private void afterSettingGroup(ArrayList<Group> list) {
+        ArrayList<ScheduleUnit> listFromTable = new ArrayList<>(tableModel.getSizeScheduleUnits());
+        ScheduleUnit tScheduleUnit;
+
+        for (int i = tableModel.getSizeScheduleUnits() - 1; i >= 0; i--) {
+            tScheduleUnit = tableModel.removeScheduleUnit(i);
+            for (Group aListFromFrame : list) {
+                if (tScheduleUnit.getGroup().getName().equals(aListFromFrame.getName())) {
+                    listFromTable.add(tScheduleUnit);
+                }
+            }
+        }
+
+        Group tGroup;
+        boolean b = false;
+        for (Group aListFromFrame : list) {
+            tGroup = aListFromFrame;
+            for (ScheduleUnit aListFromTable : listFromTable) {
+                if (aListFromTable.getGroup().getName().equals(tGroup.getName())) {
+                    b = true;
+                }
+            }
+            if (!b) listFromTable.add(new ScheduleUnit(tGroup));
+            b = false;
+        }
+
+        for (ScheduleUnit unit :listFromTable) {
+            tableModel.addScheduleUnit(unit);
+        }
     }
 
     private void InitialYearsPanel() {

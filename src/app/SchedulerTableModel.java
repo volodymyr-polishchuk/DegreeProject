@@ -1,5 +1,7 @@
 package app;
 
+import javafx.collections.transformation.SortedList;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -115,6 +117,16 @@ public class SchedulerTableModel extends AbstractTableModel {
 
     public ScheduleUnit getScheduleUnit(int index) {
         return units.get(index);
+    }
+
+    public ScheduleUnit removeScheduleUnit(int index) {
+        ScheduleUnit t = units.remove(index);
+        fireTableDataChanged();
+        return t;
+    }
+
+    public int getSizeScheduleUnits() {
+        return units.size();
     }
 
     public ArrayList<ScheduleUnit> getAllScheduleUnits() {
