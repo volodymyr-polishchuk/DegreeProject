@@ -5,12 +5,10 @@ import app.*;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Enumeration;
+import java.util.*;
 
 /**
  * Created by Vladimir on 10/01/18.
@@ -20,11 +18,14 @@ public class SchedulePanel extends JPanel{
     private JPanel mainPanel;
     private JList<String> jList;
     private JButton settingGroupButton;
-    private JButton зберегтиЗміниButton;
+    private JButton saveButton;
     private JTextField authorTextField;
     private JButton prevYearButton;
     private JButton nextYearButton;
     private JLabel yearsLabel;
+    private JLabel groupNameLabel;
+    private JLabel studyDaysLabel;
+    private JLabel weeksLabel;
 
     private SchedulerTableModel tableModel;
 
@@ -34,22 +35,24 @@ public class SchedulePanel extends JPanel{
         add(mainPanel);
         InitialTable();
         InitialList();
-        settingGroupButton.addActionListener(e ->  {
-                int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
-                int count = 0;
-                ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
-                for (int i = 0; i < tList.size(); i++) {
-                    for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
-                        if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getName())) {
-                            choice[count++] = i;
-                        }
-                    }
-                }
-                choice = Arrays.copyOf(choice, count);
-                new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) this::afterSettingGroup);
-            }
-        );
+        settingGroupButton.addActionListener(e -> settingGroupClick(e));
         InitialYearsPanel();
+    }
+
+    private void settingGroupClick(ActionEvent e) {
+        int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
+        int count = 0;
+        ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
+        for (int i = 0; i < tList.size(); i++) {
+            for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
+                if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getName())) {
+                    choice[count++] = i;
+                }
+            }
+        }
+        choice = Arrays.copyOf(choice, count);
+        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) this::afterSettingGroup);
+        saveButton.setEnabled(true);
     }
 
     private void afterSettingGroup(ArrayList<Group> list) {
@@ -88,12 +91,18 @@ public class SchedulePanel extends JPanel{
         prevYearButton.addActionListener(e -> {
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) - 1);
+            Calendar c = Calendar.getInstance();
+            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
         });
         nextYearButton.addActionListener(e -> {
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) + 1);
+            Calendar c = Calendar.getInstance();
+            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
         });
@@ -133,16 +142,7 @@ public class SchedulePanel extends JPanel{
         jTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (jList.getSelectedIndex() < 0) {
-                    // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
-                    return;
-                }
-                Week week = DegreeProject.WEEKLIST.getWeekByName(
-                        jList.getModel().getElementAt(
-                                jList.getSelectedIndex()
-                        )
-                );
-                jTable.setValueAt(week, jTable.getSelectedRow(), jTable.getSelectedColumn());
+                mouseClickEvent(e);
             }
 
             @Override
@@ -188,5 +188,47 @@ public class SchedulePanel extends JPanel{
 //                jTable.setToolTipText(result);
 //            }
 //        });
+    }
+
+    private void mouseClickEvent(MouseEvent e) {
+        ScheduleUnit tScheduleUnit = tableModel.getScheduleUnit(jTable.getSelectedRow() - 3);
+        // Виконує встановлення значення тижня
+        if (jList.getSelectedIndex() < 0) {
+            // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
+            return;
+        }
+        Week week = DegreeProject.WEEKLIST.getWeekByName(jList.getModel().getElementAt(jList.getSelectedIndex()));
+        jTable.setValueAt(week, jTable.getSelectedRow(), jTable.getSelectedColumn());
+
+        // Виводить назву групи
+        groupNameLabel.setText(tScheduleUnit.getName());
+
+        // Виводить кількість навчальних днів
+        Period tPeriod;
+        int count = 0;
+        for (int i = 0; i < 52; i++) {
+            tPeriod = tableModel.getPeriod(i);
+            if (!(tScheduleUnit.getWeek(i).getName().equals("Канікули") ||
+                    tScheduleUnit.getWeek(i).getName().equals("Не визначено"))) {
+                count += tPeriod.getWorkDay();
+                // TODO треба переробити, бо якщо значення зміняться все піде крахом
+            }
+        }
+        studyDaysLabel.setText(count + " днів");
+
+        // Виводить кількість тижнів то типу
+        HashMap<Week, Integer> map = new HashMap<>();
+        for (int i = 0; i < 52; i++) {
+            map.put(
+                    tScheduleUnit.getWeek(i),
+                    map.containsKey(tScheduleUnit.getWeek(i))
+                            ? map.get(tScheduleUnit.getWeek(i)) + tableModel.getPeriod(i).getWorkDay()
+                            : tableModel.getPeriod(i).getWorkDay());
+        }
+        weeksLabel.setText("<html>");
+        for (Map.Entry<Week, Integer> mapItem: map.entrySet()){
+            weeksLabel.setText(weeksLabel.getText() + mapItem.getKey().getName() + " &rArr; " + mapItem.getValue() + "<br>");
+        }
+        weeksLabel.setText(weeksLabel.getText() + "</html>");
     }
 }

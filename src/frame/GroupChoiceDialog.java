@@ -28,7 +28,10 @@ public class GroupChoiceDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pack();
+        setSize(550, getHeight());
         setResizable(false);
+        setLocationRelativeTo(null);
+        setTitle("Налаштування груп");
 
         InitialList(list, choice);
 

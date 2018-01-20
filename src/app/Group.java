@@ -37,4 +37,23 @@ public class Group {
     public String toString() {
         return department + " - " +  groupName;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (department != null ? !department.equals(group.department) : group.department != null) return false;
+        return groupName != null ? groupName.equals(group.groupName) : group.groupName == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = department != null ? department.hashCode() : 0;
+        result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
+        return result;
+    }
 }

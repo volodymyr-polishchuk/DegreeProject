@@ -30,7 +30,7 @@ public class StudySchedule {
         preparedStatement.setString(2, author);
         preparedStatement.execute();
 
-        preparedStatement = connection.prepareStatement("DELETE FROM mydata.scheduleunits WHERE years = ?");
+        preparedStatement = connection.prepareStatement("DELETE FROM scheduleunits WHERE scheduleunits.years = ?");
         preparedStatement.setInt(1, year);
         preparedStatement.execute();
 
@@ -43,6 +43,10 @@ public class StudySchedule {
             preparedStatement.execute();
             //TODO треба придумати інші назви колонкам в таблицях, бо поточні є резервованими під систему
         }
+    }
+
+    public void LoadFromDatabase(Connection connection, WeekList weekList, int year) {
+
     }
 }
 

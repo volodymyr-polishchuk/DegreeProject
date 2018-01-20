@@ -4,6 +4,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by Vladimir on 14/01/18.
@@ -19,6 +20,19 @@ public class SchedulerTableModel extends AbstractTableModel {
         Calendar c = Calendar.getInstance();
         c.set(2017, Calendar.SEPTEMBER, 1);
         periods = Period.GetWeekList(c.getTime());
+    }
+
+    public void setPeriods(Date date) {
+        periods = Period.GetWeekList(date);
+        fireTableDataChanged();
+    }
+
+    /**
+     * @param index 0..51 - номер тижня
+     * @return Period за зазначеним номером тижня
+     */
+    public Period getPeriod(int index) {
+        return periods.get(index);
     }
 
     @Override
@@ -49,8 +63,6 @@ public class SchedulerTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
-//            case 0: return String.class;
-//            default: return Week.class;
             default: return Object.class;
         }
     }
@@ -87,8 +99,6 @@ public class SchedulerTableModel extends AbstractTableModel {
             }
         }
     }
-
-
 
     /**
      * Перетвоює одноцифрове число у форма двох цифрового
