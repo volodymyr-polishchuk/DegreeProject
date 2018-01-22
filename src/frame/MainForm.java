@@ -44,6 +44,10 @@ public class MainForm extends JFrame {
     public void StudyProcessAdd() {
         addTab(new SchedulePanel("Графік навчального процесу"));
     }
+
+    public void LessonsProcessAdd() {
+        addTab(new LessonsPanel("Розклад занять"));
+    }
 }
 
 class myMenuBar extends JMenuBar {
@@ -65,7 +69,10 @@ class myMenuBar extends JMenuBar {
         m2.add(new JMenuItem("Видалити або архівувати графік"));
         add(m2);
         JMenu m3 = new JMenu("Розклад занять");
-        m3.add(new JMenuItem("Створити розклад занять"));
+//        m3.add(new JMenuItem("Створити розклад занять"));
+        JMenuItem item1 = new JMenuItem("Створити розклад занять");
+        item1.addActionListener(e -> this.mainForm.LessonsProcessAdd());
+        m3.add(item1);
         m3.add(new JMenuItem("Редагувати існуючих розклад"));
         m3.add(new JMenuItem("Видалити або архівувати розклад"));
         add(m3);

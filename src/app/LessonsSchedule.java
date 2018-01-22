@@ -17,22 +17,19 @@ class LessonsUnit {
 }
 
 class LessonsDay {
-    private ArrayList<StudyPair> list;
+    private ArrayList<StudyPairSubject> list;
 }
 
-abstract class StudyPair {
-
+class StudyPairSubject {
+    private StudySubject numerator;
+    private StudySubject denominator;
 }
 
-class StudyOneSubject extends StudyPair {
+class StudySubject {
     private Subject subject;
     private Teacher teacher;
     private Auditory auditory;
-}
 
-class StudyTwoSubject extends StudyPair {
-    private StudyOneSubject numerator;
-    private StudyOneSubject denominator;
 }
 
 class Subject {
