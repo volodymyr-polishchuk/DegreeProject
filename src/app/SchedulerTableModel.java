@@ -126,7 +126,11 @@ public class SchedulerTableModel extends AbstractTableModel {
     }
 
     public ScheduleUnit getScheduleUnit(int index) {
-        return units.get(index);
+        try {
+            return units.get(index);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     public ScheduleUnit removeScheduleUnit(int index) {

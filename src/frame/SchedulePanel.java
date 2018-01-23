@@ -192,6 +192,7 @@ public class SchedulePanel extends JPanel{
 
     private void mouseClickEvent(MouseEvent e) {
         ScheduleUnit tScheduleUnit = tableModel.getScheduleUnit(jTable.getSelectedRow() - 3);
+        if (tScheduleUnit == null) return;
         // Виконує встановлення значення тижня
         if (jList.getSelectedIndex() < 0) {
             // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів

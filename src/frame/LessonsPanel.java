@@ -1,12 +1,20 @@
 package frame;
 
+import app.DegreeProject;
 import app.Group;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorChooserUI;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -17,12 +25,11 @@ import java.util.Objects;
 public class LessonsPanel extends JPanel{
     private JPanel contentPane;
     private JTable lessonsTable;
-    private JList list1;
     private JButton налаштуванняButton;
     private JButton зберегтиЗміниButton;
-    private JRadioButton чисельникRadioButton;
-    private JRadioButton загальнийRadioButton;
-    private JRadioButton знаменникRadioButton;
+    private JTree jTree;
+    private JComboBox comboBox1;
+    private JButton closeButton;
 
     public LessonsPanel() {
         setLayout(new GridLayout());
@@ -30,26 +37,45 @@ public class LessonsPanel extends JPanel{
         InitialTable();
     }
 
+    public LessonsPanel(String s) {
+        setName(s);
+        setLayout(new GridLayout());
+        add(contentPane);
+        InitialTable();
+    }
+
+    private class TreeModel extends DefaultTreeModel {
+
+        public TreeModel(TreeNode root) {
+            super(root);
+        }
+
+        @Override
+        public Object getRoot() {
+            return "Предмет";
+        }
+    }
+
     private void InitialTable() {
         lessonsTable.setModel(new TableModel());
-        lessonsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        lessonsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         lessonsTable.setDefaultRenderer(Object.class, new TableCellRenderer());
+        lessonsTable.getTableHeader().setResizingAllowed(false);
+        lessonsTable.getTableHeader().setReorderingAllowed(false);
         Enumeration<TableColumn> enumeration = lessonsTable.getColumnModel().getColumns();
         while (enumeration.hasMoreElements()) {
             TableColumn column = enumeration.nextElement();
             if ((column.getModelIndex()) % 2 == 0) {
                 column.setMaxWidth(25);
+            } else {
+                column.setMinWidth(250);
             }
         }
     }
 
-    public LessonsPanel(String s) {
-        this();
-        setName(s);
-    }
-
     private class TableModel extends AbstractTableModel {
         String[] daysName = {"ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ"};
+        String[] groups = {"ПС-16", "ПС-26", "ПС-36", "ПС-46"};
         final int daysHeight = 10;
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -58,13 +84,10 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case 0: return "";
-                case 1: return "ПС-16";
-                case 2: return "ПС-26";
-                case 3: return "ПС-36";
-                case 4: return "ПС-46";
-                default: return "";
+            if (column % 2 == 0) {
+                return "";
+            } else {
+                return groups[column / 2];
             }
         }
 
@@ -75,7 +98,7 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public int getColumnCount() {
-            return 6;
+            return groups.length * 2;
         }
 
         @Override
@@ -96,6 +119,14 @@ public class LessonsPanel extends JPanel{
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             label.setHorizontalAlignment(JLabel.CENTER);
+            if (isSelected) return label;
+            if (column % 2 == 0) {
+                label.setBackground(table.getTableHeader().getBackground());
+            } else if ((row / 10) % 2 == 0) {
+                label.setBackground(new Color(246, 246, 246));
+            } else {
+                label.setBackground(Color.WHITE);
+            }
             return label;
         }
     }

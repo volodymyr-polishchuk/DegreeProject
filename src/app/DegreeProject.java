@@ -1,9 +1,11 @@
 package app;
 
 import frame.ConnectionForm;
+import frame.HelloPanel;
 import frame.MainForm;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -14,6 +16,7 @@ public class DegreeProject {
     public static DatabaseData databaseData;
     public static WeekList WEEKLIST;
     public static GroupList GROUPLIST;
+    public static MainForm mainForm;
 
     public static void main(String[] args) throws IOException, SQLException {
         try {
@@ -21,6 +24,7 @@ public class DegreeProject {
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
+
 //        ConnectionForm connectionForm = new ConnectionForm();
 //        connectionForm.setVisible(true);
         try {
@@ -32,7 +36,8 @@ public class DegreeProject {
     }
 
     public static void InitialMainFrame() {
-        MainForm mainForm = new MainForm();
+        mainForm = new MainForm();
+        mainForm.addTab(new HelloPanel("Головне меню програми"));
         try {
             WEEKLIST = new WeekList(databaseData.getConnection());
             GROUPLIST = new GroupList(databaseData.getConnection());
