@@ -140,6 +140,7 @@ public class SchedulePanel extends JPanel{
         jTable.setDefaultRenderer(Object.class, Week.getInstanceTableCellRendererComponent());
         tableModel.fireTableDataChanged();
         jTable.addMouseListener(new MouseListener() {
+            int col = 0;
             @Override
             public void mouseClicked(MouseEvent e) {
                 mouseClickEvent(e);
@@ -147,10 +148,27 @@ public class SchedulePanel extends JPanel{
 
             @Override
             public void mousePressed(MouseEvent e) {
+                col = jTable.columnAtPoint(e.getPoint());
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (jList.getSelectedIndex() < 0) {
+                    // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
+                    return;
+                }
+                int row = jTable.getSelectedRow();
+                Week week = DegreeProject.WEEKLIST.getWeekByName(jList.getModel().getElementAt(jList.getSelectedIndex()));
+//                if (col > jTable.columnAtPoint(e.getPoint())) {
+//                    for (int i = jTable.columnAtPoint(e.getPoint()); i >= col; i--) {
+//                        jTable.setValueAt(week, row, i);
+//                    }
+//                } else {
+                    for (int i = col; i <= jTable.columnAtPoint(e.getPoint()); i++) {
+                        jTable.setValueAt(week, row, i);
+                    }
+//                }
+                UpdateScheduleLabels(tableModel.getScheduleUnit(row - 3));
             }
 
             @Override
@@ -201,6 +219,10 @@ public class SchedulePanel extends JPanel{
         Week week = DegreeProject.WEEKLIST.getWeekByName(jList.getModel().getElementAt(jList.getSelectedIndex()));
         jTable.setValueAt(week, jTable.getSelectedRow(), jTable.getSelectedColumn());
 
+        UpdateScheduleLabels(tScheduleUnit);
+    }
+
+    private void UpdateScheduleLabels(ScheduleUnit tScheduleUnit) {
         // Виводить назву групи
         groupNameLabel.setText(tScheduleUnit.getName());
 
