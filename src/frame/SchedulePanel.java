@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.*;
 
 /**
@@ -16,7 +17,7 @@ import java.util.*;
 public class SchedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
-    private JList<String> jList;
+    private JList<Week> jList;
     private JButton settingGroupButton;
     private JButton saveButton;
     private JTextField authorTextField;
@@ -29,13 +30,13 @@ public class SchedulePanel extends JPanel{
 
     private SchedulerTableModel tableModel;
 
-    public SchedulePanel(String name) {
+    SchedulePanel(String name) {
         setName(name);
         setLayout(new GridLayout());
         add(mainPanel);
         InitialTable();
         InitialList();
-        settingGroupButton.addActionListener(e -> settingGroupClick(e));
+        settingGroupButton.addActionListener(this::settingGroupClick);
         InitialYearsPanel();
     }
 
@@ -51,7 +52,7 @@ public class SchedulePanel extends JPanel{
             }
         }
         choice = Arrays.copyOf(choice, count);
-        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, (GroupChoiceListener) this::afterSettingGroup);
+        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
         saveButton.setEnabled(true);
     }
 
@@ -109,13 +110,35 @@ public class SchedulePanel extends JPanel{
     }
 
     private void InitialList() {
-        DefaultListModel<String> listModel = new DefaultListModel<>();
+        DefaultListModel<Week> listModel = new DefaultListModel<>();
         ArrayList<Week> weeks = DegreeProject.WEEKLIST.GetAllWeek();
-        for (Week week :
-                weeks) {
-            listModel.addElement(week.getName());
+        for (Week week : weeks) {
+            listModel.addElement(week);
         }
         jList.setModel(listModel);
+        jList.setCellRenderer(new ListRenderer());
+
+    }
+
+    private class ListRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Week week = (Week)value;
+            label.setText(week.getName());
+
+            JPanel panel = new JPanel(new BorderLayout());
+
+            JLabel colorLabel = new JLabel("   ");
+            colorLabel.setOpaque(true);
+            colorLabel.setBackground(week.getColor());
+
+            panel.add(colorLabel, BorderLayout.LINE_START);
+            panel.add(label, BorderLayout.CENTER);
+
+            return panel;
+
+        }
     }
 
     private void InitialTable() {
@@ -158,7 +181,7 @@ public class SchedulePanel extends JPanel{
                     return;
                 }
                 int row = jTable.getSelectedRow();
-                Week week = DegreeProject.WEEKLIST.getWeekByName(jList.getModel().getElementAt(jList.getSelectedIndex()));
+                Week week = jList.getModel().getElementAt(jList.getSelectedIndex());
 //                if (col > jTable.columnAtPoint(e.getPoint())) {
 //                    for (int i = jTable.columnAtPoint(e.getPoint()); i >= col; i--) {
 //                        jTable.setValueAt(week, row, i);
@@ -183,6 +206,7 @@ public class SchedulePanel extends JPanel{
         });
 //Скрипт який виводить підсказки, хаває сильно багато процесорного часу
 //        jTable.addMouseMotionListener(new MouseMotionListener() {
+//            boolean b = false;
 //            @Override
 //            public void mouseDragged(MouseEvent e) {
 //
@@ -190,6 +214,10 @@ public class SchedulePanel extends JPanel{
 //
 //            @Override
 //            public void mouseMoved(MouseEvent e) {
+//                if (b) {
+//                    b = false;
+//                    return;
+//                }
 //                String result = "";
 //                int column = jTable.columnAtPoint(e.getPoint());
 //                int row = jTable.rowAtPoint(e.getPoint());
@@ -204,6 +232,7 @@ public class SchedulePanel extends JPanel{
 //                    }
 //                }
 //                jTable.setToolTipText(result);
+//                b = !b;
 //            }
 //        });
     }
@@ -216,7 +245,7 @@ public class SchedulePanel extends JPanel{
             // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
             return;
         }
-        Week week = DegreeProject.WEEKLIST.getWeekByName(jList.getModel().getElementAt(jList.getSelectedIndex()));
+        Week week = jList.getModel().getElementAt(jList.getSelectedIndex());
         jTable.setValueAt(week, jTable.getSelectedRow(), jTable.getSelectedColumn());
 
         UpdateScheduleLabels(tScheduleUnit);

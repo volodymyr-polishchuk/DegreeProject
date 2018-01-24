@@ -1,5 +1,7 @@
 package app;
 
+import test.VerticalLabelUI;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
