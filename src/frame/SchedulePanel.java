@@ -1,14 +1,19 @@
 package frame;
 
 import app.*;
+import sun.swing.table.DefaultTableCellHeaderRenderer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -17,16 +22,29 @@ import java.util.*;
 public class SchedulePanel extends JPanel{
     private JTable jTable;
     private JPanel mainPanel;
-    private JList<Week> jList;
     private JButton settingGroupButton;
     private JButton saveButton;
-    private JTextField authorTextField;
     private JButton prevYearButton;
     private JButton nextYearButton;
     private JLabel yearsLabel;
     private JLabel groupNameLabel;
     private JLabel studyDaysLabel;
     private JLabel weeksLabel;
+    private JComboBox<Week> jComboBox;
+    private final String[] MONTHS = {
+        "Вересень",
+        "Жовтень",
+        "Листопад",
+        "Грудень",
+        "Січень",
+        "Лютий",
+        "Березень",
+        "Квітень",
+        "Травень",
+        "Червень",
+        "Липень",
+        "Серпень"
+    };
 
     private SchedulerTableModel tableModel;
 
@@ -35,9 +53,9 @@ public class SchedulePanel extends JPanel{
         setLayout(new GridLayout());
         add(mainPanel);
         InitialTable();
-        InitialList();
         settingGroupButton.addActionListener(this::settingGroupClick);
         InitialYearsPanel();
+        initialComboBox();
     }
 
     private void settingGroupClick(ActionEvent e) {
@@ -87,6 +105,32 @@ public class SchedulePanel extends JPanel{
         }
     }
 
+    private void initialComboBox() {
+        DefaultComboBoxModel<Week> boxModel = new DefaultComboBoxModel<>();
+        DegreeProject.WEEKLIST.GetAllWeek().forEach(boxModel::addElement);
+        jComboBox.setModel(boxModel);
+
+        jComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                Week week = (Week)value;
+                label.setText(week.getName());
+
+                JPanel panel = new JPanel(new BorderLayout());
+
+                JLabel colorLabel = new JLabel("   ");
+                colorLabel.setOpaque(true);
+                colorLabel.setBackground(week.getColor());
+
+                panel.add(colorLabel, BorderLayout.LINE_START);
+                panel.add(label, BorderLayout.CENTER);
+
+                return panel;
+            }
+        });
+    }
+
     private void InitialYearsPanel() {
         yearsLabel.setText(Calendar.getInstance().get(Calendar.YEAR) + "-" + (Calendar.getInstance().get(Calendar.YEAR) + 1));
         prevYearButton.addActionListener(e -> {
@@ -107,38 +151,6 @@ public class SchedulePanel extends JPanel{
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
         });
-    }
-
-    private void InitialList() {
-        DefaultListModel<Week> listModel = new DefaultListModel<>();
-        ArrayList<Week> weeks = DegreeProject.WEEKLIST.GetAllWeek();
-        for (Week week : weeks) {
-            listModel.addElement(week);
-        }
-        jList.setModel(listModel);
-        jList.setCellRenderer(new ListRenderer());
-
-    }
-
-    private class ListRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            Week week = (Week)value;
-            label.setText(week.getName());
-
-            JPanel panel = new JPanel(new BorderLayout());
-
-            JLabel colorLabel = new JLabel("   ");
-            colorLabel.setOpaque(true);
-            colorLabel.setBackground(week.getColor());
-
-            panel.add(colorLabel, BorderLayout.LINE_START);
-            panel.add(label, BorderLayout.CENTER);
-
-            return panel;
-
-        }
     }
 
     private void InitialTable() {
@@ -176,21 +188,11 @@ public class SchedulePanel extends JPanel{
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (jList.getSelectedIndex() < 0) {
-                    // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
-                    return;
-                }
                 int row = jTable.getSelectedRow();
-                Week week = jList.getModel().getElementAt(jList.getSelectedIndex());
-//                if (col > jTable.columnAtPoint(e.getPoint())) {
-//                    for (int i = jTable.columnAtPoint(e.getPoint()); i >= col; i--) {
-//                        jTable.setValueAt(week, row, i);
-//                    }
-//                } else {
-                    for (int i = col; i <= jTable.columnAtPoint(e.getPoint()); i++) {
-                        jTable.setValueAt(week, row, i);
-                    }
-//                }
+                Week week = jComboBox.getModel().getElementAt(jComboBox.getSelectedIndex());
+                for (int i = col; i <= jTable.columnAtPoint(e.getPoint()); i++) {
+                    jTable.setValueAt(week, row, i);
+                }
                 UpdateScheduleLabels(tableModel.getScheduleUnit(row - 3));
             }
 
@@ -203,6 +205,44 @@ public class SchedulePanel extends JPanel{
             public void mouseExited(MouseEvent e) {
 
             }
+        });
+        jTable.getTableHeader().setDefaultRenderer(new DefaultTableCellHeaderRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable jTable, Object o, boolean b, boolean b1, int row, int col) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(jTable, o, b, b1, row, col);
+                if (col == 0) return label;
+                int first = col, last, count;
+                while (first-- > 0)
+                    if (!jTable.getTableHeader().getColumnModel().getColumn(first).getHeaderValue().equals(o)) {
+                        first++; break;
+                }
+                last = first;
+                while (last++ < 53)
+                    if (last == 53 || !jTable.getTableHeader().getColumnModel().getColumn(last).getHeaderValue().equals(o)) {
+                        last--;
+                        break;
+                }
+                if (col == last) {
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.gray));
+                } else {
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
+                }
+                count = last - first + 1;
+                label.setText("");
+                BufferedImage image = new BufferedImage(26, 18, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = (Graphics2D) image.getGraphics();
+                g.setColor(label.getBackground());
+                g.fillRect(0, 0, 26, 18);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
+                g.setColor(label.getForeground());
+                int w = jTable.getTableHeader().getColumnModel().getColumn(col).getWidth();
+                int wi = (int) g.getFontMetrics().getStringBounds(String.valueOf(o), g).getWidth();
+                g.drawString(String.valueOf(o), (int) (((w*count - wi)/2.0) - w*((col - first) % count)), 14);
+                label.setIcon(new ImageIcon(image));
+                return label;
+            }
+
         });
 //Скрипт який виводить підсказки, хаває сильно багато процесорного часу
 //        jTable.addMouseMotionListener(new MouseMotionListener() {
@@ -241,11 +281,7 @@ public class SchedulePanel extends JPanel{
         ScheduleUnit tScheduleUnit = tableModel.getScheduleUnit(jTable.getSelectedRow() - 3);
         if (tScheduleUnit == null) return;
         // Виконує встановлення значення тижня
-        if (jList.getSelectedIndex() < 0) {
-            // TODO Треба кидати ошибку, що не обрано жодного елемента із списку елементів
-            return;
-        }
-        Week week = jList.getModel().getElementAt(jList.getSelectedIndex());
+        Week week = jComboBox.getModel().getElementAt(jComboBox.getSelectedIndex());
         jTable.setValueAt(week, jTable.getSelectedRow(), jTable.getSelectedColumn());
 
         UpdateScheduleLabels(tScheduleUnit);

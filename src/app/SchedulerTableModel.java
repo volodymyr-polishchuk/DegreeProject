@@ -13,7 +13,7 @@ public class SchedulerTableModel extends AbstractTableModel {
     private ArrayList<Period> periods;
     private ArrayList<ScheduleUnit> units = new ArrayList<>();
     private Calendar c = Calendar.getInstance();
-    private final String[] MONTHS = {"С","Л","Б","К","Т","Ч","Л","С","В","Ж","Л","Г"};
+    private final String[] MONTHS = {"Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"};
 
     public SchedulerTableModel() {
         super();
@@ -25,6 +25,7 @@ public class SchedulerTableModel extends AbstractTableModel {
     public void setPeriods(Date date) {
         periods = Period.GetWeekList(date);
         fireTableDataChanged();
+        fireTableStructureChanged();
     }
 
     /**
@@ -51,11 +52,11 @@ public class SchedulerTableModel extends AbstractTableModel {
             case 0: return "Місяць";
             default: {
                 c.setTime(periods.get(columnIndex - 1).getStartDate());
-                if (c.get(Calendar.MONTH) % 2 == 0) {
+//                if (c.get(Calendar.MONTH) % 2 == 0) {
                     return MONTHS[c.get(Calendar.MONTH)];
-                } else {
-                    return "<html><b>" + MONTHS[c.get(Calendar.MONTH)] + "</b></html>";
-                }
+//                } else {
+//                    return "<html><b>" + MONTHS[c.get(Calendar.MONTH)] + "</b></html>";
+//                }
             }
         }
     }
