@@ -31,20 +31,6 @@ public class SchedulePanel extends JPanel{
     private JLabel studyDaysLabel;
     private JLabel weeksLabel;
     private JComboBox<Week> jComboBox;
-    private final String[] MONTHS = {
-        "Вересень",
-        "Жовтень",
-        "Листопад",
-        "Грудень",
-        "Січень",
-        "Лютий",
-        "Березень",
-        "Квітень",
-        "Травень",
-        "Червень",
-        "Липень",
-        "Серпень"
-    };
 
     private SchedulerTableModel tableModel;
 
@@ -209,6 +195,7 @@ public class SchedulePanel extends JPanel{
         jTable.getTableHeader().setDefaultRenderer(new DefaultTableCellHeaderRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable jTable, Object o, boolean b, boolean b1, int row, int col) {
+                Color borderColor = new Color(207, 207, 207);
                 JLabel label = (JLabel) super.getTableCellRendererComponent(jTable, o, b, b1, row, col);
                 if (col == 0) return label;
                 int first = col, last, count;
@@ -223,16 +210,16 @@ public class SchedulePanel extends JPanel{
                         break;
                 }
                 if (col == last) {
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.gray));
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, borderColor));
                 } else {
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, borderColor));
                 }
                 count = last - first + 1;
                 label.setText("");
                 BufferedImage image = new BufferedImage(26, 18, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g = (Graphics2D) image.getGraphics();
                 g.setColor(label.getBackground());
-                g.fillRect(0, 0, 26, 18);
+                g.fillRect(0, 0, jTable.getTableHeader().getColumnModel().getColumn(col).getWidth() + 1, jTable.getTableHeader().getHeight() + 5);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
                 g.setColor(label.getForeground());
@@ -288,6 +275,7 @@ public class SchedulePanel extends JPanel{
     }
 
     private void UpdateScheduleLabels(ScheduleUnit tScheduleUnit) {
+        if (tScheduleUnit == null) return;
         // Виводить назву групи
         groupNameLabel.setText(tScheduleUnit.getName());
 

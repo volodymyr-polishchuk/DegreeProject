@@ -66,7 +66,9 @@ public class MainForm extends JFrame {
 
     private void InitJToolBar(JToolBar jToolBar) {
         try {
-            jToolBar.add(new JToggleButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
         } catch (IOException e) {
             e.printStackTrace();
         }

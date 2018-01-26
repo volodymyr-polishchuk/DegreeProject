@@ -4,6 +4,7 @@ import app.DegreeProject;
 import app.Group;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.plaf.ColorChooserUI;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -27,33 +28,35 @@ public class LessonsPanel extends JPanel{
     private JTable lessonsTable;
     private JButton налаштуванняButton;
     private JButton зберегтиЗміниButton;
-    private JTree jTree;
-    private JComboBox comboBox1;
+    private JToggleButton button1;
+    private JToggleButton button2;
+    private JToggleButton button3;
     private JButton closeButton;
 
     public LessonsPanel() {
         setLayout(new GridLayout());
         add(contentPane);
         InitialTable();
+        Border out = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY);
+        Border outCenter = BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY);
+        Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
+        button1.setBorder(BorderFactory.createCompoundBorder(out, in));
+        button1.setFocusable(false);
+        button2.setBorder(BorderFactory.createCompoundBorder(outCenter, in));
+        button2.setFocusable(false);
+        button2.setSelected(true);
+        button3.setBorder(BorderFactory.createCompoundBorder(out, in));
+        button3.setFocusable(false);
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(button1);
+        buttonGroup.add(button2);
+        buttonGroup.add(button3);
+
     }
 
     public LessonsPanel(String s) {
+        this();
         setName(s);
-        setLayout(new GridLayout());
-        add(contentPane);
-        InitialTable();
-    }
-
-    private class TreeModel extends DefaultTreeModel {
-
-        public TreeModel(TreeNode root) {
-            super(root);
-        }
-
-        @Override
-        public Object getRoot() {
-            return "Предмет";
-        }
     }
 
     private void InitialTable() {

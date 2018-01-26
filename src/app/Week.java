@@ -83,7 +83,7 @@ public class Week {
             } else {
                 label.setBackground(new Color(238, 238, 238));
             }
-            if (isSelected && row >= 3) {
+            if ((isSelected || hasFocus) && row >= 3) {
                 label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(122, 138, 153)));
             }
             return label;
