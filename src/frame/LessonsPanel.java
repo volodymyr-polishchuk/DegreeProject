@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Created by Vladimir on 20/01/18.
@@ -68,10 +69,19 @@ public class LessonsPanel extends JPanel{
         Enumeration<TableColumn> enumeration = lessonsTable.getColumnModel().getColumns();
         while (enumeration.hasMoreElements()) {
             TableColumn column = enumeration.nextElement();
-            if ((column.getModelIndex()) % 2 == 0) {
-                column.setMaxWidth(25);
-            } else {
-                column.setMinWidth(250);
+            switch (column.getModelIndex() % 4) {
+                case 0: {
+                    column.setMaxWidth(25);
+                    column.setMinWidth(24);
+                } break;
+                case 1:case 2: {
+                    column.setMinWidth(149);
+                    column.setMaxWidth(150);
+                } break;
+                case 3: {
+                    column.setMinWidth(40);
+                    column.setMaxWidth(40);
+                } break;
             }
         }
     }
@@ -79,7 +89,11 @@ public class LessonsPanel extends JPanel{
     private class TableModel extends AbstractTableModel {
         String[] daysName = {"ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ"};
         String[] groups = {"ПС-16", "ПС-26", "ПС-36", "ПС-46"};
+        String[] columnName = {"Предмет", "Викладач", "Ауд."};
+        String[] pair = {"ІЗВП", "ООП", "ОПІ", "АСУ", "ІСТКО", "Мат. аналіз", "Англ. мова", "Інформатика"};
+        String[] teacher = {"Завірюха В.П.", "Харченко О.О.", "Левченко А.В.", "Заболотній Ю.Л.", "Поліщук Н.П."};
         final int daysHeight = 10;
+        Random random = new Random();
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             return false;
@@ -87,10 +101,10 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public String getColumnName(int column) {
-            if (column % 2 == 0) {
+            if (column % 4 == 0) {
                 return "";
             } else {
-                return groups[column / 2];
+                return groups[column / 4];
             }
         }
 
@@ -101,14 +115,25 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public int getColumnCount() {
-            return groups.length * 2;
+            return groups.length * 4;
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            if (rowIndex == 0) {
+                switch (columnIndex % 4) {
+                    case 0: return "";
+                    case 1: return columnName[0];
+                    case 2: return columnName[1];
+                    case 3: return columnName[2];
+                }
+            }
             try {
-                if (columnIndex % 2 == 0) return daysName[rowIndex / daysHeight].charAt(rowIndex % 10);
-                switch (columnIndex) {
+                if (columnIndex % 4 == 0) return daysName[(rowIndex - 1) / daysHeight].charAt((rowIndex - 1) % 10);
+                switch (columnIndex % 4) {
+                    case 1: return pair[random.nextInt(pair.length)];
+                    case 2: return teacher[random.nextInt(teacher.length)];
+                    case 3: return String.valueOf(random.nextInt(500));
                     default: return 31 * rowIndex * columnIndex;
                 }
             } catch (StringIndexOutOfBoundsException e) {
