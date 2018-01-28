@@ -1,24 +1,13 @@
 package frame;
 
-import app.DegreeProject;
-import app.Group;
-
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.plaf.ColorChooserUI;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -33,6 +22,29 @@ public class LessonsPanel extends JPanel{
     private JToggleButton button2;
     private JToggleButton button3;
     private JButton closeButton;
+
+    /**
+     * Кільсть колонок, що потрібні для відображення інформації. Номери колонок задаються нижче
+     */
+    private final int COLUMN_REPEAT = 5;
+    // Константи, що позначають положення колонок в таблиці
+    private final int DAY_NAME_NUMBER = 0;
+    private final int PAIR_NUMBER = 1;
+    private final int LESSONS_NAME_NUMBER = 2;
+    private final int TEACHER_NAME_NUMBER = 3;
+    private final int AUDITORY_NUMBER = 4;
+    /**
+     * Кількість пар в одному дні
+     */
+    private final int PAIR_IN_DAY = 6;
+    /**
+     * Кількість колонок для відображення одного дня
+     */
+    private final int DAYS_HEIGHT = PAIR_IN_DAY * 2;
+    /**
+     * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок - Вівторок, 3 - Понеділок - Середа
+     */
+    private final int DAY_AT_WEEK = 5;
 
     public LessonsPanel() {
         setLayout(new GridLayout());
@@ -66,19 +78,22 @@ public class LessonsPanel extends JPanel{
         lessonsTable.setDefaultRenderer(Object.class, new TableCellRenderer());
         lessonsTable.getTableHeader().setResizingAllowed(false);
         lessonsTable.getTableHeader().setReorderingAllowed(false);
+        lessonsTable.setShowGrid(false);
+        lessonsTable.setIntercellSpacing(new Dimension(0, 0));
+        lessonsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         Enumeration<TableColumn> enumeration = lessonsTable.getColumnModel().getColumns();
         while (enumeration.hasMoreElements()) {
             TableColumn column = enumeration.nextElement();
-            switch (column.getModelIndex() % 4) {
-                case 0: {
+            switch (column.getModelIndex() % COLUMN_REPEAT) {
+                case DAY_NAME_NUMBER:case PAIR_NUMBER: {
                     column.setMaxWidth(25);
                     column.setMinWidth(24);
                 } break;
-                case 1:case 2: {
+                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
                     column.setMinWidth(149);
                     column.setMaxWidth(150);
                 } break;
-                case 3: {
+                case AUDITORY_NUMBER: {
                     column.setMinWidth(40);
                     column.setMaxWidth(40);
                 } break;
@@ -87,12 +102,11 @@ public class LessonsPanel extends JPanel{
     }
 
     private class TableModel extends AbstractTableModel {
-        String[] daysName = {"ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ"};
+        String[] daysName = {"ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"};
         String[] groups = {"ПС-16", "ПС-26", "ПС-36", "ПС-46"};
-        String[] columnName = {"Предмет", "Викладач", "Ауд."};
+        String[] columnName = {"<html><b>Предмет</b></html>", "<html><b>Викладач</b></html>", "<html><b>Ауд.</b></html>"};
         String[] pair = {"ІЗВП", "ООП", "ОПІ", "АСУ", "ІСТКО", "Мат. аналіз", "Англ. мова", "Інформатика"};
         String[] teacher = {"Завірюха В.П.", "Харченко О.О.", "Левченко А.В.", "Заболотній Ю.Л.", "Поліщук Н.П."};
-        final int daysHeight = 10;
         Random random = new Random();
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -101,40 +115,45 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public String getColumnName(int column) {
-            if (column % 4 == 0) {
+            if (column % COLUMN_REPEAT == 0) {
                 return "";
             } else {
-                return groups[column / 4];
+//                return groups[column / COLUMN_REPEAT];
+                return "";
             }
         }
 
         @Override
         public int getRowCount() {
-            return daysHeight * 5;
+            return DAYS_HEIGHT * DAY_AT_WEEK;
         }
 
         @Override
         public int getColumnCount() {
-            return groups.length * 4;
+            return groups.length * COLUMN_REPEAT;
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            /*Header*/
             if (rowIndex == 0) {
-                switch (columnIndex % 4) {
-                    case 0: return "";
-                    case 1: return columnName[0];
-                    case 2: return columnName[1];
-                    case 3: return columnName[2];
+                switch (columnIndex % COLUMN_REPEAT) {
+                    case DAY_NAME_NUMBER:       return "";
+                    case PAIR_NUMBER:           return "";
+                    case LESSONS_NAME_NUMBER:   return columnName[0];
+                    case TEACHER_NAME_NUMBER:   return columnName[1];
+                    case AUDITORY_NUMBER:       return columnName[2];
                 }
             }
+            /*Cells*/
             try {
-                if (columnIndex % 4 == 0) return daysName[(rowIndex - 1) / daysHeight].charAt((rowIndex - 1) % 10);
-                switch (columnIndex % 4) {
-                    case 1: return pair[random.nextInt(pair.length)];
-                    case 2: return teacher[random.nextInt(teacher.length)];
-                    case 3: return String.valueOf(random.nextInt(500));
-                    default: return 31 * rowIndex * columnIndex;
+                if (columnIndex % COLUMN_REPEAT == 0) return daysName[(rowIndex - 1) / DAYS_HEIGHT].charAt((rowIndex - 1) % DAYS_HEIGHT);
+                switch (columnIndex % COLUMN_REPEAT) {
+                    case PAIR_NUMBER:           return rowIndex % 2 == 0 ? "" : (((rowIndex % DAYS_HEIGHT) + 1) / 2);
+//                    case LESSONS_NAME_NUMBER:   return pair[random.nextInt(pair.length)];
+//                    case TEACHER_NAME_NUMBER:   return teacher[random.nextInt(teacher.length)];
+//                    case AUDITORY_NUMBER:       return String.valueOf(random.nextInt(500));
+                    default:                    return "";
                 }
             } catch (StringIndexOutOfBoundsException e) {
                 return "";
@@ -148,12 +167,29 @@ public class LessonsPanel extends JPanel{
             JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             label.setHorizontalAlignment(JLabel.CENTER);
             if (isSelected) return label;
-            if (column % 2 == 0) {
+            /*Set color*/
+            if (column % COLUMN_REPEAT == 0) {
                 label.setBackground(table.getTableHeader().getBackground());
-            } else if ((row / 10) % 2 == 0) {
+            } else if (((row - 1) / DAYS_HEIGHT) % 2 == 0) {
                 label.setBackground(new Color(246, 246, 246));
             } else {
                 label.setBackground(Color.WHITE);
+            }
+            /*Set font*/
+            switch (column % COLUMN_REPEAT) {
+                case DAY_NAME_NUMBER: {
+                    label.setFont(new Font(label.getFont().getFontName(), Font.BOLD, label.getFont().getSize()));
+                }
+            }
+            /*Set border*/
+            if (column % COLUMN_REPEAT == 0) {
+                label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
+                if (row % DAYS_HEIGHT == 0)
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
+            } else if (row % 2 == 0) {
+                label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
+            } else {
+                label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
             }
             return label;
         }
