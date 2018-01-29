@@ -195,7 +195,7 @@ public class SchedulePanel extends JPanel{
         jTable.getTableHeader().setDefaultRenderer(new DefaultTableCellHeaderRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable jTable, Object o, boolean b, boolean b1, int row, int col) {
-                Color borderColor = new Color(207, 207, 207);
+                final Color borderColor = new Color(207, 207, 207);
                 JLabel label = (JLabel) super.getTableCellRendererComponent(jTable, o, b, b1, row, col);
                 if (col == 0) return label;
                 int first = col, last, count;
