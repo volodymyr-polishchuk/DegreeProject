@@ -1,8 +1,8 @@
 package frame;
 
+import app.DegreeProject;
 import app.Group;
-import app.lessons.LessonsDay;
-import app.lessons.LessonsUnit;
+import app.lessons.*;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -11,8 +11,11 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 /**
  * Created by Vladimir on 20/01/18.
@@ -27,6 +30,7 @@ public class LessonsPanel extends JPanel{
     private JToggleButton button3;
     private JButton closeButton;
     private TableModel tableModel;
+    ButtonGroup buttonGroup;
 
     /**
      * Кільсть колонок, що потрібні для відображення інформації. Номери колонок задаються нижче
@@ -69,12 +73,15 @@ public class LessonsPanel extends JPanel{
         Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
         button1.setBorder(BorderFactory.createCompoundBorder(out, in));
         button1.setFocusable(false);
+        button1.setActionCommand("NUMERATOR");
         button2.setBorder(BorderFactory.createCompoundBorder(outCenter, in));
         button2.setFocusable(false);
         button2.setSelected(true);
+        button2.setActionCommand("BOTH");
         button3.setBorder(BorderFactory.createCompoundBorder(out, in));
         button3.setFocusable(false);
-        ButtonGroup buttonGroup = new ButtonGroup();
+        button3.setActionCommand("DENOMINATOR");
+        buttonGroup = new ButtonGroup();
         buttonGroup.add(button1);
         buttonGroup.add(button2);
         buttonGroup.add(button3);
@@ -100,14 +107,45 @@ public class LessonsPanel extends JPanel{
                     column.setMinWidth(24);
                 } break;
                 case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
-                    column.setMinWidth(149);
-                    column.setMaxWidth(150);
+                    column.setMinWidth(130);
+                    column.setMaxWidth(130);
                 } break;
                 case AUDITORY_NUMBER: {
                     column.setMinWidth(40);
                     column.setMaxWidth(40);
                 } break;
             }
+        }
+        lessonsTable.addMouseListener(new TableMouseListener());
+    }
+
+    private class TableMouseListener implements java.awt.event.MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int row = lessonsTable.rowAtPoint(e.getPoint());
+            int col = lessonsTable.columnAtPoint(e.getPoint());
+            lessonsTable.getModel().setValueAt(new StudySubject(new Subject("Предмет"), new Teacher(), new Auditory()), row, col);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
         }
     }
 
@@ -130,8 +168,16 @@ public class LessonsPanel extends JPanel{
 
     private class TableModel extends AbstractTableModel {
         String[] daysName = {"ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"};
-        String[] groups = {"ПС-16", "ПС-26", "ПС-36", "ПС-46"};
         String[] columnName = {"<html><b>Предмет</b></html>", "<html><b>Викладач</b></html>", "<html><b>Ауд.</b></html>"};
+        ArrayList<LessonsUnit> lessonsUnits = new ArrayList<>();
+
+        public TableModel() {
+            LessonsUnit unit;
+            for (Group group : DegreeProject.GROUPLIST.GetAllWeek()) {
+                unit = new LessonsUnit(group, DAY_AT_WEEK, PAIR_IN_DAY);
+                lessonsUnits.add(unit);
+            }
+        }
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -141,7 +187,7 @@ public class LessonsPanel extends JPanel{
         @Override
         public String getColumnName(int column) {
             switch (column % COLUMN_REPEAT) {
-                case TEACHER_NAME_NUMBER: return groups[column / COLUMN_REPEAT];
+                case TEACHER_NAME_NUMBER: return lessonsUnits.get(column / COLUMN_REPEAT).getGroup().getName();
                 default: return "";
             }
         }
@@ -153,8 +199,23 @@ public class LessonsPanel extends JPanel{
 
         @Override
         public int getColumnCount() {
-            return groups.length * COLUMN_REPEAT;
-//            return lessonsUnits == null ? 1 : lessonsUnits.size() * COLUMN_REPEAT + 1;
+//            return groups.length * COLUMN_REPEAT;
+            return lessonsUnits == null ? 1 : lessonsUnits.size() * COLUMN_REPEAT;
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            try {
+                lessonsUnits.get(columnIndex / COLUMN_REPEAT)
+                        .setPairSubjects(
+                                rowIndex - 1,
+                                PairType.valueOf(buttonGroup.getSelection().getActionCommand()),
+                                (StudySubject)aValue
+                        );
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+            }
+
         }
 
         @Override
@@ -175,12 +236,18 @@ public class LessonsPanel extends JPanel{
 
                 switch (columnIndex % COLUMN_REPEAT) {
                     case PAIR_NUMBER:           return rowIndex % 2 == 0 ? "" : (((rowIndex % DAYS_HEIGHT) + 1) / 2);
-//                    case LESSONS_NAME_NUMBER:   return
-//                    case TEACHER_NAME_NUMBER:   return
-//                    case AUDITORY_NUMBER:       return
+                    case LESSONS_NAME_NUMBER:   return lessonsUnits.get(columnIndex / COLUMN_REPEAT)
+                            .getStudySubjectByRow(rowIndex - 1, PairType.valueOf(buttonGroup.getSelection().getActionCommand()))
+                            .getSubject();
+                    case TEACHER_NAME_NUMBER:   return lessonsUnits.get(columnIndex / COLUMN_REPEAT)
+                            .getStudySubjectByRow(rowIndex - 1, PairType.valueOf(buttonGroup.getSelection().getActionCommand()))
+                            .getTeacher();
+                    case AUDITORY_NUMBER:       return lessonsUnits.get(columnIndex / COLUMN_REPEAT)
+                            .getStudySubjectByRow(rowIndex - 1, PairType.valueOf(buttonGroup.getSelection().getActionCommand()))
+                            .getAuditory();
                     default:                    return "";
                 }
-            } catch (StringIndexOutOfBoundsException | NullPointerException e) {
+            } catch (StringIndexOutOfBoundsException e) {
                 return "";
             }
         }
@@ -191,6 +258,7 @@ public class LessonsPanel extends JPanel{
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             label.setHorizontalAlignment(JLabel.CENTER);
+
             if (isSelected) return label;
             /*Set color*/
             if (column % COLUMN_REPEAT == 0) {

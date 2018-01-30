@@ -1,16 +1,14 @@
 package app.lessons;
 
 /**
- * Created by Vladimir on 29/01/18.
+ * Created by Vladimir on 30/01/18.
  **/
-public class Subject {
-    private String name;
-
-    public void setName(String name) {
-        this.name = name;
+public class Subject extends NamedItem {
+    public Subject() {
+        super();
     }
 
-    public String getName() {
-        return name;
+    public Subject(String name) {
+        super(name);
     }
 }

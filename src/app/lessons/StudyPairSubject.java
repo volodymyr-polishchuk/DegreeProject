@@ -1,45 +1,69 @@
 package app.lessons;
 
 /**
- * Created by Vladimir on 29/01/18.
+ * Created by Vladimir on 30/01/18.
  **/
 public class StudyPairSubject {
+
     private StudySubject numerator;
     private StudySubject denominator;
-    public static final int NUMERATOR = 0;
-    public static final int DENOMINATOR = 1;
+    private PairType type;
 
-    public StudyPairSubject(StudySubject numerator, StudySubject denominator) {
-        this.numerator = numerator;
-        this.denominator = denominator;
+    public StudyPairSubject() {
+        numerator = new StudySubject();
+        denominator = new StudySubject();
+        type = PairType.BOTH;
     }
 
-    public StudyPairSubject(StudySubject subject) {
-        this(subject, subject);
+    public void setSubject(PairType how, StudySubject subject) {
+        switch (how) {
+            case NUMERATOR: numerator = subject;
+                break;
+            case DENOMINATOR: denominator = subject;
+                break;
+            case BOTH:
+                numerator = subject;
+                denominator = subject;
+                break;
+        }
+        type = how;
     }
 
-    public static StudyPairSubject getEmptyInstance() {
-        return new StudyPairSubject(new StudySubject(), new StudySubject());
-    }
-
-    public StudySubject getNumerator() {
-        return numerator;
-    }
-
-    public StudySubject getByIndex(int index) {
-        switch (index) {
-            case NUMERATOR: return getNumerator();
-            case DENOMINATOR: return getDenominator();
-            default: throw new IllegalArgumentException("Argument must be constant NUMERATOR or DENOMINATOR");
+    public StudySubject getStudySubject(PairType how) {
+        switch (how) {
+            case NUMERATOR: return numerator;
+            case DENOMINATOR: return denominator;
+            default: return numerator;
         }
     }
 
-    public StudySubject getDenominator() {
-        if (numerator.equals(denominator)) {
-            return new StudySubject();
-        }
-        return denominator;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StudyPairSubject that = (StudyPairSubject) o;
+
+        if (numerator != null ? !numerator.equals(that.numerator) : that.numerator != null) return false;
+        if (denominator != null ? !denominator.equals(that.denominator) : that.denominator != null) return false;
+        return type == that.type;
+
     }
 
+    @Override
+    public int hashCode() {
+        int result = numerator != null ? numerator.hashCode() : 0;
+        result = 31 * result + (denominator != null ? denominator.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
 
+    @Override
+    public String toString() {
+        return "StudyPairSubject{" +
+                "numerator=" + numerator +
+                ", denominator=" + denominator +
+                ", type=" + type +
+                '}';
+    }
 }

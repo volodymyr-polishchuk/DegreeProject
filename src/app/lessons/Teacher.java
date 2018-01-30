@@ -1,16 +1,13 @@
 package app.lessons;
 
 /**
- * Created by Vladimir on 29/01/18.
+ * Created by Vladimir on 30/01/18.
  **/
-public class Teacher {
-    private String name;
-
-    public String getName() {
-        return name;
+public class Teacher extends NamedItem {
+    public Teacher() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Teacher(String name) {
+        super(name);
     }
 }
