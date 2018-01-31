@@ -137,6 +137,7 @@ public class NewLessonsPanel extends JPanel{
             }
 
             JLabel labelBottom = new JLabel();
+
             if (((row * 2) + 1) % (PAIR_IN_DAY * 2) < daysName[row / DAY_AT_WEEK].length()) {
                 labelBottom.setText(String.valueOf(
                         daysName[row / DAY_AT_WEEK].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))
