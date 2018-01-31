@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
 
+import static app.lessons.PairType.NUMERATOR;
+
 /**
  * Created by Vladimir on 20/01/18.
  **/
@@ -96,11 +98,14 @@ public class LessonsPanel extends JPanel{
         lessonsTable.setModel(tableModel);
         lessonsTable.setDefaultRenderer(Object.class, new TableCellRenderer());
         lessonsTable.getTableHeader().setDefaultRenderer(new TableHeaderModelRenderer());
+
         lessonsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         lessonsTable.getTableHeader().setResizingAllowed(false);
         lessonsTable.getTableHeader().setReorderingAllowed(false);
+
         lessonsTable.setShowGrid(false);
         lessonsTable.setIntercellSpacing(new Dimension(0, 0));
+
         lessonsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         Enumeration<TableColumn> enumeration = lessonsTable.getColumnModel().getColumns();
         while (enumeration.hasMoreElements()) {
