@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -74,13 +75,16 @@ public class LessonsPanel extends JPanel{
         button1.setBorder(BorderFactory.createCompoundBorder(out, in));
         button1.setFocusable(false);
         button1.setActionCommand("NUMERATOR");
+        button1.addActionListener(e -> ((TableModel)lessonsTable.getModel()).fireTableDataChanged());
         button2.setBorder(BorderFactory.createCompoundBorder(outCenter, in));
         button2.setFocusable(false);
         button2.setSelected(true);
         button2.setActionCommand("BOTH");
+        button2.addActionListener(e -> ((TableModel)lessonsTable.getModel()).fireTableDataChanged());
         button3.setBorder(BorderFactory.createCompoundBorder(out, in));
         button3.setFocusable(false);
         button3.setActionCommand("DENOMINATOR");
+        button3.addActionListener(e -> ((TableModel)lessonsTable.getModel()).fireTableDataChanged());
         buttonGroup = new ButtonGroup();
         buttonGroup.add(button1);
         buttonGroup.add(button2);
@@ -212,6 +216,7 @@ public class LessonsPanel extends JPanel{
                                 PairType.valueOf(buttonGroup.getSelection().getActionCommand()),
                                 (StudySubject)aValue
                         );
+                fireTableDataChanged();
             } catch (ClassCastException e) {
                 e.printStackTrace();
             }
