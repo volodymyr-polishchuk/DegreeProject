@@ -134,7 +134,7 @@ public class LessonsPanel extends JPanel{
         public void mouseClicked(MouseEvent e) {
             int row = lessonsTable.rowAtPoint(e.getPoint());
             int col = lessonsTable.columnAtPoint(e.getPoint());
-            lessonsTable.getModel().setValueAt(new StudySubject(new Subject("Предмет"), new Teacher(), new Auditory()), row, col);
+//            lessonsTable.getModel().setValueAt(new StudySubject(new Subject("Предмет"), new Teacher(), new Auditory()), row, col);
         }
 
         @Override

@@ -1,5 +1,6 @@
 package frame;
 
+import app.Group;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -8,8 +9,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.Enumeration;
-import java.util.Objects;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
 
 /**
  * Created by Vladimir on 31/01/18.
@@ -19,6 +21,15 @@ public class NewLessonsPanel extends JPanel{
     private JButton налаштуванняButton;
     private JButton зберегтиButton;
     private JPanel contentPane;
+    private JToggleButton button1;
+    private JToggleButton button2;
+    private JToggleButton button3;
+    private ButtonGroup buttonGroup;
+    private TableModel tableModel;
+    /**
+     * Кількість пар в одному дні
+     */
+    private final int PAIR_IN_DAY = 5;
     private final int COLUMN_REPEAT = 5;
     // Константи, що позначають положення колонок в таблиці
     private final int DAY_NAME_NUMBER = 0;
@@ -26,10 +37,6 @@ public class NewLessonsPanel extends JPanel{
     private final int LESSONS_NAME_NUMBER = 2;
     private final int TEACHER_NAME_NUMBER = 3;
     private final int AUDITORY_NUMBER = 4;
-    /**
-     * Кількість пар в одному дні
-     */
-    private final int PAIR_IN_DAY = 5;
     /**
      * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок...Вівторок, 3 - Понеділок...Середа
      */
@@ -39,18 +46,53 @@ public class NewLessonsPanel extends JPanel{
         setLayout(new GridLayout());
         add(contentPane);
         InitialTable();
+        InitialGroupButton();
+        System.out.println(jTable.getRowHeight());
     }
 
-    void InitialTable() {
-        jTable.setModel(new TableModel());
+    private void InitialGroupButton() {
+        Border out = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY);
+        Border outCenter = BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY);
+        Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
+        button1.setBorder(BorderFactory.createCompoundBorder(out, in));
+        button1.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        button2.setBorder(BorderFactory.createCompoundBorder(outCenter, in));
+        button2.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        button3.setBorder(BorderFactory.createCompoundBorder(out, in));
+        button3.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add(button1);
+        buttonGroup.add(button2);
+        buttonGroup.add(button3);
+    }
+
+    public TableModel getTableModel() {
+        return tableModel;
+    }
+
+    private void InitialTable() {
+        tableModel = new TableModel();
+        jTable.setModel(tableModel);
         jTable.getTableHeader().setDefaultRenderer(new TableHeaderCellRenderer());
         jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer());
         jTable.setDefaultRenderer(Integer.class, new TableCellPairNumberRenderer());
-        jTable.setDefaultRenderer(Object.class, new TableCellSubjectRenderer());
+        jTable.setDefaultRenderer(StudyPair.class, new TableCellSubjectRenderer());
         jTable.setShowGrid(false);
         jTable.setIntercellSpacing(new Dimension(0, 0));
         Enumeration<TableColumn> columns = jTable.getColumnModel().getColumns();
         jTable.setRowHeight(jTable.getRowHeight() * 2);
+        jTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                StudyPairDouble aDouble = new StudyPairDouble(
+                        new StudyPairLonely(new Lesson("MYLESSON"), new Teacher("MYTEACHER"), new Auditory("MYAU")),
+                                new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory("")));
+                tableModel.setValueAt(aDouble,
+                        jTable.rowAtPoint(e.getPoint()),
+                        jTable.columnAtPoint(e.getPoint())
+                );
+            }
+        });
         while (columns.hasMoreElements()) {
             TableColumn column = columns.nextElement();
             switch (column.getModelIndex() % COLUMN_REPEAT) {
@@ -84,9 +126,20 @@ public class NewLessonsPanel extends JPanel{
         }
     }
 
-
     private class TableModel extends AbstractTableModel {
-        private String[] groupName = new String[] {"ПС-16", "ПС-26"};
+//        private String[] groupName = new String[] {"ПС-16", "ПС-26"};
+        private ArrayList<NewLessonsUnit> units = new ArrayList<>();
+
+        public TableModel() {
+            NewLessonsUnit lessonsUnit = new NewLessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
+            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
+            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
+            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
+            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
+            units.add(lessonsUnit);
+            units.add(new NewLessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
+            units.add(new NewLessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
+        }
 
         @Override
         public int getRowCount() {
@@ -95,7 +148,8 @@ public class NewLessonsPanel extends JPanel{
 
         @Override
         public String getColumnName(int column) {
-            if (column % COLUMN_REPEAT == TEACHER_NAME_NUMBER) return groupName[column / COLUMN_REPEAT];
+//            if (column % COLUMN_REPEAT == TEACHER_NAME_NUMBER) return groupName[column / COLUMN_REPEAT];
+            if (column % COLUMN_REPEAT == TEACHER_NAME_NUMBER) return units.get(column / COLUMN_REPEAT).getGroup().getName();
             return "";
         }
 
@@ -104,19 +158,34 @@ public class NewLessonsPanel extends JPanel{
             switch (columnIndex % COLUMN_REPEAT) {
                 case DAY_NAME_NUMBER: return String.class;
                 case PAIR_NUMBER: return Integer.class;
-//                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER: return
+                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER: return StudyPair.class;
                 default: return Object.class;
             }
         }
 
         @Override
         public int getColumnCount() {
-            return COLUMN_REPEAT * groupName.length;
+//            return COLUMN_REPEAT * groupName.length;
+            return units == null ? 2 : units.size() * COLUMN_REPEAT;
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return null;
+            switch (columnIndex % COLUMN_REPEAT) {
+                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER:
+                    return units.get(columnIndex / COLUMN_REPEAT).getPair(rowIndex);
+            }
+            return "";
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            switch (columnIndex % COLUMN_REPEAT) {
+                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER:
+//                    units.set(columnIndex / COLUMN_REPEAT, (StudyPair)aValue);
+                    units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
+            }
+            fireTableDataChanged();
         }
     }
 
@@ -175,10 +244,13 @@ public class NewLessonsPanel extends JPanel{
     private class TableCellSubjectRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
-            if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1) label.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
-            return label;
+//            JPanel panel = (JPanel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            JPanel panel = new JPanel();
+            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
+            if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1) panel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
+            panel.add(((StudyPair) value).getRendererComponent(StudyPair.Query.values()[(column % COLUMN_REPEAT) - 2]));
+            panel.setBackground(Color.WHITE);
+            return panel;
         }
     }
 
@@ -196,6 +268,248 @@ public class NewLessonsPanel extends JPanel{
         frame.add(new NewLessonsPanel());
         frame.setVisible(true);
     }
+}
+
+class NewLessonsUnit {
+    private Group group;
+    private StudyPair[] pairs;
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public StudyPair[] getPairs() {
+        return pairs;
+    }
+
+    public StudyPair getPair(int index) {
+        return pairs[index];
+    }
+
+    public void setPair(int index, StudyPair pairs) {
+        this.pairs[index] = pairs;
+    }
+
+    public NewLessonsUnit(Group group, int pairPerDay, int dayPerWeek) {
+        this.group = group;
+        pairs = new StudyPair[pairPerDay * dayPerWeek];
+        for (int i = 0; i < pairs.length; i++) {
+            pairs[i] = StudyPair.getEmptyInstance();
+        }
+    }
+}
+
+abstract class StudyPair {
+    public static StudyPair getEmptyInstance() {
+        return new EmptyStudyPair();
+    }
+
+    enum Query {
+        LESSON, TEACHER, AUDITORY;
+    }
+
+    enum Forbidden {
+        DAY_FORBIDDEN,
+        ROW_FORBIDDEN,
+        COL_FORBIDDEN,
+        SELF_FORBIDDEN,
+        WEEK_FORBIDDEN,
+        NON_FORBIDDEN,
+        UNKNOWN_FORBIDDEN
+    }
+
+    abstract public JComponent getRendererComponent(Query data);
+
+    abstract public Forbidden[] getForbidden(StudyPair studyPair);
+}
+
+class EmptyStudyPair extends StudyPair {
+
+    @Override
+    public JComponent getRendererComponent(Query data) {
+        JLabel jLabel = new JLabel("Empty - ?");
+        jLabel.setVerticalAlignment(SwingConstants.CENTER);
+        return jLabel;
+    }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair) {
+        return new Forbidden[] {Forbidden.NON_FORBIDDEN};
+    }
+}
+
+class StudyPairLonely extends StudyPair {
+
+    private Lesson lesson;
+    private Teacher teacher;
+    private Auditory auditory;
+
+    public StudyPairLonely() {
+        lesson = new Lesson();
+        teacher = new Teacher();
+        auditory = new Auditory();
+    }
+
+    public StudyPairLonely(Lesson lesson, Teacher teacher, Auditory auditory) {
+        this.lesson = lesson;
+        this.teacher = teacher;
+        this.auditory = auditory;
+    }
+
+    public Lesson getLesson() {
+        return lesson;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public Auditory getAuditory() {
+        return auditory;
+    }
+
+    @Override
+    public JComponent getRendererComponent(Query data) {
+//        JPanel panel = new JPanel(new GridLayout(1, 1));
+        JLabel label = new JLabel();
+        label.setVerticalAlignment(SwingConstants.CENTER);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        switch (data) {
+            case LESSON: label.setText(lesson.getName());
+                break;
+            case TEACHER: label.setText(teacher.getName());
+                break;
+            case AUDITORY: label.setText(auditory.getName());
+                break;
+        }
+//        panel.add(label);
+//        panel.setOpaque(true);
+//        panel.setBackground(Color.WHITE);
+//        panel.setBorder(BorderFactory.createEmptyBorder());
+//        return panel;
+        return label;
+    }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair) {
+        if (studyPair instanceof StudyPairLonely) {
+            StudyPairLonely lonely = (StudyPairLonely) studyPair;
+            if (this.teacher.equals(lonely.teacher) ||
+                    this.auditory.equals(lonely.auditory)) {
+                return new Forbidden[] {Forbidden.ROW_FORBIDDEN, Forbidden.SELF_FORBIDDEN};
+            } else {
+                return new Forbidden[] {Forbidden.NON_FORBIDDEN};
+            }
+        } else if (studyPair instanceof StudyPairDouble) {
+            StudyPairDouble pairDouble = (StudyPairDouble) studyPair;
+            return pairDouble.getForbidden(this);
+        }
+        return new Forbidden[] {Forbidden.UNKNOWN_FORBIDDEN};
+    }
+}
+
+class StudyPairDouble extends StudyPair {
+
+    private StudyPairLonely numerator;
+    private StudyPairLonely denominator;
+
+    public StudyPairDouble() {
+        numerator = new StudyPairLonely();
+        denominator = new StudyPairLonely();
+    }
+
+    public StudyPairDouble(StudyPairLonely numerator, StudyPairLonely denominator) {
+        this.numerator = numerator;
+        this.denominator = denominator;
+    }
+
+    @Override
+    public JComponent getRendererComponent(Query data) {
+        JPanel panel = new JPanel(new GridLayout(2, 1));
+        switch (data) {
+            case LESSON: {
+                panel.add(new JLabel("Ч/ " + numerator.getLesson().getName()));
+                panel.add(new JLabel("З\\ " + denominator.getLesson().getName()));
+            } break;
+            case TEACHER: {
+                panel.add(new JLabel(numerator.getTeacher().getName()));
+                panel.add(new JLabel(denominator.getTeacher().getName()));
+            } break;
+            case AUDITORY: {
+                panel.add(new JLabel(numerator.getAuditory().getName()));
+                panel.add(new JLabel(denominator.getAuditory().getName()));
+            } break;
+        }
+        panel.setOpaque(true);
+        panel.setBorder(BorderFactory.createEmptyBorder());
+        panel.setBackground(Color.WHITE);
+        return panel;
+    }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair) {
+        if (studyPair instanceof StudyPairDouble) {
+            StudyPairDouble pairDouble = (StudyPairDouble) studyPair;
+            HashSet<Forbidden> fb = new HashSet<>();
+            Collections.addAll(fb, this.numerator.getForbidden(pairDouble.numerator));
+            Collections.addAll(fb, this.denominator.getForbidden(pairDouble.numerator));
+            Collections.addAll(fb, this.numerator.getForbidden(pairDouble.denominator));
+            Collections.addAll(fb, this.denominator.getForbidden(pairDouble.denominator));
+            return (Forbidden[]) fb.toArray();
+        } else if (studyPair instanceof StudyPairLonely) {
+            StudyPairLonely lonely = (StudyPairLonely) studyPair;
+            HashSet<Forbidden> fb = new HashSet<>();
+            Collections.addAll(fb, this.numerator.getForbidden(lonely));
+            Collections.addAll(fb, this.denominator.getForbidden(lonely));
+            return (Forbidden[]) fb.toArray();
+        }
+        return new Forbidden[] {Forbidden.UNKNOWN_FORBIDDEN};
+    }
+}
+
+class Lesson {
+    String name;
+
+    public Lesson() {name = "Lesson = ?";}
+
+    public Lesson(String name) {this.name = name;}
+
+    public String getName() {return name;}
+
+    public void setName(String name) {this.name = name;}
+
+    @Override
+    public String toString() {return "Lesson{" + name + '}';}
+}
+
+class Teacher {
+    private String name;
+
+    public Teacher() {name = "Teacher = ?";}
+
+    public Teacher(String name) {this.name = name;}
+
+    public String getName() {return name;}
+
+    public void setName(String name) {this.name = name;}
+
+    @Override
+    public String toString() {return "Teacher{" + name + '}';}
+}
+
+class Auditory {
+    private String name;
+
+    public Auditory() {name = "Auditory = ?";}
+
+    public Auditory(String name) {this.name = name;}
+
+    public String getName() {return name;}
+
+    public void setName(String name) {this.name = name;}
+
+    @Override
+    public String toString() {return "Auditory{" + name + '}';}
 }
 
 
