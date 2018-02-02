@@ -26,6 +26,7 @@ public class NewLessonsPanel extends JPanel{
     private JToggleButton button3;
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
+    private StudyPair nowStudyPair;
     /**
      * Кількість пар в одному дні
      */
@@ -43,6 +44,7 @@ public class NewLessonsPanel extends JPanel{
     private final int DAY_AT_WEEK = 5;
 
     public NewLessonsPanel() {
+        nowStudyPair = new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789"));
         setLayout(new GridLayout());
         add(contentPane);
         InitialTable();
@@ -245,12 +247,20 @@ public class NewLessonsPanel extends JPanel{
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 //            JPanel panel = (JPanel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            JPanel panel = new JPanel();
-            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
-            if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1) panel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
-            panel.add(((StudyPair) value).getRendererComponent(StudyPair.Query.values()[(column % COLUMN_REPEAT) - 2]));
-            panel.setBackground(Color.WHITE);
-            return panel;
+            JComponent component = ((StudyPair) value).getRendererComponent(StudyPair.Query.values()[(column % COLUMN_REPEAT) - 2]);
+            component.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
+            if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1)
+                component.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
+            component.setBackground(Color.WHITE);
+            for (StudyPair.Forbidden forbidden: ((StudyPair)value).getForbidden(nowStudyPair)) {
+                if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
+                    component.setBackground(Color.RED);
+                    component.setOpaque(true);
+                    System.out.println(forbidden);
+                }
+//                System.out.println(forbidden);
+            }
+            return component;
         }
     }
 
@@ -327,8 +337,9 @@ class EmptyStudyPair extends StudyPair {
 
     @Override
     public JComponent getRendererComponent(Query data) {
-        JLabel jLabel = new JLabel("Empty - ?");
+        JLabel jLabel = new JLabel("Empty");
         jLabel.setVerticalAlignment(SwingConstants.CENTER);
+        jLabel.setHorizontalAlignment(SwingConstants.CENTER);
         return jLabel;
     }
 
@@ -370,7 +381,6 @@ class StudyPairLonely extends StudyPair {
 
     @Override
     public JComponent getRendererComponent(Query data) {
-//        JPanel panel = new JPanel(new GridLayout(1, 1));
         JLabel label = new JLabel();
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -382,11 +392,6 @@ class StudyPairLonely extends StudyPair {
             case AUDITORY: label.setText(auditory.getName());
                 break;
         }
-//        panel.add(label);
-//        panel.setOpaque(true);
-//        panel.setBackground(Color.WHITE);
-//        panel.setBorder(BorderFactory.createEmptyBorder());
-//        return panel;
         return label;
     }
 
@@ -426,20 +431,26 @@ class StudyPairDouble extends StudyPair {
     @Override
     public JComponent getRendererComponent(Query data) {
         JPanel panel = new JPanel(new GridLayout(2, 1));
+        JLabel labelTop = new JLabel();
+        JLabel labelBottom = new JLabel();
+        labelTop.setHorizontalAlignment(SwingConstants.CENTER);
+        labelBottom.setHorizontalAlignment(SwingConstants.CENTER);
         switch (data) {
             case LESSON: {
-                panel.add(new JLabel("Ч/ " + numerator.getLesson().getName()));
-                panel.add(new JLabel("З\\ " + denominator.getLesson().getName()));
+                labelTop.setText("Ч/ " + numerator.getLesson().getName());
+                labelBottom.setText("З\\ " + denominator.getLesson().getName());
             } break;
             case TEACHER: {
-                panel.add(new JLabel(numerator.getTeacher().getName()));
-                panel.add(new JLabel(denominator.getTeacher().getName()));
+                labelTop.setText(numerator.getTeacher().getName());
+                labelBottom.setText(denominator.getTeacher().getName());
             } break;
             case AUDITORY: {
-                panel.add(new JLabel(numerator.getAuditory().getName()));
-                panel.add(new JLabel(denominator.getAuditory().getName()));
+                labelTop.setText(numerator.getAuditory().getName());
+                labelBottom.setText(denominator.getAuditory().getName());
             } break;
         }
+        panel.add(labelTop);
+        panel.add(labelBottom);
         panel.setOpaque(true);
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setBackground(Color.WHITE);
@@ -455,13 +466,23 @@ class StudyPairDouble extends StudyPair {
             Collections.addAll(fb, this.denominator.getForbidden(pairDouble.numerator));
             Collections.addAll(fb, this.numerator.getForbidden(pairDouble.denominator));
             Collections.addAll(fb, this.denominator.getForbidden(pairDouble.denominator));
-            return (Forbidden[]) fb.toArray();
+            Forbidden[] forbiddens = new Forbidden[fb.size()];
+            int i = 0;
+            for (Forbidden forbidden: fb) {
+                forbiddens[i++] = forbidden;
+            }
+            return forbiddens;
         } else if (studyPair instanceof StudyPairLonely) {
             StudyPairLonely lonely = (StudyPairLonely) studyPair;
             HashSet<Forbidden> fb = new HashSet<>();
             Collections.addAll(fb, this.numerator.getForbidden(lonely));
             Collections.addAll(fb, this.denominator.getForbidden(lonely));
-            return (Forbidden[]) fb.toArray();
+            Forbidden[] forbiddens = new Forbidden[fb.size()];
+            int i = 0;
+            for (Forbidden forbidden: fb) {
+                forbiddens[i++] = forbidden;
+            }
+            return forbiddens;
         }
         return new Forbidden[] {Forbidden.UNKNOWN_FORBIDDEN};
     }
@@ -480,6 +501,22 @@ class Lesson {
 
     @Override
     public String toString() {return "Lesson{" + name + '}';}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Lesson lesson = (Lesson) o;
+
+        return name != null ? name.equals(lesson.name) : lesson.name == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }
 
 class Teacher {
@@ -495,6 +532,22 @@ class Teacher {
 
     @Override
     public String toString() {return "Teacher{" + name + '}';}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Teacher teacher = (Teacher) o;
+
+        return name != null ? name.equals(teacher.name) : teacher.name == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }
 
 class Auditory {
@@ -510,6 +563,22 @@ class Auditory {
 
     @Override
     public String toString() {return "Auditory{" + name + '}';}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Auditory auditory = (Auditory) o;
+
+        return name != null ? name.equals(auditory.name) : auditory.name == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }
 
 
