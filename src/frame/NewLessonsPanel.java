@@ -9,6 +9,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
@@ -24,6 +26,10 @@ public class NewLessonsPanel extends JPanel{
     private JToggleButton button1;
     private JToggleButton button2;
     private JToggleButton button3;
+    private JTextField textField1;
+    private JTextField textField2;
+    private JTextField textField3;
+    private JButton setButton;
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
     private StudyPair nowStudyPair;
@@ -44,12 +50,19 @@ public class NewLessonsPanel extends JPanel{
     private final int DAY_AT_WEEK = 5;
 
     public NewLessonsPanel() {
-        nowStudyPair = new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789"));
+        nowStudyPair = new EmptyStudyPair();
         setLayout(new GridLayout());
         add(contentPane);
         InitialTable();
         InitialGroupButton();
-        System.out.println(jTable.getRowHeight());
+//        System.out.println(jTable.getRowHeight());
+        setButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
+                tableModel.fireTableDataChanged();
+            }
+        });
     }
 
     private void InitialGroupButton() {
@@ -86,10 +99,10 @@ public class NewLessonsPanel extends JPanel{
         jTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                StudyPairDouble aDouble = new StudyPairDouble(
-                        new StudyPairLonely(new Lesson("MYLESSON"), new Teacher("MYTEACHER"), new Auditory("MYAU")),
-                                new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory("")));
-                tableModel.setValueAt(aDouble,
+//                StudyPairDouble aDouble = new StudyPairDouble(
+//                        new StudyPairLonely(new Lesson("MYLESSON"), new Teacher("MYTEACHER"), new Auditory("MYAU")),
+//                                new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory("")));
+                tableModel.setValueAt(nowStudyPair,
                         jTable.rowAtPoint(e.getPoint()),
                         jTable.columnAtPoint(e.getPoint())
                 );
@@ -253,10 +266,13 @@ public class NewLessonsPanel extends JPanel{
                 component.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
             component.setBackground(Color.WHITE);
             for (StudyPair.Forbidden forbidden: ((StudyPair)value).getForbidden(nowStudyPair)) {
-                if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
+                /*if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
                     component.setBackground(Color.RED);
                     component.setOpaque(true);
-                    System.out.println(forbidden);
+//                    System.out.println(forbidden);
+                } else*/ if (forbidden == StudyPair.Forbidden.ROW_FORBIDDEN) {
+                    component.setBackground(Color.GREEN);
+                    component.setOpaque(true);
                 }
 //                System.out.println(forbidden);
             }
