@@ -30,6 +30,7 @@ public class DegreeProject {
         try {
             databaseData = new DatabaseData("localhost", "3306", "Volodymyr", new char[]{'0', '0', '0', '0'}, "mydata");
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Помилка підключення до бази даних. \n\r" + e.getMessage());
             e.printStackTrace();
         }
         InitialMainFrame();

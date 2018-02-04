@@ -1,6 +1,7 @@
 package frame;
 
 import app.Group;
+import app.lessons.LessonsUnit;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -14,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by Vladimir on 31/01/18.
@@ -33,6 +35,7 @@ public class NewLessonsPanel extends JPanel{
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
     private StudyPair nowStudyPair;
+    private HashSet<Integer> rowForbidHashSet = new HashSet<>();
     /**
      * Кількість пар в одному дні
      */
@@ -47,7 +50,7 @@ public class NewLessonsPanel extends JPanel{
     /**
      * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок...Вівторок, 3 - Понеділок...Середа
      */
-    private final int DAY_AT_WEEK = 5;
+    private final int DAY_AT_WEEK = 6;
 
     public NewLessonsPanel() {
         nowStudyPair = new EmptyStudyPair();
@@ -55,14 +58,16 @@ public class NewLessonsPanel extends JPanel{
         add(contentPane);
         InitialTable();
         InitialGroupButton();
-//        System.out.println(jTable.getRowHeight());
-        setButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
-                tableModel.fireTableDataChanged();
-            }
+        setButton.addActionListener(e -> {
+            nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
+            rowForbidHashSet.clear();
+            tableModel.fireTableDataChanged();
         });
+    }
+
+    public NewLessonsPanel(String title) {
+        this();
+        setName(title);
     }
 
     private void InitialGroupButton() {
@@ -99,9 +104,6 @@ public class NewLessonsPanel extends JPanel{
         jTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                StudyPairDouble aDouble = new StudyPairDouble(
-//                        new StudyPairLonely(new Lesson("MYLESSON"), new Teacher("MYTEACHER"), new Auditory("MYAU")),
-//                                new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory("")));
                 tableModel.setValueAt(nowStudyPair,
                         jTable.rowAtPoint(e.getPoint()),
                         jTable.columnAtPoint(e.getPoint())
@@ -142,15 +144,14 @@ public class NewLessonsPanel extends JPanel{
     }
 
     private class TableModel extends AbstractTableModel {
-//        private String[] groupName = new String[] {"ПС-16", "ПС-26"};
         private ArrayList<NewLessonsUnit> units = new ArrayList<>();
 
         public TableModel() {
             NewLessonsUnit lessonsUnit = new NewLessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
-            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
-            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
-            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
-            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("123"), new Teacher("456"), new Auditory("789")));
+            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("ОПІ"), new Teacher("Завірюха"), new Auditory("402")));
+            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("ООП"), new Teacher("Завірюха"), new Auditory("402")));
+            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("WEB"), new Teacher("Завірюха"), new Auditory("407")));
+            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("Практика"), new Teacher("Заболотній"), new Auditory("407")));
             units.add(lessonsUnit);
             units.add(new NewLessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
             units.add(new NewLessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
@@ -163,7 +164,6 @@ public class NewLessonsPanel extends JPanel{
 
         @Override
         public String getColumnName(int column) {
-//            if (column % COLUMN_REPEAT == TEACHER_NAME_NUMBER) return groupName[column / COLUMN_REPEAT];
             if (column % COLUMN_REPEAT == TEACHER_NAME_NUMBER) return units.get(column / COLUMN_REPEAT).getGroup().getName();
             return "";
         }
@@ -180,7 +180,6 @@ public class NewLessonsPanel extends JPanel{
 
         @Override
         public int getColumnCount() {
-//            return COLUMN_REPEAT * groupName.length;
             return units == null ? 2 : units.size() * COLUMN_REPEAT;
         }
 
@@ -197,7 +196,6 @@ public class NewLessonsPanel extends JPanel{
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             switch (columnIndex % COLUMN_REPEAT) {
                 case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER:
-//                    units.set(columnIndex / COLUMN_REPEAT, (StudyPair)aValue);
                     units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
             }
             fireTableDataChanged();
@@ -265,16 +263,18 @@ public class NewLessonsPanel extends JPanel{
             if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1)
                 component.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
             component.setBackground(Color.WHITE);
+            if (rowForbidHashSet.contains(row)) {
+                component.setBackground(new Color(0xA299FF));
+                component.setOpaque(true);
+            }
             for (StudyPair.Forbidden forbidden: ((StudyPair)value).getForbidden(nowStudyPair)) {
-                /*if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
-                    component.setBackground(Color.RED);
-                    component.setOpaque(true);
-//                    System.out.println(forbidden);
-                } else*/ if (forbidden == StudyPair.Forbidden.ROW_FORBIDDEN) {
-                    component.setBackground(Color.GREEN);
+                if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
+                    component.setBackground(new Color(0xBBBAB8));
                     component.setOpaque(true);
                 }
-//                System.out.println(forbidden);
+                if (forbidden == StudyPair.Forbidden.ROW_FORBIDDEN) {
+                    rowForbidHashSet.add(row);
+                }
             }
             return component;
         }
@@ -347,6 +347,10 @@ abstract class StudyPair {
     abstract public JComponent getRendererComponent(Query data);
 
     abstract public Forbidden[] getForbidden(StudyPair studyPair);
+
+    abstract public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek);
+
+    abstract public Forbidden[] getSelfForbidden();
 }
 
 class EmptyStudyPair extends StudyPair {
@@ -361,8 +365,20 @@ class EmptyStudyPair extends StudyPair {
 
     @Override
     public Forbidden[] getForbidden(StudyPair studyPair) {
-        return new Forbidden[] {Forbidden.NON_FORBIDDEN};
+        return new Forbidden[0];
     }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+        return getForbidden(studyPair);
+    }
+
+    @Override
+    public Forbidden[] getSelfForbidden() {
+        return new Forbidden[0];
+    }
+
+
 }
 
 class StudyPairLonely extends StudyPair {
@@ -427,6 +443,19 @@ class StudyPairLonely extends StudyPair {
         }
         return new Forbidden[] {Forbidden.UNKNOWN_FORBIDDEN};
     }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+        if (units == null || row == -1 || col == -1 || pairPerDay == -1 || dayPerWeek == -1) {
+            return getForbidden(studyPair);
+        }
+        return getForbidden(studyPair);
+    }
+
+    @Override
+    public Forbidden[] getSelfForbidden() {
+        return new Forbidden[0];
+    }
 }
 
 class StudyPairDouble extends StudyPair {
@@ -482,30 +511,40 @@ class StudyPairDouble extends StudyPair {
             Collections.addAll(fb, this.denominator.getForbidden(pairDouble.numerator));
             Collections.addAll(fb, this.numerator.getForbidden(pairDouble.denominator));
             Collections.addAll(fb, this.denominator.getForbidden(pairDouble.denominator));
-            Forbidden[] forbiddens = new Forbidden[fb.size()];
+            Forbidden[] forbids = new Forbidden[fb.size()];
             int i = 0;
             for (Forbidden forbidden: fb) {
-                forbiddens[i++] = forbidden;
+                forbids[i++] = forbidden;
             }
-            return forbiddens;
+            return forbids;
         } else if (studyPair instanceof StudyPairLonely) {
             StudyPairLonely lonely = (StudyPairLonely) studyPair;
             HashSet<Forbidden> fb = new HashSet<>();
             Collections.addAll(fb, this.numerator.getForbidden(lonely));
             Collections.addAll(fb, this.denominator.getForbidden(lonely));
-            Forbidden[] forbiddens = new Forbidden[fb.size()];
+            Forbidden[] forbids = new Forbidden[fb.size()];
             int i = 0;
             for (Forbidden forbidden: fb) {
-                forbiddens[i++] = forbidden;
+                forbids[i++] = forbidden;
             }
-            return forbiddens;
+            return forbids;
         }
         return new Forbidden[] {Forbidden.UNKNOWN_FORBIDDEN};
+    }
+
+    @Override
+    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+        return getForbidden(studyPair);
+    }
+
+    @Override
+    public Forbidden[] getSelfForbidden() {
+        return new Forbidden[0];
     }
 }
 
 class Lesson {
-    String name;
+    private String name;
 
     public Lesson() {name = "Lesson = ?";}
 
