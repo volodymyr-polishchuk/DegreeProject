@@ -10,8 +10,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
@@ -60,8 +58,9 @@ public class NewLessonsPanel extends JPanel{
         InitialGroupButton();
         setButton.addActionListener(e -> {
             nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
-            rowForbidHashSet.clear();
-            tableModel.fireTableDataChanged();
+            getTableModel().updateForbids(nowStudyPair);
+//            rowForbidHashSet.clear();
+//            tableModel.fireTableDataChanged();
         });
     }
 
@@ -145,6 +144,34 @@ public class NewLessonsPanel extends JPanel{
 
     private class TableModel extends AbstractTableModel {
         private ArrayList<NewLessonsUnit> units = new ArrayList<>();
+        private HashMap<Point, HashSet<StudyPair.Forbidden>> fMap = new HashMap<>();
+
+        public HashMap<Point, HashSet<StudyPair.Forbidden>> getfMap() {
+            return fMap;
+        }
+
+        public void updateForbids(StudyPair studyPair) {
+            fMap.clear();
+            StudyPair.Forbidden[] forbidsArr;
+            for (int i = 0; i < units.size(); i++) {
+                NewLessonsUnit unit = units.get(i);
+                for (int j = 0; j < unit.getPairPerDay() * unit.getDayPerWeek(); j++) {
+                    forbidsArr = unit.getPair(j).getForbidden(studyPair, units, j, i, unit.getPairPerDay(), unit.getDayPerWeek());
+                    for (StudyPair.Forbidden f: forbidsArr) {
+                        if (fMap.get(new Point(j, i)) == null) {
+                            HashSet<StudyPair.Forbidden> set = new HashSet<>();
+                            set.add(f);
+                            fMap.put(new Point(j, i), set);
+                        } else {
+                            HashSet<StudyPair.Forbidden> set = fMap.get(new Point(j, i));
+                            set.add(f);
+                            fMap.put(new Point(j, i), set);
+                        }
+                    }
+                }
+            }
+            fireTableDataChanged();
+        }
 
         public TableModel() {
             NewLessonsUnit lessonsUnit = new NewLessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
@@ -156,6 +183,8 @@ public class NewLessonsPanel extends JPanel{
             units.add(new NewLessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
             units.add(new NewLessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
         }
+
+
 
         @Override
         public int getRowCount() {
@@ -257,25 +286,40 @@ public class NewLessonsPanel extends JPanel{
     private class TableCellSubjectRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//            JPanel panel = (JPanel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             JComponent component = ((StudyPair) value).getRendererComponent(StudyPair.Query.values()[(column % COLUMN_REPEAT) - 2]);
             component.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
             if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1)
                 component.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
-            component.setBackground(Color.WHITE);
-            if (rowForbidHashSet.contains(row)) {
-                component.setBackground(new Color(0xA299FF));
-                component.setOpaque(true);
-            }
-            for (StudyPair.Forbidden forbidden: ((StudyPair)value).getForbidden(nowStudyPair)) {
-                if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
-                    component.setBackground(new Color(0xBBBAB8));
-                    component.setOpaque(true);
+//            component.setBackground(Color.WHITE);
+            component.setBackground(new Color(0xC5DCA0));
+            component.setOpaque(true);
+            if (((TableModel)table.getModel()).getfMap().get(new Point(row, column)) != null) {
+                HashSet<StudyPair.Forbidden> set = ((TableModel)table.getModel()).getfMap().get(new Point(row, column));
+                for (StudyPair.Forbidden forbidden :set) {
+                    switch (forbidden) {
+                        case ROW_FORBIDDEN: component.setBackground(new Color(0xF9DAD0));
+                            break;
+                        case SELF_FORBIDDEN: component.setBackground(new Color(0x818AA3));
+                            break;
+                        case NON_FORBIDDEN: component.setBackground(new Color(0xF5F2B8));
+                            break;
+                    }
                 }
-                if (forbidden == StudyPair.Forbidden.ROW_FORBIDDEN) {
-                    rowForbidHashSet.add(row);
-                }
             }
+//            if (rowForbidHashSet.contains(row)) {
+//                component.setBackground(new Color(0xF9DAD0));
+//            }
+//            for (StudyPair.Forbidden forbidden: ((StudyPair)value).getForbidden(nowStudyPair)) {
+//                if (forbidden == StudyPair.Forbidden.SELF_FORBIDDEN) {
+//                    component.setBackground(new Color(0x818AA3));
+//                }
+//                if (forbidden == StudyPair.Forbidden.NON_FORBIDDEN) {
+//                    component.setBackground(new Color(0xF5F2B8));
+//                }
+//                if (forbidden == StudyPair.Forbidden.ROW_FORBIDDEN) {
+//                    rowForbidHashSet.add(row);
+//                }
+//            }
             return component;
         }
     }
@@ -299,6 +343,8 @@ public class NewLessonsPanel extends JPanel{
 class NewLessonsUnit {
     private Group group;
     private StudyPair[] pairs;
+    private int pairPerDay;
+    private int dayPerWeek;
 
     public Group getGroup() {
         return group;
@@ -318,10 +364,20 @@ class NewLessonsUnit {
 
     public NewLessonsUnit(Group group, int pairPerDay, int dayPerWeek) {
         this.group = group;
+        this.pairPerDay = pairPerDay;
+        this.dayPerWeek = dayPerWeek;
         pairs = new StudyPair[pairPerDay * dayPerWeek];
         for (int i = 0; i < pairs.length; i++) {
             pairs[i] = StudyPair.getEmptyInstance();
         }
+    }
+
+    public int getPairPerDay() {
+        return pairPerDay;
+    }
+
+    public int getDayPerWeek() {
+        return dayPerWeek;
     }
 }
 
@@ -348,7 +404,7 @@ abstract class StudyPair {
 
     abstract public Forbidden[] getForbidden(StudyPair studyPair);
 
-    abstract public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek);
+    abstract public Forbidden[] getForbidden(StudyPair studyPair, List<NewLessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek);
 
     abstract public Forbidden[] getSelfForbidden();
 }
@@ -369,7 +425,7 @@ class EmptyStudyPair extends StudyPair {
     }
 
     @Override
-    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+    public Forbidden[] getForbidden(StudyPair studyPair, List<NewLessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
         return getForbidden(studyPair);
     }
 
@@ -445,7 +501,7 @@ class StudyPairLonely extends StudyPair {
     }
 
     @Override
-    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+    public Forbidden[] getForbidden(StudyPair studyPair, List<NewLessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
         if (units == null || row == -1 || col == -1 || pairPerDay == -1 || dayPerWeek == -1) {
             return getForbidden(studyPair);
         }
@@ -533,7 +589,7 @@ class StudyPairDouble extends StudyPair {
     }
 
     @Override
-    public Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
+    public Forbidden[] getForbidden(StudyPair studyPair, List<NewLessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek) {
         return getForbidden(studyPair);
     }
 
