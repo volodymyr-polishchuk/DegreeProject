@@ -55,7 +55,32 @@ public class LessonsPanel extends JPanel{
         InitialTable();
         InitialGroupButton();
         setButton.addActionListener(e -> {
-            nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
+            switch (buttonGroup.getSelection().getActionCommand()) {
+                case "BOTH": nowStudyPair = new StudyPairLonely(
+                        new Lesson(textField1.getText()),
+                        new Teacher(textField2.getText()),
+                        new Auditory(textField3.getText())
+                ); break;
+                case "NUMERATOR": nowStudyPair = new StudyPairDouble(
+                        new StudyPairLonely(
+                                new Lesson(textField1.getText()),
+                                new Teacher(textField2.getText()),
+                                new Auditory(textField3.getText())),
+                        new StudyPairLonely()
+                ); break;
+                case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
+                        new StudyPairLonely(
+                                new Lesson(textField1.getText()),
+                                new Teacher(textField2.getText()),
+                                new Auditory(textField3.getText())),
+                        new StudyPairLonely(
+                            new Lesson(textField1.getText()),
+                            new Teacher(textField2.getText()),
+                            new Auditory(textField3.getText()))
+                ); break;
+            }
+            System.out.println(buttonGroup.getSelection().getActionCommand());
+
             tableModel.updateForbids(nowStudyPair);
         });
     }
@@ -142,6 +167,17 @@ public class LessonsPanel extends JPanel{
         private ArrayList<LessonsUnit> units = new ArrayList<>();
         private HashMap<app.lessons.StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
+        public TableModel() {
+            LessonsUnit lessonsUnit = new LessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
+            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("ОПІ"), new Teacher("Завірюха"), new Auditory("402")));
+            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("ООП"), new Teacher("Завірюха"), new Auditory("402")));
+            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("WEB"), new Teacher("Завірюха"), new Auditory("407")));
+            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("Практика"), new Teacher("Заболотній"), new Auditory("407")));
+            units.add(lessonsUnit);
+            units.add(new LessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
+            units.add(new LessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
+        }
+
         public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {
             return fMap;
         }
@@ -184,17 +220,6 @@ public class LessonsPanel extends JPanel{
                 }
             }
             fireTableDataChanged();
-        }
-
-        public TableModel() {
-            LessonsUnit lessonsUnit = new LessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
-            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("ОПІ"), new Teacher("Завірюха"), new Auditory("402")));
-            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("ООП"), new Teacher("Завірюха"), new Auditory("402")));
-            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("WEB"), new Teacher("Завірюха"), new Auditory("407")));
-            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("Практика"), new Teacher("Заболотній"), new Auditory("407")));
-            units.add(lessonsUnit);
-            units.add(new LessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
-            units.add(new LessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
         }
 
 
