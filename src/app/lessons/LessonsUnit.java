@@ -2,82 +2,46 @@ package app.lessons;
 
 import app.Group;
 
-import java.util.Arrays;
-
 /**
- * Created by Vladimir on 29/01/18.
+ * Created by Vladimir on 06/02/18.
  **/
 public class LessonsUnit {
-
     private Group group;
-    private StudyPairSubject[] pairSubjects;
-    private int daysOfWeek;
-    private int pairOfDay;
-
-    public LessonsUnit(Group group, int daysOfWeek, int pairOfDay) {
-        this.group = group;
-        this.daysOfWeek = daysOfWeek;
-        this.pairOfDay = pairOfDay;
-        pairSubjects = new StudyPairSubject[getDaysOfWeek() * getPairOfDay()];
-        for (int i = 0; i < getDaysOfWeek() * getPairOfDay(); i++) {
-            pairSubjects[i] = new StudyPairSubject();
-        }
-    }
-
-    public StudySubject getStudySubjectByRow(int row, PairType type) {
-        if (PairType.BOTH == type && row % 2 != 0) return new StudySubject();
-        return pairSubjects[row / 2].getStudySubject(type);
-    }
-
-    public StudyPairSubject getStudyPairByRow(int row) {
-        return pairSubjects[row / 2];
-    }
-
-    public void setPairSubjects(int row, PairType type, StudySubject subject) {
-        pairSubjects[row / 2].setSubject(type, subject);
-    }
-
-    public int getDaysOfWeek() {
-        return daysOfWeek;
-    }
-
-    public int getPairOfDay() {
-        return pairOfDay;
-    }
+    private StudyPair[] pairs;
+    private int pairPerDay;
+    private int dayPerWeek;
 
     public Group getGroup() {
         return group;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        LessonsUnit that = (LessonsUnit) o;
-
-        if (daysOfWeek != that.daysOfWeek) return false;
-        if (pairOfDay != that.pairOfDay) return false;
-        if (group != null ? !group.equals(that.group) : that.group != null) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(pairSubjects, that.pairSubjects);
-
+    public StudyPair[] getPairs() {
+        return pairs;
     }
 
-    @Override
-    public int hashCode() {
-        int result = group != null ? group.hashCode() : 0;
-        result = 31 * result + Arrays.hashCode(pairSubjects);
-        result = 31 * result + daysOfWeek;
-        result = 31 * result + pairOfDay;
-        return result;
+    public StudyPair getPair(int index) {
+        return pairs[index];
     }
 
-    @Override
-    public String toString() {
-        return "LessonsUnit{" +
-                "group=" + group +
-                ", pairSubjects=" + Arrays.toString(pairSubjects) +
-                '}';
+    public void setPair(int index, StudyPair pairs) {
+        this.pairs[index] = pairs;
+    }
+
+    public LessonsUnit(Group group, int pairPerDay, int dayPerWeek) {
+        this.group = group;
+        this.pairPerDay = pairPerDay;
+        this.dayPerWeek = dayPerWeek;
+        pairs = new StudyPair[pairPerDay * dayPerWeek];
+        for (int i = 0; i < pairs.length; i++) {
+            pairs[i] = StudyPair.getEmptyInstance();
+        }
+    }
+
+    public int getPairPerDay() {
+        return pairPerDay;
+    }
+
+    public int getDayPerWeek() {
+        return dayPerWeek;
     }
 }

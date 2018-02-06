@@ -1,13 +1,35 @@
 package app.lessons;
 
 /**
- * Created by Vladimir on 30/01/18.
+ * Created by Vladimir on 06/02/18.
  **/
-public class Teacher extends NamedItem {
-    public Teacher() {
+public class Teacher {
+    private String name;
+
+    public Teacher() {name = "Teacher = ?";}
+
+    public Teacher(String name) {this.name = name;}
+
+    public String getName() {return name;}
+
+    public void setName(String name) {this.name = name;}
+
+    @Override
+    public String toString() {return "Teacher{" + name + '}';}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Teacher teacher = (Teacher) o;
+
+        return name != null ? name.equals(teacher.name) : teacher.name == null;
+
     }
 
-    public Teacher(String name) {
-        super(name);
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }

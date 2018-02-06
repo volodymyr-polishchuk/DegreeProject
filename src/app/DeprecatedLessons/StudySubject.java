@@ -1,4 +1,4 @@
-package app.lessons;
+package app.DeprecatedLessons;
 
 /**
  * Created by Vladimir on 30/01/18.

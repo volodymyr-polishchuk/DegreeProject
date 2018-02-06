@@ -3,28 +3,28 @@ package app.lessons;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class Auditory {
+public class Lesson {
     private String name;
 
-    public Auditory() {name = "Auditory = ?";}
+    public Lesson() {name = "Lesson = ?";}
 
-    public Auditory(String name) {this.name = name;}
+    public Lesson(String name) {this.name = name;}
 
     public String getName() {return name;}
 
     public void setName(String name) {this.name = name;}
 
     @Override
-    public String toString() {return "Auditory{" + name + '}';}
+    public String toString() {return "Lesson{" + name + '}';}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Auditory auditory = (Auditory) o;
+        Lesson lesson = (Lesson) o;
 
-        return name != null ? name.equals(auditory.name) : auditory.name == null;
+        return name != null ? name.equals(lesson.name) : lesson.name == null;
 
     }
 

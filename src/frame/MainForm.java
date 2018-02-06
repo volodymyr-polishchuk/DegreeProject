@@ -79,8 +79,8 @@ public class MainForm extends JFrame {
     }
 
     public void LessonsProcessAdd() {
-//        addTab(new LessonsPanel("Розклад занять"), "Розклад занять");
-        addTab(new NewLessonsPanel("Розклад занять"), "Розклад занять");
+//        addTab(new DeprecatedLessonsPanel("Розклад занять"), "Розклад занять");
+        addTab(new LessonsPanel("Розклад занять"), "Розклад занять");
     }
 
     private class myMenuBar extends JMenuBar {
