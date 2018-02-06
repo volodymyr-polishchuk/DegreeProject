@@ -58,7 +58,7 @@ public class NewLessonsPanel extends JPanel{
         InitialGroupButton();
         setButton.addActionListener(e -> {
             nowStudyPair = new StudyPairLonely(new Lesson(textField1.getText()), new Teacher(textField2.getText()), new Auditory(textField3.getText()));
-            getTableModel().updateForbids(nowStudyPair);
+            tableModel.updateForbids(nowStudyPair);
 //            rowForbidHashSet.clear();
 //            tableModel.fireTableDataChanged();
         });
@@ -144,29 +144,46 @@ public class NewLessonsPanel extends JPanel{
 
     private class TableModel extends AbstractTableModel {
         private ArrayList<NewLessonsUnit> units = new ArrayList<>();
-        private HashMap<Point, HashSet<StudyPair.Forbidden>> fMap = new HashMap<>();
+        private HashMap<StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
-        public HashMap<Point, HashSet<StudyPair.Forbidden>> getfMap() {
+        public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {
             return fMap;
+        }
+
+        private StudyPair.Forbidden getForbidden(TableModel tableModel, int row, int column) {
+            StudyPair.Forbidden forbidden = StudyPair.Forbidden.UNKNOWN_FORBIDDEN;
+            HashMap<StudyPair.Forbidden, HashSet<Point>> map = tableModel.getfMap();
+            if (map.get(StudyPair.Forbidden.ROW_FORBIDDEN) != null) {
+                for (Point point: map.get(StudyPair.Forbidden.ROW_FORBIDDEN)) {
+                    if (point.getX() == row) {
+                        forbidden = StudyPair.Forbidden.ROW_FORBIDDEN;
+                        break;
+                    }
+                }
+            }
+            for (StudyPair.Forbidden f: map.keySet()) {
+                if (!map.get(f).contains(new Point(row, column / COLUMN_REPEAT))) continue;
+                switch (f) {
+                    case SELF_FORBIDDEN: forbidden = StudyPair.Forbidden.SELF_FORBIDDEN;
+                        break;
+                    case NON_FORBIDDEN: forbidden = StudyPair.Forbidden.NON_FORBIDDEN;
+                        break;
+                }
+            }
+            return forbidden;
         }
 
         public void updateForbids(StudyPair studyPair) {
             fMap.clear();
             StudyPair.Forbidden[] forbidsArr;
-            for (int i = 0; i < units.size(); i++) {
-                NewLessonsUnit unit = units.get(i);
-                for (int j = 0; j < unit.getPairPerDay() * unit.getDayPerWeek(); j++) {
-                    forbidsArr = unit.getPair(j).getForbidden(studyPair, units, j, i, unit.getPairPerDay(), unit.getDayPerWeek());
+            for (int col = 0; col < units.size(); col++) {
+                NewLessonsUnit unit = units.get(col);
+                for (int row = 0; row < unit.getPairPerDay() * unit.getDayPerWeek(); row++) {
+                    forbidsArr = unit.getPair(row).getForbidden(studyPair, units, row, col, unit.getPairPerDay(), unit.getDayPerWeek());
                     for (StudyPair.Forbidden f: forbidsArr) {
-                        if (fMap.get(new Point(j, i)) == null) {
-                            HashSet<StudyPair.Forbidden> set = new HashSet<>();
-                            set.add(f);
-                            fMap.put(new Point(j, i), set);
-                        } else {
-                            HashSet<StudyPair.Forbidden> set = fMap.get(new Point(j, i));
-                            set.add(f);
-                            fMap.put(new Point(j, i), set);
-                        }
+                        HashSet<Point> set = fMap.get(f) == null ? new HashSet<>() : fMap.get(f);
+                        set.add(new Point(row, col));
+                        fMap.put(f, set);
                     }
                 }
             }
@@ -227,6 +244,7 @@ public class NewLessonsPanel extends JPanel{
                 case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER:
                     units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
             }
+            updateForbids(nowStudyPair);
             fireTableDataChanged();
         }
     }
@@ -293,19 +311,30 @@ public class NewLessonsPanel extends JPanel{
 //            component.setBackground(Color.WHITE);
             component.setBackground(new Color(0xC5DCA0));
             component.setOpaque(true);
-            if (((TableModel)table.getModel()).getfMap().get(new Point(row, column)) != null) {
-                HashSet<StudyPair.Forbidden> set = ((TableModel)table.getModel()).getfMap().get(new Point(row, column));
-                for (StudyPair.Forbidden forbidden :set) {
-                    switch (forbidden) {
-                        case ROW_FORBIDDEN: component.setBackground(new Color(0xF9DAD0));
-                            break;
-                        case SELF_FORBIDDEN: component.setBackground(new Color(0x818AA3));
-                            break;
-                        case NON_FORBIDDEN: component.setBackground(new Color(0xF5F2B8));
-                            break;
-                    }
-                }
+            StudyPair.Forbidden forbidden = ((TableModel)table.getModel()).getForbidden(tableModel, row, column);
+
+            switch (forbidden) {
+                case SELF_FORBIDDEN: component.setBackground(new Color(0x818AA3));
+                    break;
+                case ROW_FORBIDDEN: component.setBackground(new Color(0xF9DAD0));
+                    break;
+                case NON_FORBIDDEN: component.setBackground(new Color(0xF5F2B8));
+                    break;
+                case UNKNOWN_FORBIDDEN: component.setBackground(new Color(0xC5DCA0));
             }
+//            HashMap<StudyPair.Forbidden, HashSet<Point>> map = ((TableModel) table.getModel()).getfMap();
+//            for (StudyPair.Forbidden forbidden: map.keySet()) {
+//                if (!map.get(forbidden).contains(new Point(row, column / COLUMN_REPEAT))) continue;
+//                switch (forbidden) {
+//                    case SELF_FORBIDDEN: component.setBackground(new Color(0x818AA3));
+//                        break;
+//                    case ROW_FORBIDDEN: component.setBackground(new Color(0xF9DAD0));
+//                        break;
+//                    case NON_FORBIDDEN: component.setBackground(new Color(0xF5F2B8));
+//                        break;
+//                }
+//            }
+
 //            if (rowForbidHashSet.contains(row)) {
 //                component.setBackground(new Color(0xF9DAD0));
 //            }
@@ -413,7 +442,7 @@ class EmptyStudyPair extends StudyPair {
 
     @Override
     public JComponent getRendererComponent(Query data) {
-        JLabel jLabel = new JLabel("Empty");
+        JLabel jLabel = new JLabel("");
         jLabel.setVerticalAlignment(SwingConstants.CENTER);
         jLabel.setHorizontalAlignment(SwingConstants.CENTER);
         return jLabel;
