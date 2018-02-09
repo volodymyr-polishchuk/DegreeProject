@@ -6,7 +6,7 @@ package app.lessons;
 public class Auditory {
     private String name;
 
-    public Auditory() {name = "Auditory = ?";}
+    public Auditory() {name = "";}
 
     public Auditory(String name) {this.name = name;}
 

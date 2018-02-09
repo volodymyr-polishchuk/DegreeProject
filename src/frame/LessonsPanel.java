@@ -69,10 +69,7 @@ public class LessonsPanel extends JPanel{
                         new StudyPairLonely()
                 ); break;
                 case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
-                        new StudyPairLonely(
-                                new Lesson(textField1.getText()),
-                                new Teacher(textField2.getText()),
-                                new Auditory(textField3.getText())),
+                        new StudyPairLonely(),
                         new StudyPairLonely(
                             new Lesson(textField1.getText()),
                             new Teacher(textField2.getText()),

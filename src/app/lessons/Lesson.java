@@ -6,7 +6,7 @@ package app.lessons;
 public class Lesson {
     private String name;
 
-    public Lesson() {name = "Lesson = ?";}
+    public Lesson() {name = "";}
 
     public Lesson(String name) {this.name = name;}
 
