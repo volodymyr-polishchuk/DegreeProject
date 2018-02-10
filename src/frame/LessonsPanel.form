@@ -3,12 +3,12 @@
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="860" height="385"/>
+      <xy x="20" y="20" width="946" height="385"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="509ac" layout-manager="GridLayoutManager" row-count="1" column-count="8" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="509ac" layout-manager="GridLayoutManager" row-count="2" column-count="8" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false"/>
@@ -121,6 +121,73 @@
               <text value="Set"/>
             </properties>
           </component>
+          <component id="7fb84" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+            <constraints>
+              <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <model>
+                <item value="Піддубна О.В."/>
+                <item value="Горденко Л.П."/>
+                <item value="Поліщук Н.П."/>
+                <item value="Горденко Л.П."/>
+                <item value="Ткаченко О.М."/>
+                <item value="Просторук В.В."/>
+                <item value="Карбовська Л.В."/>
+                <item value="Сухонос С.А."/>
+                <item value="Гайшук В.І."/>
+                <item value="Тарнавська С.П."/>
+                <item value="Широкун О.В."/>
+                <item value="Даценко Т.А."/>
+                <item value="Кутова О.О."/>
+                <item value="Топтун В.В."/>
+              </model>
+            </properties>
+          </component>
+          <component id="d7372" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+            <constraints>
+              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <model>
+                <item value="Математика"/>
+                <item value="Українська мова"/>
+                <item value="Історія України"/>
+                <item value="Українська література"/>
+                <item value="Всесвітня історія"/>
+                <item value="Світова література"/>
+                <item value="Безпека життєдіяльності"/>
+                <item value="Іноземна мова"/>
+                <item value="Захист Вітчизни"/>
+                <item value="Біологія"/>
+                <item value="Інформатика"/>
+                <item value="Фізика"/>
+                <item value="Культурологія"/>
+                <item value="Економічна теорія"/>
+                <item value="Хімія"/>
+                <item value="Фізична культура"/>
+              </model>
+            </properties>
+          </component>
+          <component id="32a4e" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
+            <constraints>
+              <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <model>
+                <item value="204"/>
+                <item value="202"/>
+                <item value="203"/>
+                <item value="105"/>
+                <item value="14/1"/>
+                <item value="14/2"/>
+                <item value="302"/>
+                <item value="402"/>
+                <item value="15"/>
+                <item value="12"/>
+              </model>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="898fe" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -174,7 +241,10 @@
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <horizontalScrollBarPolicy value="32"/>
+              <verticalScrollBarPolicy value="22"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="eb792" class="javax.swing.JTable" binding="jTable">

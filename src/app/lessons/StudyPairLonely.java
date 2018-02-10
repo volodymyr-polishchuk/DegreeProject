@@ -24,6 +24,10 @@ public class StudyPairLonely extends StudyPair {
         this.auditory = auditory;
     }
 
+    public boolean isEmpty() {
+        return lesson.getName().isEmpty() && teacher.getName().isEmpty() && auditory.getName().isEmpty();
+    }
+
     public Lesson getLesson() {
         return lesson;
     }

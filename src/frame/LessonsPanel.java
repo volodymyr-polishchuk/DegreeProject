@@ -29,6 +29,9 @@ public class LessonsPanel extends JPanel{
     private JTextField textField2;
     private JTextField textField3;
     private JButton setButton;
+    private JComboBox comboBox1;
+    private JComboBox comboBox2;
+    private JComboBox comboBox3;
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
     private StudyPair nowStudyPair;
@@ -57,9 +60,9 @@ public class LessonsPanel extends JPanel{
         setButton.addActionListener(e -> {
             switch (buttonGroup.getSelection().getActionCommand()) {
                 case "BOTH": nowStudyPair = new StudyPairLonely(
-                        new Lesson(textField1.getText()),
-                        new Teacher(textField2.getText()),
-                        new Auditory(textField3.getText())
+                        new Lesson((String) comboBox1.getModel().getSelectedItem()),
+                        new Teacher((String) comboBox2.getModel().getSelectedItem()),
+                        new Auditory((String) comboBox3.getModel().getSelectedItem())
                 ); break;
                 case "NUMERATOR": nowStudyPair = new StudyPairDouble(
                         new StudyPairLonely(
@@ -76,8 +79,6 @@ public class LessonsPanel extends JPanel{
                             new Auditory(textField3.getText()))
                 ); break;
             }
-            System.out.println(buttonGroup.getSelection().getActionCommand());
-
             tableModel.updateForbids(nowStudyPair);
         });
     }
@@ -110,6 +111,7 @@ public class LessonsPanel extends JPanel{
     private void InitialTable() {
         tableModel = new TableModel();
         jTable.setModel(tableModel);
+        jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         jTable.getTableHeader().setDefaultRenderer(new TableHeaderCellRenderer());
         jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer());
         jTable.setDefaultRenderer(Integer.class, new TableCellPairNumberRenderer());
@@ -259,8 +261,18 @@ public class LessonsPanel extends JPanel{
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             switch (columnIndex % COLUMN_REPEAT) {
-                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER:
-                    units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
+                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER:case AUDITORY_NUMBER: {
+                    if (units.get(columnIndex / COLUMN_REPEAT).getPair(rowIndex) instanceof StudyPairDouble
+                            && aValue instanceof StudyPairDouble) {
+                        units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex,
+                                StudyPairDouble.unite(
+                                        (StudyPairDouble)units.get(columnIndex / COLUMN_REPEAT).getPair(rowIndex),
+                                        (StudyPairDouble)aValue));
+                    } else {
+                        units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
+                    }
+//                    units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
+                }
             }
             updateForbids(nowStudyPair);
             fireTableDataChanged();

@@ -56,10 +56,17 @@ public class StudyPairDouble extends StudyPair {
         if (studyPair instanceof StudyPairDouble) {
             StudyPairDouble pairDouble = (StudyPairDouble) studyPair;
             HashSet<Forbidden> fb = new HashSet<>();
-            Collections.addAll(fb, this.numerator.getForbidden(pairDouble.numerator));
-            Collections.addAll(fb, this.denominator.getForbidden(pairDouble.numerator));
-            Collections.addAll(fb, this.numerator.getForbidden(pairDouble.denominator));
-            Collections.addAll(fb, this.denominator.getForbidden(pairDouble.denominator));
+            if (!this.numerator.isEmpty()) {
+                if (!pairDouble.numerator.isEmpty())
+                    Collections.addAll(fb, this.numerator.getForbidden(pairDouble.numerator));
+                if (!pairDouble.denominator.isEmpty())
+                    Collections.addAll(fb, this.numerator.getForbidden(pairDouble.denominator));
+            } else if (!this.denominator.isEmpty()) {
+                if (!pairDouble.numerator.isEmpty())
+                    Collections.addAll(fb, this.denominator.getForbidden(pairDouble.numerator));
+                if (!pairDouble.denominator.isEmpty())
+                    Collections.addAll(fb, this.denominator.getForbidden(pairDouble.denominator));
+            }
             Forbidden[] forbids = new Forbidden[fb.size()];
             int i = 0;
             for (Forbidden forbidden: fb) {
@@ -69,8 +76,10 @@ public class StudyPairDouble extends StudyPair {
         } else if (studyPair instanceof StudyPairLonely) {
             StudyPairLonely lonely = (StudyPairLonely) studyPair;
             HashSet<Forbidden> fb = new HashSet<>();
-            Collections.addAll(fb, this.numerator.getForbidden(lonely));
-            Collections.addAll(fb, this.denominator.getForbidden(lonely));
+            if (!this.numerator.isEmpty())
+                Collections.addAll(fb, this.numerator.getForbidden(lonely));
+            else if (!this.denominator.isEmpty())
+                Collections.addAll(fb, this.denominator.getForbidden(lonely));
             Forbidden[] forbids = new Forbidden[fb.size()];
             int i = 0;
             for (Forbidden forbidden: fb) {
@@ -89,5 +98,15 @@ public class StudyPairDouble extends StudyPair {
     @Override
     public Forbidden[] getSelfForbidden() {
         return new Forbidden[0];
+    }
+
+
+    public static StudyPair unite(StudyPairDouble pair1, StudyPairDouble pair2) {
+        if (pair1.numerator.isEmpty() && pair2.denominator.isEmpty()) {
+            return new StudyPairDouble(pair2.numerator, pair1.denominator);
+        } else if (pair1.denominator.isEmpty() && pair2.numerator.isEmpty()){
+            return new StudyPairDouble(pair1.numerator, pair2.denominator);
+        }
+        return pair2;
     }
 }
