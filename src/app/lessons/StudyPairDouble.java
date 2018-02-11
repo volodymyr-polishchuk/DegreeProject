@@ -22,6 +22,14 @@ public class StudyPairDouble extends StudyPair {
         this.denominator = denominator;
     }
 
+    public StudyPairLonely getNumerator() {
+        return numerator;
+    }
+
+    public StudyPairLonely getDenominator() {
+        return denominator;
+    }
+
     @Override
     public JComponent getRendererComponent(Query data) {
         JPanel panel = new JPanel(new GridLayout(2, 1));

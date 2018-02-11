@@ -32,6 +32,9 @@ public class LessonsPanel extends JPanel{
     private JComboBox comboBox1;
     private JComboBox comboBox2;
     private JComboBox comboBox3;
+    private JLabel groupNameLabel;
+    private JLabel workHourInWeekLabel;
+    private JLabel studyPairInWeekLabel;
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
     private StudyPair nowStudyPair;
@@ -66,17 +69,17 @@ public class LessonsPanel extends JPanel{
                 ); break;
                 case "NUMERATOR": nowStudyPair = new StudyPairDouble(
                         new StudyPairLonely(
-                                new Lesson(textField1.getText()),
-                                new Teacher(textField2.getText()),
-                                new Auditory(textField3.getText())),
+                                new Lesson((String) comboBox1.getModel().getSelectedItem()),
+                                new Teacher((String) comboBox2.getModel().getSelectedItem()),
+                                new Auditory((String) comboBox3.getModel().getSelectedItem())),
                         new StudyPairLonely()
                 ); break;
                 case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
                         new StudyPairLonely(),
                         new StudyPairLonely(
-                            new Lesson(textField1.getText()),
-                            new Teacher(textField2.getText()),
-                            new Auditory(textField3.getText()))
+                            new Lesson((String) comboBox1.getModel().getSelectedItem()),
+                            new Teacher((String) comboBox2.getModel().getSelectedItem()),
+                            new Auditory((String) comboBox3.getModel().getSelectedItem()))
                 ); break;
             }
             tableModel.updateForbids(nowStudyPair);
@@ -112,6 +115,8 @@ public class LessonsPanel extends JPanel{
         tableModel = new TableModel();
         jTable.setModel(tableModel);
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable.getTableHeader().setReorderingAllowed(false);
+        jTable.getTableHeader().setResizingAllowed(false);
         jTable.getTableHeader().setDefaultRenderer(new TableHeaderCellRenderer());
         jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer());
         jTable.setDefaultRenderer(Integer.class, new TableCellPairNumberRenderer());
@@ -122,27 +127,20 @@ public class LessonsPanel extends JPanel{
         jTable.setRowHeight(jTable.getRowHeight() * 2);
         jTable.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                tableModel.setValueAt(nowStudyPair,
-                        jTable.rowAtPoint(e.getPoint()),
-                        jTable.columnAtPoint(e.getPoint())
-                );
+            public void mouseClicked(MouseEvent e) {mouseTableClick(e);
             }
         });
         while (columns.hasMoreElements()) {
             TableColumn column = columns.nextElement();
             switch (column.getModelIndex() % COLUMN_REPEAT) {
                 case DAY_NAME_NUMBER:case PAIR_NUMBER: {
-                    column.setMaxWidth(25);
-                    column.setMinWidth(25);
+                    column.setMaxWidth(25); column.setMinWidth(25);
                 } break;
                 case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
-                    column.setMinWidth(130);
-                    column.setMaxWidth(130);
+                    column.setMinWidth(130); column.setMaxWidth(130);
                 } break;
                 case AUDITORY_NUMBER: {
-                    column.setMinWidth(40);
-                    column.setMaxWidth(40);
+                    column.setMinWidth(40); column.setMaxWidth(40);
                 } break;
             }
         }
@@ -353,6 +351,41 @@ public class LessonsPanel extends JPanel{
             }
             return component;
         }
+    }
+
+    private void mouseTableClick(MouseEvent e) {
+        int row = jTable.rowAtPoint(e.getPoint());
+        int column = jTable.columnAtPoint(e.getPoint());
+        tableModel.setValueAt(nowStudyPair, row, column);
+        analyzeTable(row, column);
+    }
+
+    private void analyzeTable(int row, int column) {
+        LessonsUnit unit = getTableModel().units.get(column / COLUMN_REPEAT);
+        int pairCountNumerator = 0;
+        int pairCountDenominator = 0;
+        for (StudyPair pair : unit.getPairs()) {
+            if (pair instanceof StudyPairLonely) {
+                StudyPairLonely lonely = (StudyPairLonely) pair;
+                if (lonely.isEmpty()) continue;
+                pairCountNumerator++;
+                pairCountDenominator++;
+            } else if (pair instanceof StudyPairDouble) {
+                StudyPairLonely numerator = ((StudyPairDouble)pair).getNumerator();
+                StudyPairLonely denominator = ((StudyPairDouble)pair).getDenominator();
+                if (!numerator.isEmpty()) pairCountNumerator++;
+                if (!denominator.isEmpty()) pairCountDenominator++;
+            }
+        }
+        groupNameLabel.setText(unit.getGroup().getName());
+        workHourInWeekLabel.setText(pairCountNumerator == pairCountDenominator ?
+                (pairCountNumerator * 2) + " годин; в середньому на день " + ((pairCountDenominator * 2 + pairCountNumerator * 2) / 10) :
+                "(Ч) " + (pairCountNumerator * 2) + " годин; (З) " + (pairCountDenominator * 2) + " годин;  в середньому на день " + ((pairCountDenominator * 2 + pairCountNumerator * 2) / 10)
+        );
+        studyPairInWeekLabel.setText(pairCountNumerator == pairCountDenominator ?
+                (pairCountNumerator) + " пар; в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10) :
+                "(Ч) " + (pairCountNumerator) + " годин; (З) " + (pairCountDenominator) + " годин;  в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10)
+        );
     }
 
     public static void main(String[] args) {
