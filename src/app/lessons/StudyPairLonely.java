@@ -1,5 +1,9 @@
 package app.lessons;
 
+import app.data.Auditory;
+import app.data.Lesson;
+import app.data.Teacher;
+
 import javax.swing.*;
 import java.util.List;
 

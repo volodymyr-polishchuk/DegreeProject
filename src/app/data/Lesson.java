@@ -1,4 +1,4 @@
-package app.lessons;
+package app.data;
 
 /**
  * Created by Vladimir on 06/02/18.

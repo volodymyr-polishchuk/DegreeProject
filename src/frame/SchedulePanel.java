@@ -1,19 +1,20 @@
 package frame;
 
 import app.*;
+import app.data.Group;
+import app.data.Period;
+import app.data.Week;
+import app.schedules.ScheduleUnit;
+import app.schedules.SchedulerTableModel;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -219,7 +220,7 @@ public class SchedulePanel extends JPanel{
                 BufferedImage image = new BufferedImage(26, 18, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g = (Graphics2D) image.getGraphics();
                 g.setColor(label.getBackground());
-                g.fillRect(0, 0, jTable.getTableHeader().getColumnModel().getColumn(col).getWidth() + 1, jTable.getTableHeader().getHeight() + 5);
+                g.fillRect(0, 0, jTable.getTableHeader().getColumnModel().getColumn(col).getWidth() + 10, jTable.getTableHeader().getHeight() + 5);
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
                 g.setColor(label.getForeground());
@@ -306,5 +307,9 @@ public class SchedulePanel extends JPanel{
             weeksLabel.setText(weeksLabel.getText() + mapItem.getKey().getName() + " &rArr; " + mapItem.getValue() + "<br>");
         }
         weeksLabel.setText(weeksLabel.getText() + "</html>");
+    }
+
+    public void showSetting() {
+        settingGroupButton.doClick();
     }
 }

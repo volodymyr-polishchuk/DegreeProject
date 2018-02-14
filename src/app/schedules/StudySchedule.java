@@ -1,4 +1,7 @@
-package app;
+package app.schedules;
+
+import app.DegreeProject;
+import app.data.WeekList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

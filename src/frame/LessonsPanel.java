@@ -1,6 +1,9 @@
 package frame;
 
-import app.Group;
+import app.data.Auditory;
+import app.data.Group;
+import app.data.Lesson;
+import app.data.Teacher;
 import app.lessons.*;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 

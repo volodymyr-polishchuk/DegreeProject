@@ -54,7 +54,19 @@ public class MainForm extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        button.addActionListener(e -> {tabbedPane.remove(tabbedPane.indexOfComponent(jPanel));});
+        button.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(
+                    null,
+                    "Всі не збережі зміни будуть втрачені! \n\rПродовжити?",
+                    "Увага",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
+            );
+            switch (result) {
+                case JOptionPane.YES_OPTION: break;
+                case JOptionPane.NO_OPTION: return;
+            }
+            tabbedPane.remove(tabbedPane.indexOfComponent(jPanel));
+        });
         panel.add(button, BorderLayout.LINE_END);
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(jPanel), panel);
         tabbedPane.setSelectedComponent(jPanel);
@@ -75,7 +87,9 @@ public class MainForm extends JFrame {
     }
 
     public void StudyProcessAdd() {
-        addTab(new SchedulePanel("Графік навчального процесу"), "Графік навчального процесу");
+        SchedulePanel panel = new SchedulePanel("Графік навчального процесу");
+        addTab(panel, panel.getName());
+        panel.showSetting();
     }
 
     public void LessonsProcessAdd() {
@@ -86,13 +100,36 @@ public class MainForm extends JFrame {
         private MainForm mainForm;
         myMenuBar(MainForm mainForm) {
             this.mainForm = mainForm;
-    // Створення головного меню програми
+            //Створення головного меню програми
+//          Створення пункту меню ПРОГРАМА
             JMenu m1 = new JMenu("Програма");
-            m1.add(new JMenuItem("Виконати підключення до іншого сервера"));
-            m1.add(new JMenuItem("Налаштування"));
+            JMenuItem MenuItemReconnection = new JMenuItem("Виконати підключення до іншого сервера");
+            MenuItemReconnection.addActionListener(e -> {
+                (new ConnectionForm()).setVisible(true);
+                dispose();
+            });
+            m1.add(MenuItemReconnection);
+            JMenuItem MenuItemSetting = new JMenuItem("Налаштування");
+            m1.add(MenuItemSetting);
             m1.add(new JPopupMenu.Separator());
-            m1.add(new JMenuItem("Вихід"));
+            JMenuItem MenuItemExit = new JMenuItem("Вихід");
+            MenuItemExit.addActionListener(e -> {
+                int result = JOptionPane.showConfirmDialog(null, "Зберегти зміни?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
+                switch (result) {
+                    case JOptionPane.YES_OPTION:
+                       //TODO Збереження даних в базу даних перед виходом із програми
+                        System.exit(0);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        System.exit(0);
+                        break;
+                    case JOptionPane.CANCEL_OPTION:
+                        break;
+                }
+            });
+            m1.add(MenuItemExit);
             add(m1);
+//          Створення меню Навчальний графік
             JMenu m2 = new JMenu("Навчальний графік");
             JMenuItem item = new JMenuItem("Створити навчальний графік");
             item.addActionListener(e -> this.mainForm.StudyProcessAdd());
@@ -100,21 +137,33 @@ public class MainForm extends JFrame {
             m2.add(new JMenuItem("Редагувати існуючий графік"));
             m2.add(new JMenuItem("Видалити або архівувати графік"));
             add(m2);
+//          Створення меню Розклад занять
             JMenu m3 = new JMenu("Розклад занять");
-    //        m3.add(new JMenuItem("Створити розклад занять"));
             JMenuItem item1 = new JMenuItem("Створити розклад занять");
             item1.addActionListener(e -> this.mainForm.LessonsProcessAdd());
             m3.add(item1);
             m3.add(new JMenuItem("Редагувати існуючих розклад"));
             m3.add(new JMenuItem("Видалити або архівувати розклад"));
             add(m3);
+//          Створення меню Дані
             JMenu m4 = new JMenu("Дані");
             m4.add(new JMenuItem("Аудиторії"));
             m4.add(new JMenuItem("Викладачі"));
             m4.add(new JMenuItem("Предмети"));
+            m4.add(new JPopupMenu.Separator());
             m4.add(new JMenuItem("Навчальний предмет"));
             add(m4);
-
+//          Створення меню Довідка
+            JMenu m5 = new JMenu("Довідка");
+            //TODO Реалізувати форму допомоги користувачеві
+            JMenuItem MenuItemHelp = new JMenuItem("Допомога користувачеві");
+            m5.add(MenuItemHelp);
+            //TODO Реалізувати форму перевірки оновлення та передення на сторінку GitHub
+            m5.add(new JMenuItem("Перевірка оновлень"));
+            //TODO Реалізувати форму Про програму
+            JMenuItem MenuItemAbout = new JMenuItem("Про програму");
+            m5.add(MenuItemAbout);
+            add(m5);
         }
     }
 }

@@ -1,7 +1,7 @@
 package frame;
 
-import app.Group;
-import app.GroupChoiceListener;
+import app.data.Group;
+import app.schedules.GroupChoiceListener;
 
 import javax.swing.*;
 import java.awt.event.*;

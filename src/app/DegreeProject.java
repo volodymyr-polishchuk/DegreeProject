@@ -1,11 +1,12 @@
 package app;
 
+import app.data.GroupList;
+import app.data.WeekList;
 import frame.ConnectionForm;
 import frame.HelloPanel;
 import frame.MainForm;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -25,16 +26,16 @@ public class DegreeProject {
             e.printStackTrace();
         }
 
-//        ConnectionForm connectionForm = new ConnectionForm();
-//        connectionForm.setVisible(true);
-        try {
-            databaseData = new DatabaseData("localhost", "3306", "Volodymyr", new char[]{'0', '0', '0', '0'}, "mydata");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Помилка підключення до бази даних. \n\r" + e.getMessage());
-            e.printStackTrace();
-
-        }
-        InitialMainFrame();
+        ConnectionForm connectionForm = new ConnectionForm();
+        connectionForm.setVisible(true);
+//        try {
+//            databaseData = new DatabaseData("localhost", "3306", "Volodymyr", new char[]{'0', '0', '0', '0'}, "mydata");
+//        } catch (SQLException e) {
+//            JOptionPane.showMessageDialog(null, "Помилка підключення до бази даних. \n\r" + e.getMessage());
+//            e.printStackTrace();
+//
+//        }
+//        InitialMainFrame();
     }
 
     public static void InitialMainFrame() {

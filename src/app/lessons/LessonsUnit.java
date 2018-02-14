@@ -1,6 +1,6 @@
 package app.lessons;
 
-import app.Group;
+import app.data.Group;
 
 /**
  * Created by Vladimir on 06/02/18.

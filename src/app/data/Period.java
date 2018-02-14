@@ -1,4 +1,4 @@
-package app;
+package app.data;
 
 import org.jetbrains.annotations.Contract;
 

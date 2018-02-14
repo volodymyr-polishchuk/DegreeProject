@@ -1,4 +1,6 @@
-package app;
+package app.schedules;
+
+import app.data.Group;
 
 import java.util.ArrayList;
 

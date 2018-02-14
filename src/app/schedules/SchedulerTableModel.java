@@ -1,4 +1,7 @@
-package app;
+package app.schedules;
+
+import app.data.Period;
+import app.data.Week;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

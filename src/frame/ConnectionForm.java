@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Created by Vladimir on 26/12/17.
@@ -20,7 +21,6 @@ public class ConnectionForm extends JFrame{
     private JTextField userTextField;
     private JPasswordField passwordField;
     private JButton connectButton;
-    private JTextField databaseField;
     private JCheckBox rememberCheckBox;
 
     public ConnectionForm() {
@@ -30,6 +30,24 @@ public class ConnectionForm extends JFrame{
         setResizable(false);
         setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize().getWidth() - this.getWidth()) / 2),
                 (int) ((Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight()) / 2));
+        String line = "";
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+                    new File(new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/database.txt")))));
+            line = reader.readLine();
+            reader.close();
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+        if (!line.isEmpty()) {
+            String[] lines = line.split(";");
+            if (lines.length == 5) {
+                addressTextField.setText(lines[0]);
+                portTextField.setText(lines[1]);
+                userTextField.setText(lines[2]);
+                passwordField.setText(lines[3]);
+            }
+        }
 
         connectButton.addActionListener(e -> {
             try {
@@ -37,33 +55,63 @@ public class ConnectionForm extends JFrame{
                         portTextField.getText(),
                         userTextField.getText(),
                         passwordField.getPassword(),
-                        databaseField.getText());
+                        "asfsc");
             } catch (SQLException e1) {
+                if (e1.getSQLState().equals("42000")) {
+                    int r = JOptionPane.showConfirmDialog(null, "База даних 'asfcs' потрібна для роботи не знайдена! \n\r" +
+                            "Створити нову базу?", "Налаштування бази даних", JOptionPane.YES_NO_CANCEL_OPTION);
+                    switch (r) {
+                        case JOptionPane.YES_OPTION: {
+                            //TODO Виконувати створення і накатування бази даних
+                            return;
+                        }
+                        default: return;
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "Підключення не встановлено. \n\r " +
+                        "Сервер повернув помилку:" + e1.getMessage(),
+                        "Помилка сервера", JOptionPane.ERROR_MESSAGE);
                 e1.printStackTrace();
                 return;
             }
-            if (rememberCheckBox.isSelected()) {
-                try {
-                    BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(
-                                    new FileOutputStream(
-                                            new File(
-                                                    new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/databases.txt")
-                                            ))));
-                    writer.write(addressTextField.getText() + ";");
-                    writer.write(portTextField.getText() + ";");
-                    writer.write(userTextField.getText() + ";");
-                    writer.write(String.valueOf(passwordField.getPassword()) + ";");
-                    writer.write(databaseField.getText());
-                    writer.flush();
-                    writer.close();
-                } catch (IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
-            }
+
+            if (rememberCheckBox.isSelected()) rememberMe();
+            logDate();
             DegreeProject.InitialMainFrame();
             dispose();
         });
+    }
+
+    private void logDate() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    new File(new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/log.txt")))));
+            writer.write((new Date(System.currentTimeMillis())).toString());
+            writer.flush();
+            writer.close();
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void rememberMe() {
+        try {
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(
+                                    new File(
+                                            new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/database.txt")
+                                    ))));
+            writer.write(addressTextField.getText() + ";");
+            writer.write(portTextField.getText() + ";");
+            writer.write(userTextField.getText() + ";");
+            writer.write(String.valueOf(passwordField.getPassword()) + ";");
+            writer.write("asfsc");
+            writer.flush();
+            writer.close();
+        } catch (IOException | URISyntaxException e1) {
+            e1.printStackTrace();
+        }
     }
 
 }

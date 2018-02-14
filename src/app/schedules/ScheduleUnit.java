@@ -1,4 +1,8 @@
-package app;
+package app.schedules;
+
+import app.data.Group;
+import app.data.Week;
+import app.data.WeekList;
 
 /**
  * Created by Vladimir on 03/01/18.

@@ -1,4 +1,4 @@
-package app;
+package app.data;
 
 import javax.swing.*;
 import java.sql.Connection;
