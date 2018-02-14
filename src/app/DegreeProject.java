@@ -32,6 +32,7 @@ public class DegreeProject {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Помилка підключення до бази даних. \n\r" + e.getMessage());
             e.printStackTrace();
+
         }
         InitialMainFrame();
     }

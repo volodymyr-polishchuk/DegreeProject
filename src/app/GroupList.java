@@ -1,5 +1,6 @@
 package app;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ public class GroupList {
                 list.add(new Group(resultSet));
             }
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Помилка читання даних з бази \n\r MySQL -> " + e.getSQLState());
             //Тут треба буде якось кидати явну помилку
             e.printStackTrace();
         }
