@@ -1,5 +1,7 @@
 package frame;
 
+import app.DegreeProject;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -134,7 +136,18 @@ public class MainForm extends JFrame {
             JMenuItem item = new JMenuItem("Створити навчальний графік");
             item.addActionListener(e -> this.mainForm.StudyProcessAdd());
             m2.add(item);
-            m2.add(new JMenuItem("Переглянути/редагувати графік"));
+            JMenuItem viewScheduleMenuItem = new JMenuItem("Переглянути/редагувати графік");
+            viewScheduleMenuItem.addActionListener(e -> {
+                ScheduleChoiceForm form = new ScheduleChoiceForm(DegreeProject.databaseData.getConnection()) {
+                    @Override
+                    public void onChoice(String args) {
+                        super.onChoice(args);
+//                        TODO Робити щось з обраним елементом
+                    }
+                };
+                form.setVisible(true);
+            });
+            m2.add(viewScheduleMenuItem);
             m2.add(new JMenuItem("Видалити графік"));
             add(m2);
 //          Створення меню Розклад занять
