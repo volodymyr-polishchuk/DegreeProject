@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 /**
@@ -43,6 +45,56 @@ public class SchedulePanel extends JPanel{
         settingGroupButton.addActionListener(this::settingGroupClick);
         InitialYearsPanel();
         initialComboBox();
+        saveButton.addActionListener(this::saveButtonClick);
+    }
+
+    private void saveButtonClick(ActionEvent e) {
+        try {
+            int schedule_key = 0;
+            HashMap<Group, Integer> groupMap = new HashMap<>();
+            HashMap<Integer, String> department = new HashMap<>();
+            Connection c = DegreeProject.databaseData.getConnection();
+            Statement st;
+            st = c.createStatement();
+            ResultSet departmentRS = st.executeQuery("SELECT * FROM departments;");
+            while (departmentRS.next()) {
+                department.put(departmentRS.getInt("k"), departmentRS.getString("name"));
+            }
+            ResultSet rs = st.executeQuery("SELECT * FROM groups");
+            while (rs.next()) {
+                groupMap.put(new Group(department.get(rs.getInt("department")), rs.getString("name")), rs.getInt("k"));
+            }
+            ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
+
+            PreparedStatement ps = c.prepareStatement("INSERT IGNORE schedules(period, date_of_create, coments) VALUE (?, ?, ?);");
+            ps.setString(1, yearsLabel.getText());
+            ps.setDate(2, new Date(System.currentTimeMillis()));
+            ps.setString(3, "");
+            ps.execute();
+
+            rs = st.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
+            while (rs.next()) {
+                schedule_key = rs.getInt("k");
+            }
+            System.out.println("SchedulePanel:74 -> " + schedule_key);
+            System.out.println(groupMap);
+            for (ScheduleUnit unit : units) {
+                ps = c.prepareStatement("INSERT IGNORE schedules_data(schedule, groups, data) VALUE (?, ?, ?);");
+                ps.setInt(1, schedule_key);
+                System.out.println(unit.getName() + " - " + unit.getDepartment());
+                ps.setInt(2, groupMap.get(new Group(unit.getDepartment(), unit.getName())));
+                String line = "";
+                for (int i = 0; i < 52; i++) {
+                    line += unit.getWeek(i).getMark();
+                }
+                ps.setString(3, line);
+                ps.execute();
+            }
+
+        } catch (SQLException | ClassCastException e1) {
+            JOptionPane.showMessageDialog(null, e1.getMessage());
+            e1.printStackTrace();
+        }
     }
 
     private void settingGroupClick(ActionEvent e) {

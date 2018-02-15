@@ -31,6 +31,10 @@ public class SchedulerTableModel extends AbstractTableModel {
         fireTableStructureChanged();
     }
 
+    public ArrayList<ScheduleUnit> getUnits() {
+        return units;
+    }
+
     /**
      * @param index 0..51 - номер тижня
      * @return Period за зазначеним номером тижня

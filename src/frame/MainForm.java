@@ -134,22 +134,24 @@ public class MainForm extends JFrame {
             JMenuItem item = new JMenuItem("Створити навчальний графік");
             item.addActionListener(e -> this.mainForm.StudyProcessAdd());
             m2.add(item);
-            m2.add(new JMenuItem("Редагувати існуючий графік"));
-            m2.add(new JMenuItem("Видалити або архівувати графік"));
+            m2.add(new JMenuItem("Переглянути/редагувати графік"));
+            m2.add(new JMenuItem("Видалити графік"));
             add(m2);
 //          Створення меню Розклад занять
             JMenu m3 = new JMenu("Розклад занять");
             JMenuItem item1 = new JMenuItem("Створити розклад занять");
             item1.addActionListener(e -> this.mainForm.LessonsProcessAdd());
             m3.add(item1);
-            m3.add(new JMenuItem("Редагувати існуючих розклад"));
-            m3.add(new JMenuItem("Видалити або архівувати розклад"));
+            m3.add(new JMenuItem("Переглянути/редагувати розклад"));
+            m3.add(new JMenuItem("Видалити розклад"));
             add(m3);
 //          Створення меню Дані
             JMenu m4 = new JMenu("Дані");
             m4.add(new JMenuItem("Аудиторії"));
             m4.add(new JMenuItem("Викладачі"));
             m4.add(new JMenuItem("Предмети"));
+            m4.add(new JPopupMenu.Separator());
+            m4.add(new JMenuItem("Групи"));
             m4.add(new JPopupMenu.Separator());
             m4.add(new JMenuItem("Навчальний предмет"));
             add(m4);

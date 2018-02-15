@@ -30,7 +30,6 @@ public class GroupList {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Помилка читання даних з бази \n\r MySQL -> " + e.getSQLState());
-            //Тут треба буде якось кидати явну помилку
             e.printStackTrace();
         }
     }
