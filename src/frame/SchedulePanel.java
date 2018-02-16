@@ -34,6 +34,7 @@ public class SchedulePanel extends JPanel{
     private JLabel studyDaysLabel;
     private JLabel weeksLabel;
     private JComboBox<Week> jComboBox;
+    private JButton друкButton;
 
     private SchedulerTableModel tableModel;
 
@@ -46,6 +47,15 @@ public class SchedulePanel extends JPanel{
         InitialYearsPanel();
         initialComboBox();
         saveButton.addActionListener(this::saveButtonClick);
+    }
+
+    public SchedulerTableModel getTableModel() {
+        return tableModel;
+    }
+
+    public void setPeriod(String line) {
+        yearsLabel.setText(line);
+        tableModel.fireTableStructureChanged();
     }
 
     private void saveButtonClick(ActionEvent e) {
@@ -66,6 +76,23 @@ public class SchedulePanel extends JPanel{
             }
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
+            if (st.execute("SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'")) {
+                int r = JOptionPane.showConfirmDialog(
+                        null,
+                        "В базі даних уже існує графік навчання\n\rза цей період. Перезаписати?",
+                        "Попередження",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (r == JOptionPane.YES_OPTION) {
+                    st.execute(
+                            "DELETE FROM schedules_data WHERE schedule LIKE " +
+                                    "(SELECT k FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "')"
+                    );
+                    st.execute("DELETE FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'");
+                } else {
+                    return;
+                }
+            }
+
             PreparedStatement ps = c.prepareStatement("INSERT IGNORE schedules(period, date_of_create, coments) VALUE (?, ?, ?);");
             ps.setString(1, yearsLabel.getText());
             ps.setDate(2, new Date(System.currentTimeMillis()));
@@ -76,8 +103,6 @@ public class SchedulePanel extends JPanel{
             while (rs.next()) {
                 schedule_key = rs.getInt("k");
             }
-            System.out.println("SchedulePanel:74 -> " + schedule_key);
-            System.out.println(groupMap);
             for (ScheduleUnit unit : units) {
                 ps = c.prepareStatement("INSERT IGNORE schedules_data(schedule, groups, data) VALUE (?, ?, ?);");
                 ps.setInt(1, schedule_key);
@@ -180,6 +205,8 @@ public class SchedulePanel extends JPanel{
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
+
+            saveButton.setEnabled(true);
         });
         nextYearButton.addActionListener(e -> {
             String[] lines = yearsLabel.getText().split("-");
@@ -189,6 +216,8 @@ public class SchedulePanel extends JPanel{
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
+
+            saveButton.setEnabled(true);
         });
     }
 
@@ -223,6 +252,7 @@ public class SchedulePanel extends JPanel{
             @Override
             public void mousePressed(MouseEvent e) {
                 col = jTable.columnAtPoint(e.getPoint());
+                saveButton.setEnabled(true);
             }
 
             @Override
@@ -233,6 +263,7 @@ public class SchedulePanel extends JPanel{
                     jTable.setValueAt(week, row, i);
                 }
                 UpdateScheduleLabels(tableModel.getScheduleUnit(row - 3));
+                saveButton.setEnabled(true);
             }
 
             @Override

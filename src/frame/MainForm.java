@@ -138,17 +138,16 @@ public class MainForm extends JFrame {
             m2.add(item);
             JMenuItem viewScheduleMenuItem = new JMenuItem("Переглянути/редагувати графік");
             viewScheduleMenuItem.addActionListener(e -> {
-                ScheduleChoiceForm form = new ScheduleChoiceForm(DegreeProject.databaseData.getConnection()) {
-                    @Override
-                    public void onChoice(String args) {
-                        super.onChoice(args);
-//                        TODO Робити щось з обраним елементом
-                    }
-                };
+                ScheduleChoiceForm form = new ScheduleChoiceForm(DegreeProject.databaseData.getConnection());
                 form.setVisible(true);
             });
             m2.add(viewScheduleMenuItem);
-            m2.add(new JMenuItem("Видалити графік"));
+            JMenuItem removeScheduleMenuItem = new JMenuItem("Видалити графік");
+            removeScheduleMenuItem.addActionListener(e -> {
+                ScheduleRemoveForm form = new ScheduleRemoveForm(DegreeProject.databaseData.getConnection());
+                form.setVisible(true);
+            });
+            m2.add(removeScheduleMenuItem);
             add(m2);
 //          Створення меню Розклад занять
             JMenu m3 = new JMenu("Розклад занять");

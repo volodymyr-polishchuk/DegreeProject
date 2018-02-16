@@ -31,6 +31,10 @@ public class SchedulerTableModel extends AbstractTableModel {
         fireTableStructureChanged();
     }
 
+    public void setUnits(ArrayList<ScheduleUnit> units) {
+        this.units = units;
+    }
+
     public ArrayList<ScheduleUnit> getUnits() {
         return units;
     }
