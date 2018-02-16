@@ -1,11 +1,18 @@
 package frame;
 
 import app.DegreeProject;
+import app.data.Auditory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.transform.Result;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedList;
 
 /**
  * Created by Vladimir on 09/01/18.
@@ -104,80 +111,103 @@ public class MainForm extends JFrame {
             this.mainForm = mainForm;
             //Створення головного меню програми
 //          Створення пункту меню ПРОГРАМА
-            JMenu m1 = new JMenu("Програма");
-            JMenuItem MenuItemReconnection = new JMenuItem("Виконати підключення до іншого сервера");
-            MenuItemReconnection.addActionListener(e -> {
-                (new ConnectionForm()).setVisible(true);
-                dispose();
-            });
-            m1.add(MenuItemReconnection);
-            JMenuItem MenuItemSetting = new JMenuItem("Налаштування");
-            m1.add(MenuItemSetting);
-            m1.add(new JPopupMenu.Separator());
-            JMenuItem MenuItemExit = new JMenuItem("Вихід");
-            MenuItemExit.addActionListener(e -> {
-                int result = JOptionPane.showConfirmDialog(null, "Зберегти зміни?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
-                switch (result) {
-                    case JOptionPane.YES_OPTION:
-                       //TODO Збереження даних в базу даних перед виходом із програми
-                        System.exit(0);
-                        break;
-                    case JOptionPane.NO_OPTION:
-                        System.exit(0);
-                        break;
-                    case JOptionPane.CANCEL_OPTION:
-                        break;
-                }
-            });
-            m1.add(MenuItemExit);
-            add(m1);
+            JMenu programMenu = new JMenu("Програма");
+            programMenu.add(new JMenuItem("Виконати підключення до іншого сервера")).addActionListener(this::MenuItemReconnect);
+            programMenu.add(new JMenuItem("Налаштування"));
+            programMenu.add(new JPopupMenu.Separator());
+            programMenu.add(new JMenuItem("Вихід")).addActionListener(this::MenuItemExit);
+            add(programMenu);
+
 //          Створення меню Навчальний графік
-            JMenu m2 = new JMenu("Навчальний графік");
-            JMenuItem item = new JMenuItem("Створити навчальний графік");
-            item.addActionListener(e -> this.mainForm.StudyProcessAdd());
-            m2.add(item);
-            JMenuItem viewScheduleMenuItem = new JMenuItem("Переглянути/редагувати графік");
-            viewScheduleMenuItem.addActionListener(e -> {
-                ScheduleChoiceForm form = new ScheduleChoiceForm(DegreeProject.databaseData.getConnection());
-                form.setVisible(true);
-            });
-            m2.add(viewScheduleMenuItem);
-            JMenuItem removeScheduleMenuItem = new JMenuItem("Видалити графік");
-            removeScheduleMenuItem.addActionListener(e -> {
-                ScheduleRemoveForm form = new ScheduleRemoveForm(DegreeProject.databaseData.getConnection());
-                form.setVisible(true);
-            });
-            m2.add(removeScheduleMenuItem);
-            add(m2);
+            JMenu scheduleMenu = new JMenu("Навчальний графік");
+            scheduleMenu.add(new JMenuItem("Створити навчальний графік")).addActionListener(this::MenuItemCreateSchedule);
+            scheduleMenu.add(new JMenuItem("Переглянути/редагувати графік")).addActionListener(this::MenuItemViewSchedule);
+            scheduleMenu.add(new JMenuItem("Видалити графік")).addActionListener(this::MenuItemRemoveSchedule);
+            add(scheduleMenu);
+
 //          Створення меню Розклад занять
-            JMenu m3 = new JMenu("Розклад занять");
-            JMenuItem item1 = new JMenuItem("Створити розклад занять");
-            item1.addActionListener(e -> this.mainForm.LessonsProcessAdd());
-            m3.add(item1);
-            m3.add(new JMenuItem("Переглянути/редагувати розклад"));
-            m3.add(new JMenuItem("Видалити розклад"));
-            add(m3);
+            JMenu lessonsMenu = new JMenu("Розклад занять");
+            lessonsMenu.add(new JMenuItem("Створити розклад занять")).addActionListener(this::MenuItemCreateLessons);
+            lessonsMenu.add(new JMenuItem("Переглянути/редагувати розклад"));
+            lessonsMenu.add(new JMenuItem("Видалити розклад"));
+            add(lessonsMenu);
+
 //          Створення меню Дані
-            JMenu m4 = new JMenu("Дані");
-            m4.add(new JMenuItem("Аудиторії"));
-            m4.add(new JMenuItem("Викладачі"));
-            m4.add(new JMenuItem("Предмети"));
-            m4.add(new JPopupMenu.Separator());
-            m4.add(new JMenuItem("Групи"));
-            m4.add(new JPopupMenu.Separator());
-            m4.add(new JMenuItem("Навчальний предмет"));
-            add(m4);
+            JMenu dataMenu = new JMenu("Дані");
+            dataMenu.add(new JMenuItem("Аудиторії")).addActionListener(this::MenuItemDataAuditory);
+            dataMenu.add(new JMenuItem("Викладачі"));
+            dataMenu.add(new JMenuItem("Предмети"));
+            dataMenu.add(new JPopupMenu.Separator());
+            dataMenu.add(new JMenuItem("Групи"));
+            dataMenu.add(new JPopupMenu.Separator());
+            dataMenu.add(new JMenuItem("Навчальний предмет"));
+            add(dataMenu);
+
 //          Створення меню Довідка
-            JMenu m5 = new JMenu("Довідка");
+            JMenu helpMenu = new JMenu("Довідка");
             //TODO Реалізувати форму допомоги користувачеві
             JMenuItem MenuItemHelp = new JMenuItem("Допомога користувачеві");
-            m5.add(MenuItemHelp);
+            helpMenu.add(MenuItemHelp);
             //TODO Реалізувати форму перевірки оновлення та передення на сторінку GitHub
-            m5.add(new JMenuItem("Перевірка оновлень"));
+            helpMenu.add(new JMenuItem("Перевірка оновлень"));
             //TODO Реалізувати форму Про програму
             JMenuItem MenuItemAbout = new JMenuItem("Про програму");
-            m5.add(MenuItemAbout);
-            add(m5);
+            helpMenu.add(MenuItemAbout);
+            add(helpMenu);
+        }
+
+        private void MenuItemDataAuditory(ActionEvent event) {
+            try {
+                Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM auditorys");
+                LinkedList<Auditory> auditories = new LinkedList<>();
+                while (rs.next()) {
+                    auditories.add(new Auditory(rs.getString("name")));
+                }
+                Auditory[] a = new Auditory[auditories.size()];
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        private void MenuItemCreateLessons(ActionEvent event) {
+            this.mainForm.LessonsProcessAdd();
+        }
+
+        private void MenuItemRemoveSchedule(ActionEvent event) {
+            ScheduleRemoveForm form = new ScheduleRemoveForm(DegreeProject.databaseData.getConnection());
+            form.setVisible(true);
+        }
+
+        private void MenuItemViewSchedule(ActionEvent event) {
+            ScheduleChoiceForm form = new ScheduleChoiceForm(DegreeProject.databaseData.getConnection());
+            form.setVisible(true);
+        }
+
+        private void MenuItemCreateSchedule(ActionEvent event) {
+            this.mainForm.StudyProcessAdd();
+        }
+
+        private void MenuItemExit(ActionEvent event) {
+            int result = JOptionPane.showConfirmDialog(null, "Зберегти зміни?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
+            switch (result) {
+                case JOptionPane.YES_OPTION:
+                    //TODO Збереження даних в базу даних перед виходом із програми
+                    System.exit(0);
+                    break;
+                case JOptionPane.NO_OPTION:
+                    System.exit(0);
+                    break;
+                case JOptionPane.CANCEL_OPTION:
+                    break;
+            }
+        }
+
+        private void MenuItemReconnect(ActionEvent event) {
+            (new ConnectionForm()).setVisible(true);
+            dispose();
         }
     }
 }

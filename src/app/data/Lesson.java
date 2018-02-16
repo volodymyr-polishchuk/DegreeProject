@@ -3,15 +3,17 @@ package app.data;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class Lesson {
+public class Lesson implements StudyData{
     private String name;
 
     public Lesson() {name = "";}
 
     public Lesson(String name) {this.name = name;}
 
+    @Override
     public String getName() {return name;}
 
+    @Override
     public void setName(String name) {this.name = name;}
 
     @Override

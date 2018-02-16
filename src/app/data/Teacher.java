@@ -3,15 +3,17 @@ package app.data;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class Teacher {
+public class Teacher implements StudyData {
     private String name;
 
     public Teacher() {name = "";}
 
     public Teacher(String name) {this.name = name;}
 
+    @Override
     public String getName() {return name;}
 
+    @Override
     public void setName(String name) {this.name = name;}
 
     @Override

@@ -22,6 +22,10 @@ public class DegreeProject {
     public static void main(String[] args) throws IOException, SQLException {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
+            UIManager.put("OptionPane.yesButtonText"   , "Да"    );
+            UIManager.put("OptionPane.noButtonText"    , "Ні"   );
+            UIManager.put("OptionPane.cancelButtonText", "Відміна");
+            UIManager.put("OptionPane.okButtonText"    , "Готово");
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
