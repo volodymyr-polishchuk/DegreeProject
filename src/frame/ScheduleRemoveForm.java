@@ -28,9 +28,8 @@ public class ScheduleRemoveForm extends JFrame{
         jList.setModel(listModel);
         this.connection = connection;
 
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM schedules");
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM schedules")) {
             while (rs.next()) {
                 listModel.addElement("Навчальний графік " + rs.getString("period"));
             }
@@ -46,10 +45,9 @@ public class ScheduleRemoveForm extends JFrame{
     }
 
     private void removeClick(ActionEvent event) {
-        try {
+        try (Statement st = connection.createStatement()) {
             int r = JOptionPane.showConfirmDialog(null, "Ви впевнені, що бажає видалити: " + listModel.getElementAt(jList.getSelectedIndex()), "Видалення", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if (r == JOptionPane.NO_OPTION || r == JOptionPane.CANCEL_OPTION) return;
-            Statement st = connection.createStatement();
             String period = listModel.getElementAt(jList.getSelectedIndex()).split(" ")[2];
             st.execute("DELETE FROM schedules_data WHERE schedule LIKE (SELECT k FROM schedules WHERE period LIKE '" + period + "')");
             st.execute("DELETE FROM schedules WHERE period LIKE '" + period + "'");

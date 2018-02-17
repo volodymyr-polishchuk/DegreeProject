@@ -70,10 +70,13 @@ public class TeacherDialogModify extends JDialog{
     }
 
     public static Teacher getModify(Teacher a) {
+        if (a == null) throw new NullPointerException("Teacher must be not null");
         TeacherDialogModify dialog = new TeacherDialogModify(a);
         dialog.setVisible(true);
 //
-        return dialog.nameTextField.getText().isEmpty() ? dialog.teacher : new Teacher(dialog.nameTextField.getText(),
+        return dialog.nameTextField.getText().isEmpty() ? dialog.teacher : new Teacher(
+                dialog.teacher.getKey(),
+                dialog.nameTextField.getText(),
                 new Preference(
                         dialog.monCBox.isSelected(),
                         dialog.tueCBox.isSelected(),
@@ -81,9 +84,5 @@ public class TeacherDialogModify extends JDialog{
                         dialog.thuCBox.isSelected(),
                         dialog.friCBox.isSelected(),
                         dialog.satCBox.isSelected()));
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getModify());
     }
 }

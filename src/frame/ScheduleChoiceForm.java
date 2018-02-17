@@ -34,9 +34,8 @@ public class ScheduleChoiceForm extends JFrame {
         jList.setModel(listModel);
         this.connection = connection;
 
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM schedules;");
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM schedules;")) {
             while (rs.next()) {
                 listModel.addElement("Навчальний графік " + rs.getString("period"));
             }
@@ -59,9 +58,8 @@ public class ScheduleChoiceForm extends JFrame {
         ArrayList<ScheduleUnit> units = new ArrayList<>();
         HashMap<Integer, Group> groups = new HashMap<>();
         HashMap<Integer, String> department = new HashMap<>();
-        try {
-            Statement st = connection.createStatement();
-            ResultSet drs = st.executeQuery("SELECT * FROM departments;");
+        try (Statement st = connection.createStatement();
+             ResultSet drs = st.executeQuery("SELECT * FROM departments;")) {
             while (drs.next()) {
                 department.put(drs.getInt("k"), drs.getString("name"));
             }
@@ -70,11 +68,13 @@ public class ScheduleChoiceForm extends JFrame {
             while (grs.next()) {
                 groups.put(grs.getInt("k"), new Group(department.get(grs.getInt("department")), grs.getString("name")));
             }
+            grs.close();
             ResultSet rsKey = st.executeQuery("SELECT * FROM schedules WHERE period = '" + year + "';");
             int key = 0;
             while (rsKey.next()) {
                 key = rsKey.getInt("k");
             }
+            rsKey.close();
             ResultSet rs = st.executeQuery("SELECT * FROM schedules_data WHERE schedule = '" + key + "';");
             while (rs.next()) {
                 ScheduleUnit unit = new ScheduleUnit(groups.get(rs.getInt("groups")));
@@ -84,6 +84,7 @@ public class ScheduleChoiceForm extends JFrame {
                 }
                 units.add(unit);
             }
+            rs.close();
             System.out.println(units);
             SchedulePanel panel = new SchedulePanel("Навчальний графік");
             units.forEach(unit -> {

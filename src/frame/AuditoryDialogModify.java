@@ -49,9 +49,10 @@ public class AuditoryDialogModify extends JDialog{
     }
 
     public static Auditory getModify(Auditory a) {
+        if (a == null) throw new NullPointerException("Auditory must be not null");
         AuditoryDialogModify dialog = new AuditoryDialogModify(a);
         dialog.setModal(true);
         dialog.setVisible(true);
-        return dialog.jTextField.getText().isEmpty() ? dialog.auditory : new Auditory(dialog.jTextField.getText());
+        return dialog.jTextField.getText().isEmpty() ? dialog.auditory : new Auditory(dialog.auditory.getKey(), dialog.jTextField.getText());
     }
 }

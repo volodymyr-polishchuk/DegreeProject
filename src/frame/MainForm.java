@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Vladimir on 09/01/18.
@@ -163,26 +160,90 @@ public class MainForm extends JFrame {
         }
 
         private void MenuItemDataLesson(ActionEvent event) {
+            try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                 ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k")
+            ) {
+                HashSet<Lesson> lessonHashSet = new HashSet<>();
+                while (rs.next()) {
+                    lessonHashSet.add(
+                            new Lesson(
+                                    rs.getInt("k"),
+                                    rs.getString("name"),
+                                    new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name"))
+                            )
+                    );
+                }
+                Lesson[] inputData = new Lesson[lessonHashSet.size()];
+                int count = 0;
+                for (Lesson lesson : lessonHashSet) inputData[count++] = lesson;
+//                Ключі для аудиторії задаються не тільки тут, а й LessonsModify, тому при зміні структури ключа варто змінити і там
+                StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
+                    @Override
+                    public StudyData add() {
+                        return LessonDialogModify.getModify();
+                    }
 
+                    @Override
+                    public StudyData edit(StudyData t) {
+                        return LessonDialogModify.getModify((Lesson)t);
+                    }
+
+                    @Override
+                    public boolean remove(StudyData t) {
+                        return true;
+                    }
+
+                    @Override
+                    public void exit(StudyData[] t) {
+
+                    }
+                });
+
+                boolean b = true;
+                if (outputData.length == inputData.length) {
+                    for (int i = 0; i < outputData.length; i++) {
+                        Lesson in = inputData[i];
+                        Lesson out = (Lesson) outputData[i];
+                        if (!in.equals(out)) {
+                            b = false;
+                            break;
+                        }
+                    }
+                } else {
+                    b = false;
+                }
+                if (b) return;
+
+                st.execute("DELETE FROM lessons");
+                for (StudyData item : outputData) {
+                    if (item.keyExist())
+                        st.execute("INSERT INTO lessons(name, auditory, k) VALUE ('"
+                                + item.getName() + "', '"
+                                + ((Lesson)item).getAuditory().getKey() + "', " + item.getKey() + ");");
+                    else
+                        st.execute("INSERT INTO lessons(name, auditory) VALUE ('" + item.getName() + "', '" + ((Lesson)item).getAuditory().getKey() + "');");
+                }
+                JOptionPane.showMessageDialog(null, "Дані успішно змінено");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         private void MenuItemDataTeacher(ActionEvent event) {
-            try {
-                Statement st = DegreeProject.databaseData.getConnection().createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM teachers");
-                HashMap<Teacher, Integer> teacherHashMap = new HashMap<>();
+            try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                 ResultSet rs = st.executeQuery("SELECT * FROM teachers")) {
+                HashSet<Teacher> teacherHashSet = new HashSet<>();
                 while (rs.next()) {
-                    teacherHashMap.put(
+                    teacherHashSet.add(
                             new Teacher(
+                                    rs.getInt("k"),
                                     rs.getString("name"),
-                                    Preference.parsePreference(rs.getString("preferences"))
-                            ),
-                            rs.getInt("k")
-                    );
+                                    Preference.parsePreference(rs.getString("preferences"))));
                 }
-                Teacher[] inputData = new Teacher[teacherHashMap.size()];
+                Teacher[] inputData = new Teacher[teacherHashSet.size()];
                 int count = 0;
-                for (Teacher teacher : teacherHashMap.keySet()) inputData[count++] = teacher;
+                for (Teacher teacher : teacherHashSet) inputData[count++] = teacher;
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
                     public StudyData add() {
@@ -222,7 +283,16 @@ public class MainForm extends JFrame {
 
                 st.execute("DELETE FROM teachers");
                 for (StudyData item : outputData) {
-                    st.execute("INSERT INTO teachers(name, preferences) VALUE ('" + item.getName() + "', '" + ((Teacher)item).getPreference().getData() + "');");
+                    if (item.keyExist())
+                        st.execute("INSERT INTO teachers(name, preferences, k) VALUE ('"
+                                + item.getName() + "', '"
+                                + ((Teacher)item).getPreference().getData() + "', " +
+                                item.getKey() +
+                                ");");
+                    else
+                        st.execute("INSERT INTO teachers(name, preferences) VALUE ('"
+                                + item.getName() + "', '"
+                                + ((Teacher)item).getPreference().getData() + "');");
                 }
                 JOptionPane.showMessageDialog(null, "Дані успішно змінено");
             } catch (SQLException e) {
@@ -232,16 +302,15 @@ public class MainForm extends JFrame {
         }
 
         private void MenuItemDataAuditory(ActionEvent event) {
-            try {
-                Statement st = DegreeProject.databaseData.getConnection().createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM auditorys");
-                HashMap<Auditory, Integer> auditoryHashMap = new HashMap<>();
+            try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                 ResultSet rs = st.executeQuery("SELECT * FROM auditorys")) {
+                HashSet<Auditory> auditoryHashSet = new HashSet<>();
                 while (rs.next()) {
-                    auditoryHashMap.put(new Auditory(rs.getString("name")), rs.getInt("k"));
+                    auditoryHashSet.add(new Auditory(rs.getInt("k"), rs.getString("name")));
                 }
-                Auditory[] inputData = new Auditory[auditoryHashMap.size()];
+                Auditory[] inputData = new Auditory[auditoryHashSet.size()];
                 int count = 0;
-                for (Auditory auditory : auditoryHashMap.keySet()) inputData[count++] = auditory;
+                for (Auditory auditory : auditoryHashSet) inputData[count++] = auditory;
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
                     public StudyData add() {
@@ -279,7 +348,10 @@ public class MainForm extends JFrame {
 
                 st.execute("DELETE FROM auditorys");
                 for (StudyData item : outputData) {
-                    st.execute("INSERT INTO auditorys(name) VALUE ('" + item.getName() + "');");
+                    if (item.keyExist())
+                        st.execute("INSERT INTO auditorys(name, k) VALUE ('" + item.getName() + "', " + item.getKey() + ");");
+                    else
+                        st.execute("INSERT INTO auditorys(name) VALUE ('" + item.getName() + "');");
                 }
                 JOptionPane.showMessageDialog(null, "Дані успішно змінено");
             } catch (SQLException e) {
