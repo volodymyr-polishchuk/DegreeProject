@@ -1,18 +1,20 @@
 package frame;
 
 import app.DegreeProject;
-import app.data.Auditory;
+import app.data.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created by Vladimir on 09/01/18.
@@ -135,10 +137,10 @@ public class MainForm extends JFrame {
 //          Створення меню Дані
             JMenu dataMenu = new JMenu("Дані");
             dataMenu.add(new JMenuItem("Аудиторії")).addActionListener(this::MenuItemDataAuditory);
-            dataMenu.add(new JMenuItem("Викладачі"));
-            dataMenu.add(new JMenuItem("Предмети"));
+            dataMenu.add(new JMenuItem("Викладачі")).addActionListener(this::MenuItemDataTeacher);
+            dataMenu.add(new JMenuItem("Предмети")).addActionListener(this::MenuItemDataLesson);
             dataMenu.add(new JPopupMenu.Separator());
-            dataMenu.add(new JMenuItem("Групи"));
+            dataMenu.add(new JMenuItem("Групи")).addActionListener(this::MenuItemDataGroup);
             dataMenu.add(new JPopupMenu.Separator());
             dataMenu.add(new JMenuItem("Навчальний предмет"));
             add(dataMenu);
@@ -156,16 +158,130 @@ public class MainForm extends JFrame {
             add(helpMenu);
         }
 
+        private void MenuItemDataGroup(ActionEvent event) {
+
+        }
+
+        private void MenuItemDataLesson(ActionEvent event) {
+
+        }
+
+        private void MenuItemDataTeacher(ActionEvent event) {
+            try {
+                Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM teachers");
+                HashMap<Teacher, Integer> teacherHashMap = new HashMap<>();
+                while (rs.next()) {
+                    teacherHashMap.put(
+                            new Teacher(
+                                    rs.getString("name"),
+                                    Preference.parsePreference(rs.getString("preferences"))
+                            ),
+                            rs.getInt("k")
+                    );
+                }
+                Teacher[] inputData = new Teacher[teacherHashMap.size()];
+                int count = 0;
+                for (Teacher teacher : teacherHashMap.keySet()) inputData[count++] = teacher;
+                StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
+                    @Override
+                    public StudyData add() {
+                        return TeacherDialogModify.getModify();
+                    }
+
+                    @Override
+                    public StudyData edit(StudyData t) {
+                        return TeacherDialogModify.getModify((Teacher)t);
+                    }
+
+                    @Override
+                    public boolean remove(StudyData t) {
+                        return true;
+                    }
+
+                    @Override
+                    public void exit(StudyData[] t) {
+
+                    }
+                });
+
+                boolean b = true;
+                if (outputData.length == inputData.length) {
+                    for (int i = 0; i < outputData.length; i++) {
+                        Teacher in = inputData[i];
+                        Teacher out = (Teacher) outputData[i];
+                        if (!in.equals(out)) {
+                            b = false;
+                            break;
+                        }
+                    }
+                } else {
+                    b = false;
+                }
+                if (b) return;
+
+                st.execute("DELETE FROM teachers");
+                for (StudyData item : outputData) {
+                    st.execute("INSERT INTO teachers(name, preferences) VALUE ('" + item.getName() + "', '" + ((Teacher)item).getPreference().getData() + "');");
+                }
+                JOptionPane.showMessageDialog(null, "Дані успішно змінено");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
         private void MenuItemDataAuditory(ActionEvent event) {
             try {
                 Statement st = DegreeProject.databaseData.getConnection().createStatement();
                 ResultSet rs = st.executeQuery("SELECT * FROM auditorys");
-                LinkedList<Auditory> auditories = new LinkedList<>();
+                HashMap<Auditory, Integer> auditoryHashMap = new HashMap<>();
                 while (rs.next()) {
-                    auditories.add(new Auditory(rs.getString("name")));
+                    auditoryHashMap.put(new Auditory(rs.getString("name")), rs.getInt("k"));
                 }
-                Auditory[] a = new Auditory[auditories.size()];
+                Auditory[] inputData = new Auditory[auditoryHashMap.size()];
+                int count = 0;
+                for (Auditory auditory : auditoryHashMap.keySet()) inputData[count++] = auditory;
+                StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
+                    @Override
+                    public StudyData add() {
+                        return AuditoryDialogModify.getModify();
+                    }
 
+                    @Override
+                    public StudyData edit(StudyData t) {
+                        return AuditoryDialogModify.getModify((Auditory)t);
+                    }
+
+                    @Override
+                    public boolean remove(StudyData t) {
+                        return true;
+                    }
+
+                    @Override
+                    public void exit(StudyData[] t) {
+
+                    }
+                });
+
+                boolean b = true;
+                if (outputData.length == inputData.length) {
+                    for (int i = 0; i < inputData.length; i++) {
+                        Auditory in = inputData[i];
+                        Auditory out = (Auditory) outputData[i];
+                        if (!in.equals(out)) {
+                            b = false;
+                            break;
+                        }
+                    }
+                }
+                if (b) return;
+
+                st.execute("DELETE FROM auditorys");
+                for (StudyData item : outputData) {
+                    st.execute("INSERT INTO auditorys(name) VALUE ('" + item.getName() + "');");
+                }
+                JOptionPane.showMessageDialog(null, "Дані успішно змінено");
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
                 e.printStackTrace();
@@ -191,10 +307,9 @@ public class MainForm extends JFrame {
         }
 
         private void MenuItemExit(ActionEvent event) {
-            int result = JOptionPane.showConfirmDialog(null, "Зберегти зміни?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
+            int result = JOptionPane.showConfirmDialog(null, "Увага! Всі не збережені зміни будуть видалені\n\rПродовжити?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
             switch (result) {
                 case JOptionPane.YES_OPTION:
-                    //TODO Збереження даних в базу даних перед виходом із програми
                     System.exit(0);
                     break;
                 case JOptionPane.NO_OPTION:
