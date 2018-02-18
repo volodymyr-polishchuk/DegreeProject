@@ -11,8 +11,7 @@ public class ScheduleUnit extends Group implements Comparable {
     private Week[] weeks = new Week[52];
 
     public ScheduleUnit(Group group) {
-        this.groupName = group.getName();
-        this.department = group.getDepartment();
+        super(group.getKey(), group.getDepartment(), group.getName());
         for (int i = 0; i < 52; i++) {
             weeks[i] = new Week();
         }

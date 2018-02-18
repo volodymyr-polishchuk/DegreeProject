@@ -65,7 +65,7 @@ public class MainForm extends JFrame {
         button.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(
                     null,
-                    "Всі не збережі зміни будуть втрачені! \n\rПродовжити?",
+                    "Всі не збережі зміни будуть втрачені!\n\rПродовжити?",
                     "Увага",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
             );
@@ -87,8 +87,15 @@ public class MainForm extends JFrame {
     private void InitJToolBar(JToolBar jToolBar) {
         try {
             jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/settingsIcon.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/exitIcon.png")))));
+            jToolBar.add(new JToolBar.Separator());
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarIcon.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarSearchIcon.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarExportIcon.png")))));
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarRemoveIcon.png")))));
+            jToolBar.add(new JToolBar.Separator());
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIcon.png")))));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,6 +127,7 @@ public class MainForm extends JFrame {
 //          Створення меню Навчальний графік
             JMenu scheduleMenu = new JMenu("Навчальний графік");
             scheduleMenu.add(new JMenuItem("Створити навчальний графік")).addActionListener(this::MenuItemCreateSchedule);
+            scheduleMenu.add(new JPopupMenu.Separator());
             scheduleMenu.add(new JMenuItem("Переглянути/редагувати графік")).addActionListener(this::MenuItemViewSchedule);
             scheduleMenu.add(new JMenuItem("Видалити графік")).addActionListener(this::MenuItemRemoveSchedule);
             add(scheduleMenu);
@@ -127,6 +135,7 @@ public class MainForm extends JFrame {
 //          Створення меню Розклад занять
             JMenu lessonsMenu = new JMenu("Розклад занять");
             lessonsMenu.add(new JMenuItem("Створити розклад занять")).addActionListener(this::MenuItemCreateLessons);
+            lessonsMenu.add(new JPopupMenu.Separator());
             lessonsMenu.add(new JMenuItem("Переглянути/редагувати розклад"));
             lessonsMenu.add(new JMenuItem("Видалити розклад"));
             add(lessonsMenu);
@@ -138,8 +147,6 @@ public class MainForm extends JFrame {
             dataMenu.add(new JMenuItem("Предмети")).addActionListener(this::MenuItemDataLesson);
             dataMenu.add(new JPopupMenu.Separator());
             dataMenu.add(new JMenuItem("Групи")).addActionListener(this::MenuItemDataGroup);
-            dataMenu.add(new JPopupMenu.Separator());
-            dataMenu.add(new JMenuItem("Навчальний предмет"));
             add(dataMenu);
 
 //          Створення меню Довідка
@@ -156,7 +163,81 @@ public class MainForm extends JFrame {
         }
 
         private void MenuItemDataGroup(ActionEvent event) {
+            try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
+                 ResultSet rs = st.executeQuery("SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k")
+            ) {
+                HashSet<Group> groupHashSet = new HashSet<>();
+                while (rs.next()) {
+                    groupHashSet.add(
+                            new Group(
+                                    rs.getInt("groups.k"),
+                                    new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
+                                    rs.getString("groups.name")));
+                }
+                Group[] inputData = new Group[groupHashSet.size()];
+                int count = 0;
+                for (Group group : groupHashSet) inputData[count++] = group;
+                StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
+                    @Override
+                    public StudyData add() {
+                        return GroupDialogModify.getModify();
+                    }
 
+                    @Override
+                    public StudyData edit(StudyData t) {
+                        return GroupDialogModify.getModify((Group) t);
+                    }
+
+                    @Override
+                    public boolean remove(StudyData t) {
+                        return true;
+                    }
+
+                    @Override
+                    public void exit(StudyData[] t) {
+
+                    }
+                });
+
+                boolean b = true;
+                if (outputData.length == inputData.length) {
+                    for (int i = 0; i < outputData.length; i++) {
+                        Group in = inputData[i];
+                        Group out = (Group) outputData[i];
+                        if (!in.equals(out)) {
+                            b = false;
+                            break;
+                        }
+                    }
+                } else {
+                    b = false;
+                }
+                if (b) return;
+
+                for (Group in : inputData) {
+                    boolean bool = true;
+                    for (StudyData out : outputData) {
+                        if (in.equals(out)) {
+                            bool = false;
+                            break;
+                        }
+                    }
+                    if (bool) st.execute("DELETE FROM groups WHERE k LIKE '" + in.getKey() + "'");
+                }
+
+                for (StudyData item : outputData) {
+                    if (item.keyExist())
+                        st.execute("INSERT INTO groups(name, department, dateofcreate, k) VALUE ('" + item.getName() + "', '"
+                                + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() + "', " + item.getKey() + ") " +
+                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', department = '" + ((Group) item).getDepartment().getKey() +  "';");
+                    else
+                        st.execute("INSERT INTO groups(name, department, dateofcreate) VALUE ('" + item.getName() + "', '" + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() +"');");
+                }
+                JOptionPane.showMessageDialog(null, "Дані успішно змінено");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         private void MenuItemDataLesson(ActionEvent event) {
@@ -213,12 +294,22 @@ public class MainForm extends JFrame {
                     b = false;
                 }
                 if (b) return;
+                for (Lesson in : inputData) {
+                    boolean bool = true;
+                    for (StudyData out : outputData) {
+                        if (in.equals(out)) {
+                            bool = false;
+                            break;
+                        }
+                    }
+                    if (bool) st.execute("DELETE FROM lessons WHERE k LIKE '" + in.getKey() + "'");
+                }
 
-                st.execute("DELETE FROM lessons");
                 for (StudyData item : outputData) {
                     if (item.keyExist())
                         st.execute("INSERT INTO lessons(name, auditory, k) VALUE ('" + item.getName() + "', '"
-                                + ((Lesson) item).getAuditory().getKey() + "', " + item.getKey() + ");");
+                                + ((Lesson) item).getAuditory().getKey() + "', " + item.getKey() + ") " +
+                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', auditory = '" + ((Lesson) item).getAuditory().getKey() + "'");
                     else
                         st.execute("INSERT INTO lessons(name, auditory) VALUE ('" + item.getName() + "', '" + ((Lesson) item).getAuditory().getKey() + "');");
                 }
@@ -279,15 +370,22 @@ public class MainForm extends JFrame {
                     b = false;
                 }
                 if (b) return;
+                for (Teacher in : inputData) {
+                    boolean bool = true;
+                    for (StudyData out : outputData) {
+                        if (in.equals(out)) {
+                            bool = false;
+                            break;
+                        }
+                    }
+                    if (bool) st.execute("DELETE FROM teachers WHERE k LIKE '" + in.getKey() + "'");
+                }
 
-                st.execute("DELETE FROM teachers");
                 for (StudyData item : outputData) {
                     if (item.keyExist())
-                        st.execute("INSERT INTO teachers(name, preferences, k) VALUE ('"
-                                + item.getName() + "', '"
-                                + ((Teacher)item).getPreference().getData() + "', " +
-                                item.getKey() +
-                                ");");
+                        st.execute("INSERT INTO teachers(name, preferences, k) VALUE ('" + item.getName() + "', '"
+                                + ((Teacher)item).getPreference().getData() + "', " + item.getKey() +
+                                ") ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', preferences = '" + ((Teacher)item).getPreference().getData() + "';");
                     else
                         st.execute("INSERT INTO teachers(name, preferences) VALUE ('"
                                 + item.getName() + "', '"
@@ -344,11 +442,21 @@ public class MainForm extends JFrame {
                     }
                 }
                 if (b) return;
+                for (Auditory in : inputData) {
+                    boolean bool = true;
+                    for (StudyData out : outputData) {
+                        if (in.equals(out)) {
+                            bool = false;
+                            break;
+                        }
+                    }
+                    if (bool) st.execute("DELETE FROM auditorys WHERE k LIKE '" + in.getKey() + "'");
+                }
 
-                st.execute("DELETE FROM auditorys");
                 for (StudyData item : outputData) {
                     if (item.keyExist())
-                        st.execute("INSERT INTO auditorys(name, k) VALUE ('" + item.getName() + "', " + item.getKey() + ");");
+                        st.execute("INSERT INTO auditorys(name, k) VALUE ('" + item.getName() + "', " + item.getKey() + ")" +
+                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "'");
                     else
                         st.execute("INSERT INTO auditorys(name) VALUE ('" + item.getName() + "');");
                 }

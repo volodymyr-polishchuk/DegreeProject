@@ -1,6 +1,7 @@
 package frame;
 
 import app.DegreeProject;
+import app.data.Department;
 import app.data.Group;
 import app.schedules.ScheduleUnit;
 
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -56,28 +58,24 @@ public class ScheduleChoiceForm extends JFrame {
     public void onChoice(String args) {
         String year = args.split(" ")[2];
         ArrayList<ScheduleUnit> units = new ArrayList<>();
-        HashMap<Integer, Group> groups = new HashMap<>();
-        HashMap<Integer, String> department = new HashMap<>();
-        try (Statement st = connection.createStatement();
-             ResultSet drs = st.executeQuery("SELECT * FROM departments;")) {
-            while (drs.next()) {
-                department.put(drs.getInt("k"), drs.getString("name"));
-            }
-            drs.close();
-            ResultSet grs = st.executeQuery("SELECT * FROM groups;");
-            while (grs.next()) {
-                groups.put(grs.getInt("k"), new Group(department.get(grs.getInt("department")), grs.getString("name")));
-            }
-            grs.close();
+        HashSet<Group> groups = new HashSet<>();
+//        HashMap<Integer, String> department = new HashMap<>();
+        try (Statement st = connection.createStatement()) {
             ResultSet rsKey = st.executeQuery("SELECT * FROM schedules WHERE period = '" + year + "';");
             int key = 0;
             while (rsKey.next()) {
                 key = rsKey.getInt("k");
             }
             rsKey.close();
-            ResultSet rs = st.executeQuery("SELECT * FROM schedules_data WHERE schedule = '" + key + "';");
+            ResultSet rs = st.executeQuery(
+                    "SELECT * FROM schedules_data INNER JOIN groups ON schedules_data.groups = groups.k INNER JOIN departments ON groups.department = departments.k WHERE schedule = '" + key + "'");
             while (rs.next()) {
-                ScheduleUnit unit = new ScheduleUnit(groups.get(rs.getInt("groups")));
+                ScheduleUnit unit = new ScheduleUnit(
+                        new Group(
+                                rs.getInt("groups.k"),
+                                new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
+                                rs.getString("groups.name"))
+                );
                 String weeks = rs.getString("data");
                 for (int i = 0; i < 52; i++) {
                     unit.setWeek(i, DegreeProject.WEEKLIST.getWeekByMark(weeks.charAt(i)));
@@ -85,7 +83,6 @@ public class ScheduleChoiceForm extends JFrame {
                 units.add(unit);
             }
             rs.close();
-            System.out.println(units);
             SchedulePanel panel = new SchedulePanel("Навчальний графік");
             units.forEach(unit -> {
                 panel.getTableModel().addScheduleUnit(unit);
@@ -94,6 +91,7 @@ public class ScheduleChoiceForm extends JFrame {
             dispose();
             DegreeProject.mainForm.addTab(panel, "Навчальний графік");
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
     }

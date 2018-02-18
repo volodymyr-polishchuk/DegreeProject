@@ -1,6 +1,7 @@
 package frame;
 
 import app.*;
+import app.data.Department;
 import app.data.Group;
 import app.data.Period;
 import app.data.Week;
@@ -59,21 +60,9 @@ public class SchedulePanel extends JPanel{
     }
 
     private void saveButtonClick(ActionEvent e) {
-        try {
+        try (Connection c = DegreeProject.databaseData.getConnection();
+             Statement st = c.createStatement()) {
             int schedule_key = 0;
-            HashMap<Group, Integer> groupMap = new HashMap<>();
-            HashMap<Integer, String> department = new HashMap<>();
-            Connection c = DegreeProject.databaseData.getConnection();
-            Statement st;
-            st = c.createStatement();
-            ResultSet departmentRS = st.executeQuery("SELECT * FROM departments;");
-            while (departmentRS.next()) {
-                department.put(departmentRS.getInt("k"), departmentRS.getString("name"));
-            }
-            ResultSet rs = st.executeQuery("SELECT * FROM groups");
-            while (rs.next()) {
-                groupMap.put(new Group(department.get(rs.getInt("department")), rs.getString("name")), rs.getInt("k"));
-            }
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
             if (st.execute("SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'")) {
@@ -96,18 +85,17 @@ public class SchedulePanel extends JPanel{
             PreparedStatement ps = c.prepareStatement("INSERT IGNORE schedules(period, date_of_create, coments) VALUE (?, ?, ?);");
             ps.setString(1, yearsLabel.getText());
             ps.setDate(2, new Date(System.currentTimeMillis()));
-            ps.setString(3, "");
+            ps.setString(3, ""); // TODO Не реалізовані коментарі для графіків навчання
             ps.execute();
 
-            rs = st.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
+            ResultSet rs = st.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
             while (rs.next()) {
                 schedule_key = rs.getInt("k");
             }
             for (ScheduleUnit unit : units) {
                 ps = c.prepareStatement("INSERT IGNORE schedules_data(schedule, groups, data) VALUE (?, ?, ?);");
                 ps.setInt(1, schedule_key);
-                System.out.println(unit.getName() + " - " + unit.getDepartment());
-                ps.setInt(2, groupMap.get(new Group(unit.getDepartment(), unit.getName())));
+                ps.setInt(2, unit.getKey());
                 String line = "";
                 for (int i = 0; i < 52; i++) {
                     line += unit.getWeek(i).getMark();

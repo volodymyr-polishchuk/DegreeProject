@@ -168,14 +168,6 @@ public class LessonsPanel extends JPanel{
         private HashMap<app.lessons.StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
         public TableModel() {
-            LessonsUnit lessonsUnit = new LessonsUnit(new Group("", "ПС-16"), PAIR_IN_DAY, DAY_AT_WEEK);
-            lessonsUnit.setPair(0, new StudyPairLonely(new Lesson("ОПІ"), new Teacher("Завірюха"), new Auditory("402")));
-            lessonsUnit.setPair(1, new StudyPairLonely(new Lesson("ООП"), new Teacher("Завірюха"), new Auditory("402")));
-            lessonsUnit.setPair(2, new StudyPairLonely(new Lesson("WEB"), new Teacher("Завірюха"), new Auditory("407")));
-            lessonsUnit.setPair(3, new StudyPairLonely(new Lesson("Практика"), new Teacher("Заболотній"), new Auditory("407")));
-            units.add(lessonsUnit);
-            units.add(new LessonsUnit(new Group("", "ПС-26"), PAIR_IN_DAY, DAY_AT_WEEK));
-            units.add(new LessonsUnit(new Group("", "ПС-36"), PAIR_IN_DAY, DAY_AT_WEEK));
         }
 
         public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {

@@ -23,10 +23,10 @@ public class GroupList {
     private void loadFromDatabase() {
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM groups");
+            ResultSet rs = statement.executeQuery("SELECT * FROM groups JOIN departments ON departments.k = groups.department");
             list.clear();
-            while (resultSet.next()) {
-                list.add(new Group(resultSet));
+            while (rs.next()) {
+                list.add(new Group(rs.getInt("groups.k"), new Department(rs.getInt("departments.k"), rs.getString("departments.name")), rs.getString("groups.name")));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Помилка читання даних з бази \n\r MySQL -> " + e.getSQLState());
@@ -40,7 +40,7 @@ public class GroupList {
                 return group;
             }
         }
-        return new Group();
+        return null;
     }
 
     public int getIndexByName(String name) {

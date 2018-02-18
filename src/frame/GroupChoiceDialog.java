@@ -96,18 +96,5 @@ public class GroupChoiceDialog extends JDialog {
         // add your code here if necessary
         dispose();
     }
-
-    public static void main(String[] args) {
-        List<Group> list = new ArrayList<>();
-        list.add(new Group("Програмування", "ПС-16"));
-        list.add(new Group("Програмування", "ПС-26"));
-        list.add(new Group("Програмування", "ПС-36"));
-        list.add(new Group("Програмування", "ПС-46"));
-        list.add(new Group("Програмування", "ПС-47"));
-        list.add(new Group("Програмування", "ПС-48"));
-        GroupChoiceDialog dialog = new GroupChoiceDialog(list, new int[]{1, 2}, System.out::println);
-
-        System.exit(0);
-    }
 }
 
