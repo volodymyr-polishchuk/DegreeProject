@@ -6,7 +6,8 @@ import java.sql.SQLException;
 /**
  * Created by Vladimir on 03/01/18.
  **/
-public class Group {
+public class Group implements StudyData {
+    private int key = -1;
     protected String department; // Відділення
     protected String groupName; // Назва групи
 
@@ -29,8 +30,29 @@ public class Group {
         return department;
     }
 
+    @Override
     public String getName() {
         return groupName;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.groupName = name;
+    }
+
+    @Override
+    public int getKey() {
+        return key;
+    }
+
+    @Override
+    public void setKey(int key) {
+        this.key = key;
+    }
+
+    @Override
+    public boolean keyExist() {
+        return key > 0;
     }
 
     @Override

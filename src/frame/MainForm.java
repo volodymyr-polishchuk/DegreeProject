@@ -94,13 +94,13 @@ public class MainForm extends JFrame {
         }
     }
 
-    public void StudyProcessAdd() {
+    private void StudyProcessAdd() {
         SchedulePanel panel = new SchedulePanel("Графік навчального процесу");
         addTab(panel, panel.getName());
         panel.showSetting();
     }
 
-    public void LessonsProcessAdd() {
+    private void LessonsProcessAdd() {
         addTab(new LessonsPanel("Розклад занять"), "Розклад занять");
     }
 
@@ -185,7 +185,7 @@ public class MainForm extends JFrame {
 
                     @Override
                     public StudyData edit(StudyData t) {
-                        return LessonDialogModify.getModify((Lesson)t);
+                        return LessonDialogModify.getModify((Lesson) t);
                     }
 
                     @Override
@@ -217,11 +217,10 @@ public class MainForm extends JFrame {
                 st.execute("DELETE FROM lessons");
                 for (StudyData item : outputData) {
                     if (item.keyExist())
-                        st.execute("INSERT INTO lessons(name, auditory, k) VALUE ('"
-                                + item.getName() + "', '"
-                                + ((Lesson)item).getAuditory().getKey() + "', " + item.getKey() + ");");
+                        st.execute("INSERT INTO lessons(name, auditory, k) VALUE ('" + item.getName() + "', '"
+                                + ((Lesson) item).getAuditory().getKey() + "', " + item.getKey() + ");");
                     else
-                        st.execute("INSERT INTO lessons(name, auditory) VALUE ('" + item.getName() + "', '" + ((Lesson)item).getAuditory().getKey() + "');");
+                        st.execute("INSERT INTO lessons(name, auditory) VALUE ('" + item.getName() + "', '" + ((Lesson) item).getAuditory().getKey() + "');");
                 }
                 JOptionPane.showMessageDialog(null, "Дані успішно змінено");
             } catch (SQLException e) {
