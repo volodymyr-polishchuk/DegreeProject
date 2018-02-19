@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,7 +24,7 @@ public class MainForm extends JFrame {
     private JToolBar toolBar;
 
     public MainForm() {
-        setJMenuBar(new myMenuBar(this));
+        setJMenuBar(new MyMenuBar(this));
 
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -111,15 +112,16 @@ public class MainForm extends JFrame {
         addTab(new LessonsPanel("Розклад занять"), "Розклад занять");
     }
 
-    private class myMenuBar extends JMenuBar {
+    private class MyMenuBar extends JMenuBar {
         private MainForm mainForm;
-        myMenuBar(MainForm mainForm) {
+
+        MyMenuBar(MainForm mainForm) {
             this.mainForm = mainForm;
             //Створення головного меню програми
 //          Створення пункту меню ПРОГРАМА
             JMenu programMenu = new JMenu("Програма");
             programMenu.add(new JMenuItem("Виконати підключення до іншого сервера")).addActionListener(this::MenuItemReconnect);
-            programMenu.add(new JMenuItem("Налаштування"));
+            programMenu.add(new JMenuItem("Налаштування")).addActionListener(this::MenuItemSetting);
             programMenu.add(new JPopupMenu.Separator());
             programMenu.add(new JMenuItem("Вихід")).addActionListener(this::MenuItemExit);
             add(programMenu);
@@ -162,6 +164,10 @@ public class MainForm extends JFrame {
             add(helpMenu);
         }
 
+        private void MenuItemSetting(ActionEvent event) {
+            (new SettingForm()).setVisible(true);
+        }
+
         private void MenuItemDataGroup(ActionEvent event) {
             try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
                  ResultSet rs = st.executeQuery("SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k")
@@ -172,7 +178,8 @@ public class MainForm extends JFrame {
                             new Group(
                                     rs.getInt("groups.k"),
                                     new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
-                                    rs.getString("groups.name")));
+                                    rs.getString("groups.name"),
+                                    rs.getString("groups.comments")));
                 }
                 Group[] inputData = new Group[groupHashSet.size()];
                 int count = 0;
@@ -200,17 +207,13 @@ public class MainForm extends JFrame {
                 });
 
                 boolean b = true;
-                if (outputData.length == inputData.length) {
-                    for (int i = 0; i < outputData.length; i++) {
-                        Group in = inputData[i];
-                        Group out = (Group) outputData[i];
-                        if (!in.equals(out)) {
-                            b = false;
-                            break;
-                        }
+                for (int i = 0; i < outputData.length; i++) {
+                    Group in = inputData[i];
+                    Group out = (Group) outputData[i];
+                    if (!in.equals(out)) {
+                        b = false;
+                        break;
                     }
-                } else {
-                    b = false;
                 }
                 if (b) return;
 
@@ -224,15 +227,38 @@ public class MainForm extends JFrame {
                     }
                     if (bool) st.execute("DELETE FROM groups WHERE k LIKE '" + in.getKey() + "'");
                 }
-
+                PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(
+                        "INSERT INTO groups(name, department, dateofcreate, k, comments) VALUE (?, ?, ?, ?, ?) " +
+                                "ON DUPLICATE KEY UPDATE name = ?, department = ?, dateofcreate = ?, comments = ?");
+                PreparedStatement psElse = DegreeProject.databaseData.getConnection().prepareStatement(
+                        "INSERT INTO groups(name, department, dateofcreate, comments) VALUE (?, ?, ?, ?)");
                 for (StudyData item : outputData) {
-                    if (item.keyExist())
-                        st.execute("INSERT INTO groups(name, department, dateofcreate, k) VALUE ('" + item.getName() + "', '"
-                                + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() + "', " + item.getKey() + ") " +
-                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', department = '" + ((Group) item).getDepartment().getKey() +  "';");
-                    else
-                        st.execute("INSERT INTO groups(name, department, dateofcreate) VALUE ('" + item.getName() + "', '" + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() +"');");
+                    if (item.keyExist()) {
+                        ps.setString(1, item.getName());
+                        ps.setInt(2, ((Group)(item)).getDepartment().getKey());
+                        ps.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                        ps.setInt(4, item.getKey());
+                        ps.setString(5, ((Group) item).getComments());
+                        ps.setString(6, item.getName());
+                        ps.setInt(7, ((Group)(item)).getDepartment().getKey());
+                        ps.setDate(8, new java.sql.Date(System.currentTimeMillis()));
+                        ps.setString(9, ((Group) item).getComments());
+                        ps.execute();
+//                        st.execute("INSERT INTO groups(name, department, dateofcreate, k, comments) VALUE ('" + item.getName() + "', '"
+//                                + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() + "', " + item.getKey() + ") " +
+//                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', department = '" + ((Group) item).getDepartment().getKey() +  "', " +
+//                                "comments = '" + ((Group)item).getComments() +"';");
+                    } else {
+                        psElse.setString(1, item.getName());
+                        psElse.setInt(2, ((Group) item).getDepartment().getKey());
+                        psElse.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                        psElse.setString(4, ((Group) item).getComments());
+                        psElse.execute();
+//                        st.execute("INSERT INTO groups(name, department, dateofcreate) VALUE ('" + item.getName() + "', '" + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() +"');");
+                    }
                 }
+                ps.close();
+                psElse.close();
                 JOptionPane.showMessageDialog(null, "Дані успішно змінено");
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());

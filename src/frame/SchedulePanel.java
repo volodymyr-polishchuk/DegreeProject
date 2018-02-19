@@ -60,8 +60,9 @@ public class SchedulePanel extends JPanel{
     }
 
     private void saveButtonClick(ActionEvent e) {
-        try (Connection c = DegreeProject.databaseData.getConnection();
-             Statement st = c.createStatement()) {
+        try {
+            Connection c = DegreeProject.databaseData.getConnection();
+            Statement st = c.createStatement();
             int schedule_key = 0;
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
@@ -103,7 +104,10 @@ public class SchedulePanel extends JPanel{
                 ps.setString(3, line);
                 ps.execute();
             }
-
+            rs.close();
+            st.close();
+            ps.close();
+            JOptionPane.showMessageDialog(null, "Дані успішно збережено");
         } catch (SQLException | ClassCastException e1) {
             JOptionPane.showMessageDialog(null, e1.getMessage());
             e1.printStackTrace();
@@ -363,6 +367,19 @@ public class SchedulePanel extends JPanel{
             }
         }
         studyDaysLabel.setText(count + " днів");
+
+        int a = 0;
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 52; i++) {
+            if (tScheduleUnit.getWeek(i).equals(DegreeProject.WEEKLIST.getWeekByName("Навчання"))) {
+                a++;
+            } else if (tScheduleUnit.getWeek(i).equals(DegreeProject.WEEKLIST.getWeekByName("Канікули"))) {
+                if (a != 0) list.add(a);
+                a = 0;
+            }
+        }
+        if (a != 0) list.add(a);
+        studyDaysLabel.setText(studyDaysLabel.getText() + "; Навчання по семестрах " + list);
 
         // Виводить кількість тижнів то типу
         HashMap<Week, Integer> map = new HashMap<>();

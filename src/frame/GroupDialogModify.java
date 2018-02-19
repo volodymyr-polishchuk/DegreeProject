@@ -21,12 +21,12 @@ public class GroupDialogModify extends JDialog{
     private JButton cancelButton;
     private Group group;
     private JComboBox<Department> departmentComboBox;
-    private JTextField textField1;
+    private JTextField commentsTextField;
     private DefaultComboBoxModel<Department> comboBoxModel = new DefaultComboBoxModel<>();
 
     private GroupDialogModify() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(new Dimension(250, 180));
+        setSize(new Dimension(300, 250));
         setModal(true);
         setTitle("Створення групи");
         setResizable(false);
@@ -73,20 +73,24 @@ public class GroupDialogModify extends JDialog{
 //
         return dialog.nameTextField.getText().isEmpty() ? null :
                 new Group(
+                        -1,
                         dialog.comboBoxModel.getElementAt(dialog.departmentComboBox.getSelectedIndex()),
-                        dialog.nameTextField.getText());
+                        dialog.nameTextField.getText(),
+                        dialog.commentsTextField.getText());
     }
 
     public static Group getModify(Group a) {
         if (a == null) throw new NullPointerException("Lesson must not null");
         GroupDialogModify dialog = new GroupDialogModify(a);
         dialog.departmentComboBox.setSelectedItem(a.getDepartment());
+        dialog.commentsTextField.setText(a.getComments());
         dialog.setVisible(true);
 //
         return dialog.nameTextField.getText().isEmpty() ? dialog.group :
                 new Group(
                         dialog.group.getKey(),
                         dialog.comboBoxModel.getElementAt(dialog.departmentComboBox.getSelectedIndex()),
-                        dialog.nameTextField.getText());
+                        dialog.nameTextField.getText(),
+                        dialog.commentsTextField.getText());
     }
 }

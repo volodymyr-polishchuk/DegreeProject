@@ -74,7 +74,7 @@
           <text value="Коментар"/>
         </properties>
       </component>
-      <component id="32be7" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+      <component id="32be7" class="javax.swing.JTextField" binding="commentsTextField">
         <constraints>
           <grid row="5" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>

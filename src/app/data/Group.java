@@ -7,16 +7,29 @@ public class Group implements StudyData {
     private int key = -1;
     private Department department; // Відділення
     private String name; // Назва групи
+    private String comments;
 
     public Group(Department department, String name) {
-        this.department = department;
-        this.name = name;
+        this(-1, department, name, "");
     }
 
     public Group(int key, Department department, String name) {
+        this(key, department, name, "");
+    }
+
+    public Group(int key, Department department, String name, String comments) {
         this.key = key;
         this.department = department;
         this.name = name;
+        this.comments = comments;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public Department getDepartment() {
@@ -61,7 +74,8 @@ public class Group implements StudyData {
         Group group = (Group) o;
 
         if (department != null ? !department.equals(group.department) : group.department != null) return false;
-        return name != null ? name.equals(group.name) : group.name == null;
+        if (name != null ? !name.equals(group.name) : group.name != null) return false;
+        return comments != null ? comments.equals(group.comments) : group.comments == null;
 
     }
 
@@ -69,6 +83,7 @@ public class Group implements StudyData {
     public int hashCode() {
         int result = department != null ? department.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
     }
 }

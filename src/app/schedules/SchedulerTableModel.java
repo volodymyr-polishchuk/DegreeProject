@@ -63,11 +63,7 @@ public class SchedulerTableModel extends AbstractTableModel {
             case 0: return "Місяць";
             default: {
                 c.setTime(periods.get(columnIndex - 1).getStartDate());
-//                if (c.get(Calendar.MONTH) % 2 == 0) {
                     return MONTHS[c.get(Calendar.MONTH)];
-//                } else {
-//                    return "<html><b>" + MONTHS[c.get(Calendar.MONTH)] + "</b></html>";
-//                }
             }
         }
     }
