@@ -54,7 +54,7 @@ public class Lesson implements StudyData{
     }
 
     @Override
-    public String toString() {return "Lesson{" + name + '}';}
+    public String toString() {return name;}
 
     @Override
     public boolean equals(Object o) {

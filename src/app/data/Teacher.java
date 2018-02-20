@@ -62,10 +62,7 @@ public class Teacher implements StudyData {
 
     @Override
     public String toString() {
-        return "Teacher{" +
-                "name='" + name + '\'' +
-                ", preference=" + preference +
-                '}';
+        return name;
     }
 
     @Override

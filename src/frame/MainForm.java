@@ -207,14 +207,16 @@ public class MainForm extends JFrame {
                 });
 
                 boolean b = true;
-                for (int i = 0; i < outputData.length; i++) {
-                    Group in = inputData[i];
-                    Group out = (Group) outputData[i];
-                    if (!in.equals(out)) {
-                        b = false;
-                        break;
+                if (outputData.length == inputData.length)
+                    for (int i = 0; i < outputData.length; i++) {
+                        Group in = inputData[i];
+                        Group out = (Group) outputData[i];
+                        if (!in.equals(out)) {
+                            b = false;
+                            break;
+                        }
                     }
-                }
+                else b = false;
                 if (b) return;
 
                 for (Group in : inputData) {
@@ -244,17 +246,12 @@ public class MainForm extends JFrame {
                         ps.setDate(8, new java.sql.Date(System.currentTimeMillis()));
                         ps.setString(9, ((Group) item).getComments());
                         ps.execute();
-//                        st.execute("INSERT INTO groups(name, department, dateofcreate, k, comments) VALUE ('" + item.getName() + "', '"
-//                                + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() + "', " + item.getKey() + ") " +
-//                                "ON DUPLICATE KEY UPDATE name = '" + item.getName() + "', department = '" + ((Group) item).getDepartment().getKey() +  "', " +
-//                                "comments = '" + ((Group)item).getComments() +"';");
                     } else {
                         psElse.setString(1, item.getName());
                         psElse.setInt(2, ((Group) item).getDepartment().getKey());
                         psElse.setDate(3, new java.sql.Date(System.currentTimeMillis()));
                         psElse.setString(4, ((Group) item).getComments());
                         psElse.execute();
-//                        st.execute("INSERT INTO groups(name, department, dateofcreate) VALUE ('" + item.getName() + "', '" + ((Group) item).getDepartment().getKey() + "', '" + (new java.sql.Date(System.currentTimeMillis())).toString() +"');");
                     }
                 }
                 ps.close();
@@ -307,7 +304,7 @@ public class MainForm extends JFrame {
                 });
 
                 boolean b = true;
-                if (outputData.length == inputData.length) {
+                if (outputData.length == inputData.length)
                     for (int i = 0; i < outputData.length; i++) {
                         Lesson in = inputData[i];
                         Lesson out = (Lesson) outputData[i];
@@ -316,9 +313,7 @@ public class MainForm extends JFrame {
                             break;
                         }
                     }
-                } else {
-                    b = false;
-                }
+                else b = false;
                 if (b) return;
                 for (Lesson in : inputData) {
                     boolean bool = true;
@@ -383,7 +378,7 @@ public class MainForm extends JFrame {
                 });
 
                 boolean b = true;
-                if (outputData.length == inputData.length) {
+                if (outputData.length == inputData.length)
                     for (int i = 0; i < outputData.length; i++) {
                         Teacher in = inputData[i];
                         Teacher out = (Teacher) outputData[i];
@@ -392,9 +387,7 @@ public class MainForm extends JFrame {
                             break;
                         }
                     }
-                } else {
-                    b = false;
-                }
+                else b = false;
                 if (b) return;
                 for (Teacher in : inputData) {
                     boolean bool = true;
@@ -457,8 +450,8 @@ public class MainForm extends JFrame {
                 });
 
                 boolean b = true;
-                if (outputData.length == inputData.length) {
-                    for (int i = 0; i < inputData.length; i++) {
+                if (outputData.length == inputData.length)
+                    for (int i = 0; i < outputData.length; i++) {
                         Auditory in = inputData[i];
                         Auditory out = (Auditory) outputData[i];
                         if (!in.equals(out)) {
@@ -466,7 +459,7 @@ public class MainForm extends JFrame {
                             break;
                         }
                     }
-                }
+                else b = false;
                 if (b) return;
                 for (Auditory in : inputData) {
                     boolean bool = true;

@@ -38,7 +38,7 @@ public class Auditory implements StudyData{
     }
 
     @Override
-    public String toString() {return "Auditory{" + key + " - " + name + '}';}
+    public String toString() {return name;}
 
     @Override
     public boolean equals(Object o) {

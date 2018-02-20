@@ -1,8 +1,9 @@
 package frame;
 
+import app.DegreeProject;
 import app.data.Auditory;
-import app.data.Group;
 import app.data.Lesson;
+import app.data.Preference;
 import app.data.Teacher;
 import app.lessons.*;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
@@ -13,8 +14,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 /**
@@ -22,22 +27,20 @@ import java.util.*;
  **/
 public class LessonsPanel extends JPanel{
     private JTable jTable;
-    private JButton налаштуванняButton;
+    private JButton settingButton;
     private JButton зберегтиButton;
     private JPanel contentPane;
     private JToggleButton button1;
     private JToggleButton button2;
     private JToggleButton button3;
-    private JTextField textField1;
-    private JTextField textField2;
-    private JTextField textField3;
     private JButton setButton;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
+    private JComboBox<Lesson> lessonCBox;
+    private JComboBox<Teacher> teacherCBox;
+    private JComboBox<Auditory> auditoryCBox;
     private JLabel groupNameLabel;
     private JLabel workHourInWeekLabel;
     private JLabel studyPairInWeekLabel;
+    private JButton exportButton;
     private ButtonGroup buttonGroup;
     private TableModel tableModel;
     private StudyPair nowStudyPair;
@@ -63,35 +66,73 @@ public class LessonsPanel extends JPanel{
         add(contentPane);
         InitialTable();
         InitialGroupButton();
-        setButton.addActionListener(e -> {
-            switch (buttonGroup.getSelection().getActionCommand()) {
-                case "BOTH": nowStudyPair = new StudyPairLonely(
-                        new Lesson((String) comboBox1.getModel().getSelectedItem()),
-                        new Teacher((String) comboBox2.getModel().getSelectedItem()),
-                        new Auditory((String) comboBox3.getModel().getSelectedItem())
-                ); break;
-                case "NUMERATOR": nowStudyPair = new StudyPairDouble(
-                        new StudyPairLonely(
-                                new Lesson((String) comboBox1.getModel().getSelectedItem()),
-                                new Teacher((String) comboBox2.getModel().getSelectedItem()),
-                                new Auditory((String) comboBox3.getModel().getSelectedItem())),
-                        new StudyPairLonely()
-                ); break;
-                case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
-                        new StudyPairLonely(),
-                        new StudyPairLonely(
-                            new Lesson((String) comboBox1.getModel().getSelectedItem()),
-                            new Teacher((String) comboBox2.getModel().getSelectedItem()),
-                            new Auditory((String) comboBox3.getModel().getSelectedItem()))
-                ); break;
-            }
-            tableModel.updateForbids(nowStudyPair);
-        });
+        setButton.addActionListener(this::setButtonClick);
+        InitialData();
     }
 
     public LessonsPanel(String title) {
         this();
         setName(title);
+    }
+
+    private void InitialData() {
+        try (Statement s = DegreeProject.databaseData.getConnection().createStatement()) {
+            DefaultComboBoxModel<Lesson> lessonModel = new DefaultComboBoxModel<>();
+            lessonCBox.setModel(lessonModel);
+            ResultSet rs = s.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k");
+            while (rs.next()) {
+                lessonModel.addElement(
+                        new Lesson(
+                                rs.getInt("lessons.k"),
+                                rs.getString("lessons.name"),
+                                new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name")))
+                );
+            }
+            DefaultComboBoxModel<Teacher> teacherModel = new DefaultComboBoxModel<>();
+            teacherCBox.setModel(teacherModel);
+            rs = s.executeQuery("SELECT * FROM teachers");
+            while (rs.next()) {
+                teacherModel.addElement(
+                        new Teacher(rs.getInt("k"), rs.getString("name"), Preference.parsePreference(rs.getString("preferences")))
+                );
+            }
+
+            DefaultComboBoxModel<Auditory> auditoryModel = new DefaultComboBoxModel<>();
+            auditoryCBox.setModel(auditoryModel);
+            rs = s.executeQuery("SELECT * FROM auditorys");
+            while (rs.next()) {
+                auditoryModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void setButtonClick(ActionEvent event) {
+        switch (buttonGroup.getSelection().getActionCommand()) {
+            case "BOTH": nowStudyPair = new StudyPairLonely(
+                    new Lesson((String) lessonCBox.getModel().getSelectedItem()),
+                    new Teacher((String) teacherCBox.getModel().getSelectedItem()),
+                    new Auditory((String) auditoryCBox.getModel().getSelectedItem())
+            ); break;
+            case "NUMERATOR": nowStudyPair = new StudyPairDouble(
+                    new StudyPairLonely(
+                            new Lesson((String) lessonCBox.getModel().getSelectedItem()),
+                            new Teacher((String) teacherCBox.getModel().getSelectedItem()),
+                            new Auditory((String) auditoryCBox.getModel().getSelectedItem())),
+                    new StudyPairLonely()
+            ); break;
+            case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
+                    new StudyPairLonely(),
+                    new StudyPairLonely(
+                            new Lesson((String) lessonCBox.getModel().getSelectedItem()),
+                            new Teacher((String) teacherCBox.getModel().getSelectedItem()),
+                            new Auditory((String) auditoryCBox.getModel().getSelectedItem()))
+            ); break;
+        }
+        tableModel.updateForbids(nowStudyPair);
     }
 
     private void InitialGroupButton() {

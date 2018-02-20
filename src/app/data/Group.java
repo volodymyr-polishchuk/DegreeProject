@@ -63,7 +63,7 @@ public class Group implements StudyData {
 
     @Override
     public String toString() {
-        return department + " - " + name;
+        return name + " - " + department;
     }
 
     @Override

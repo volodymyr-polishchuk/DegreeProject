@@ -43,9 +43,7 @@ public class Department implements StudyData {
 
     @Override
     public String toString() {
-        return "Department{" +
-                "n='" + name + '\'' +
-                '}';
+        return name;
     }
 
     @Override
