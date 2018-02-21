@@ -1,10 +1,7 @@
 package frame;
 
 import app.DegreeProject;
-import app.data.Auditory;
-import app.data.Lesson;
-import app.data.Preference;
-import app.data.Teacher;
+import app.data.*;
 import app.lessons.*;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
@@ -21,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Vladimir on 31/01/18.
@@ -67,6 +65,7 @@ public class LessonsPanel extends JPanel{
         InitialTable();
         InitialGroupButton();
         setButton.addActionListener(this::setButtonClick);
+        settingButton.addActionListener(this::settingGroupClick);
         InitialData();
     }
 
@@ -75,11 +74,59 @@ public class LessonsPanel extends JPanel{
         setName(title);
     }
 
+    private void settingGroupClick(ActionEvent e) {
+        DegreeProject.GROUPLIST.refresh();
+        int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
+        int count = 0;
+        ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
+        for (int i = 0; i < tList.size(); i++) {
+            for (int j = 0; j < tableModel.units.size(); j++) {
+                if (tList.get(i).equals(tableModel.units.get(j).getGroup())) {
+                    choice[count++] = i;
+                }
+            }
+        }
+        choice = Arrays.copyOf(choice, count);
+        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
+//        saveButton.setEnabled(true);
+    }
+
+    private void afterSettingGroup(ArrayList<Group> list) {
+        ArrayList<LessonsUnit> listFromTable = new ArrayList<>(tableModel.units);
+        LessonsUnit tLessonUnit;
+
+        for (int i = tableModel.units.size() - 1; i >= 0; i--) {
+            tLessonUnit = tableModel.units.remove(i);
+            for (Group group : list) {
+                if (tLessonUnit.getGroup().equals(group)) {
+                    listFromTable.add(tLessonUnit);
+                }
+            }
+        }
+
+        Group tGroup;
+        boolean b = false;
+        for (Group group : list) {
+            tGroup = group;
+            for (LessonsUnit lessonsUnit : listFromTable) {
+                if (lessonsUnit.getGroup().equals(tGroup)) {
+                    b = true;
+                }
+            }
+            if (!b) listFromTable.add(new LessonsUnit(tGroup, PAIR_IN_DAY, DAY_AT_WEEK));
+            b = false;
+        }
+
+        tableModel.units.addAll(listFromTable);
+        tableModel.fireTableStructureChanged();
+        tableModel.fireTableDataChanged();
+    }
+
     private void InitialData() {
         try (Statement s = DegreeProject.databaseData.getConnection().createStatement()) {
             DefaultComboBoxModel<Lesson> lessonModel = new DefaultComboBoxModel<>();
             lessonCBox.setModel(lessonModel);
-            ResultSet rs = s.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k");
+            ResultSet rs = s.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k ORDER BY lessons.name");
             while (rs.next()) {
                 lessonModel.addElement(
                         new Lesson(
@@ -90,7 +137,7 @@ public class LessonsPanel extends JPanel{
             }
             DefaultComboBoxModel<Teacher> teacherModel = new DefaultComboBoxModel<>();
             teacherCBox.setModel(teacherModel);
-            rs = s.executeQuery("SELECT * FROM teachers");
+            rs = s.executeQuery("SELECT * FROM teachers ORDER BY name");
             while (rs.next()) {
                 teacherModel.addElement(
                         new Teacher(rs.getInt("k"), rs.getString("name"), Preference.parsePreference(rs.getString("preferences")))
@@ -99,7 +146,7 @@ public class LessonsPanel extends JPanel{
 
             DefaultComboBoxModel<Auditory> auditoryModel = new DefaultComboBoxModel<>();
             auditoryCBox.setModel(auditoryModel);
-            rs = s.executeQuery("SELECT * FROM auditorys");
+            rs = s.executeQuery("SELECT * FROM auditorys ORDER BY name");
             while (rs.next()) {
                 auditoryModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
             }
@@ -113,23 +160,23 @@ public class LessonsPanel extends JPanel{
     private void setButtonClick(ActionEvent event) {
         switch (buttonGroup.getSelection().getActionCommand()) {
             case "BOTH": nowStudyPair = new StudyPairLonely(
-                    new Lesson((String) lessonCBox.getModel().getSelectedItem()),
-                    new Teacher((String) teacherCBox.getModel().getSelectedItem()),
-                    new Auditory((String) auditoryCBox.getModel().getSelectedItem())
+                    (Lesson) lessonCBox.getModel().getSelectedItem(),
+                    (Teacher) teacherCBox.getModel().getSelectedItem(),
+                    (Auditory) auditoryCBox.getModel().getSelectedItem()
             ); break;
             case "NUMERATOR": nowStudyPair = new StudyPairDouble(
                     new StudyPairLonely(
-                            new Lesson((String) lessonCBox.getModel().getSelectedItem()),
-                            new Teacher((String) teacherCBox.getModel().getSelectedItem()),
-                            new Auditory((String) auditoryCBox.getModel().getSelectedItem())),
+                            (Lesson) lessonCBox.getModel().getSelectedItem(),
+                            (Teacher) teacherCBox.getModel().getSelectedItem(),
+                            (Auditory) auditoryCBox.getModel().getSelectedItem()),
                     new StudyPairLonely()
             ); break;
             case "DENOMINATOR": nowStudyPair = new StudyPairDouble(
                     new StudyPairLonely(),
                     new StudyPairLonely(
-                            new Lesson((String) lessonCBox.getModel().getSelectedItem()),
-                            new Teacher((String) teacherCBox.getModel().getSelectedItem()),
-                            new Auditory((String) auditoryCBox.getModel().getSelectedItem()))
+                            (Lesson) lessonCBox.getModel().getSelectedItem(),
+                            (Teacher) teacherCBox.getModel().getSelectedItem(),
+                            (Auditory) auditoryCBox.getModel().getSelectedItem())
             ); break;
         }
         tableModel.updateForbids(nowStudyPair);
@@ -159,35 +206,41 @@ public class LessonsPanel extends JPanel{
         tableModel = new TableModel();
         jTable.setModel(tableModel);
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable.setShowGrid(false);
+        jTable.setIntercellSpacing(new Dimension(0, 0));
+        jTable.setRowHeight(jTable.getRowHeight() * 2);
+
         jTable.getTableHeader().setReorderingAllowed(false);
         jTable.getTableHeader().setResizingAllowed(false);
         jTable.getTableHeader().setDefaultRenderer(new TableHeaderCellRenderer());
+
         jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer());
         jTable.setDefaultRenderer(Integer.class, new TableCellPairNumberRenderer());
         jTable.setDefaultRenderer(StudyPair.class, new TableCellSubjectRenderer());
-        jTable.setShowGrid(false);
-        jTable.setIntercellSpacing(new Dimension(0, 0));
-        Enumeration<TableColumn> columns = jTable.getColumnModel().getColumns();
-        jTable.setRowHeight(jTable.getRowHeight() * 2);
+
         jTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {mouseTableClick(e);
             }
         });
-        while (columns.hasMoreElements()) {
-            TableColumn column = columns.nextElement();
-            switch (column.getModelIndex() % COLUMN_REPEAT) {
-                case DAY_NAME_NUMBER:case PAIR_NUMBER: {
-                    column.setMaxWidth(25); column.setMinWidth(25);
-                } break;
-                case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
-                    column.setMinWidth(130); column.setMaxWidth(130);
-                } break;
-                case AUDITORY_NUMBER: {
-                    column.setMinWidth(40); column.setMaxWidth(40);
-                } break;
+
+        tableModel.addTableModelListener(e -> {
+            Enumeration<TableColumn> columns = jTable.getColumnModel().getColumns();
+            while (columns.hasMoreElements()) {
+                TableColumn column = columns.nextElement();
+                switch (column.getModelIndex() % COLUMN_REPEAT) {
+                    case DAY_NAME_NUMBER:case PAIR_NUMBER: {
+                        column.setMaxWidth(25); column.setMinWidth(25);
+                    } break;
+                    case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
+                        column.setMinWidth(130); column.setMaxWidth(130);
+                    } break;
+                    case AUDITORY_NUMBER: {
+                        column.setMinWidth(40); column.setMaxWidth(40);
+                    } break;
+                }
             }
-        }
+        });
     }
 
     private class TableHeaderCellRenderer extends DefaultTableCellHeaderRenderer {

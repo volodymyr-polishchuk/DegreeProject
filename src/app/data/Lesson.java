@@ -4,7 +4,7 @@ package app.data;
  * Created by Vladimir on 06/02/18.
  **/
 
-public class Lesson implements StudyData{
+public class Lesson implements StudyData, Comparable<Lesson>{
     private int key = -1;
     private String name;
     private Auditory auditory;
@@ -70,5 +70,10 @@ public class Lesson implements StudyData{
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(Lesson o) {
+        return this.getName().compareTo(o.getName());
     }
 }

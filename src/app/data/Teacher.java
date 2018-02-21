@@ -7,7 +7,7 @@ import java.util.logging.Handler;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class Teacher implements StudyData {
+public class Teacher implements StudyData, Comparable<Teacher> {
     private int key = -1;
     private String name;
     private Preference preference;
@@ -79,5 +79,10 @@ public class Teacher implements StudyData {
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(Teacher o) {
+        return this.getName().compareTo(o.getName());
     }
 }

@@ -3,7 +3,7 @@ package app.data;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class Auditory implements StudyData{
+public class Auditory implements StudyData, Comparable<Auditory> {
     private int key = -1;
     private String name;
 
@@ -54,5 +54,10 @@ public class Auditory implements StudyData{
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(Auditory o) {
+        return this.getName().compareTo(o.getName());
     }
 }

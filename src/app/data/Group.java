@@ -3,7 +3,7 @@ package app.data;
 /**
  * Created by Vladimir on 03/01/18.
  **/
-public class Group implements StudyData {
+public class Group implements StudyData, Comparable<Group> {
     private int key = -1;
     private Department department; // Відділення
     private String name; // Назва групи
@@ -85,5 +85,10 @@ public class Group implements StudyData {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public int compareTo(Group o) {
+        return this.getName().compareTo(o.getName());
     }
 }

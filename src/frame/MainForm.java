@@ -170,20 +170,20 @@ public class MainForm extends JFrame {
 
         private void MenuItemDataGroup(ActionEvent event) {
             try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-                 ResultSet rs = st.executeQuery("SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k")
+                 ResultSet rs = st.executeQuery("SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k ORDER BY groups.name")
             ) {
-                HashSet<Group> groupHashSet = new HashSet<>();
+                TreeSet<Group> groupTreeSet = new TreeSet<>();
                 while (rs.next()) {
-                    groupHashSet.add(
+                    groupTreeSet.add(
                             new Group(
                                     rs.getInt("groups.k"),
                                     new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
                                     rs.getString("groups.name"),
                                     rs.getString("groups.comments")));
                 }
-                Group[] inputData = new Group[groupHashSet.size()];
+                Group[] inputData = new Group[groupTreeSet.size()];
                 int count = 0;
-                for (Group group : groupHashSet) inputData[count++] = group;
+                for (Group group : groupTreeSet) inputData[count++] = group;
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
                     public StudyData add() {
@@ -267,9 +267,9 @@ public class MainForm extends JFrame {
             try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
                  ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k")
             ) {
-                HashSet<Lesson> lessonHashSet = new HashSet<>();
+                TreeSet<Lesson> lessonTreeSet = new TreeSet<>();
                 while (rs.next()) {
-                    lessonHashSet.add(
+                    lessonTreeSet.add(
                             new Lesson(
                                     rs.getInt("k"),
                                     rs.getString("name"),
@@ -277,9 +277,9 @@ public class MainForm extends JFrame {
                             )
                     );
                 }
-                Lesson[] inputData = new Lesson[lessonHashSet.size()];
+                Lesson[] inputData = new Lesson[lessonTreeSet.size()];
                 int count = 0;
-                for (Lesson lesson : lessonHashSet) inputData[count++] = lesson;
+                for (Lesson lesson : lessonTreeSet) inputData[count++] = lesson;
 //                Ключі для аудиторії задаються не тільки тут, а й LessonsModify, тому при зміні структури ключа варто змінити і там
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
@@ -344,17 +344,17 @@ public class MainForm extends JFrame {
         private void MenuItemDataTeacher(ActionEvent event) {
             try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
                  ResultSet rs = st.executeQuery("SELECT * FROM teachers")) {
-                HashSet<Teacher> teacherHashSet = new HashSet<>();
+                TreeSet<Teacher> teacherTreeSet = new TreeSet<>();
                 while (rs.next()) {
-                    teacherHashSet.add(
+                    teacherTreeSet.add(
                             new Teacher(
                                     rs.getInt("k"),
                                     rs.getString("name"),
                                     Preference.parsePreference(rs.getString("preferences"))));
                 }
-                Teacher[] inputData = new Teacher[teacherHashSet.size()];
+                Teacher[] inputData = new Teacher[teacherTreeSet.size()];
                 int count = 0;
-                for (Teacher teacher : teacherHashSet) inputData[count++] = teacher;
+                for (Teacher teacher : teacherTreeSet) inputData[count++] = teacher;
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
                     public StudyData add() {
@@ -420,13 +420,13 @@ public class MainForm extends JFrame {
         private void MenuItemDataAuditory(ActionEvent event) {
             try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
                  ResultSet rs = st.executeQuery("SELECT * FROM auditorys")) {
-                HashSet<Auditory> auditoryHashSet = new HashSet<>();
+                TreeSet<Auditory> auditoryTreeSet = new TreeSet<>();
                 while (rs.next()) {
-                    auditoryHashSet.add(new Auditory(rs.getInt("k"), rs.getString("name")));
+                    auditoryTreeSet.add(new Auditory(rs.getInt("k"), rs.getString("name")));
                 }
-                Auditory[] inputData = new Auditory[auditoryHashSet.size()];
+                Auditory[] inputData = new Auditory[auditoryTreeSet.size()];
                 int count = 0;
-                for (Auditory auditory : auditoryHashSet) inputData[count++] = auditory;
+                for (Auditory auditory : auditoryTreeSet) inputData[count++] = auditory;
                 StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
                     @Override
                     public StudyData add() {

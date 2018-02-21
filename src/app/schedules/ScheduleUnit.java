@@ -7,7 +7,7 @@ import app.data.WeekList;
 /**
  * Created by Vladimir on 03/01/18.
  **/
-public class ScheduleUnit extends Group implements Comparable {
+public class ScheduleUnit extends Group {
     private Week[] weeks = new Week[52];
 
     public ScheduleUnit(Group group) {
@@ -47,7 +47,7 @@ public class ScheduleUnit extends Group implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        return this.getName().compareTo(((ScheduleUnit)o).getName());
+    public int compareTo(Group o) {
+        return this.getName().compareTo(o.getName());
     }
 }

@@ -21,7 +21,7 @@ public class GroupChoiceDialog extends JDialog {
     private JButton buttonGoLeft;
     private JButton buttonAllRight;
     private GroupChoiceListener listener;
-
+//  TODO Переробити щоб передався масив і на вихід був масив
     public GroupChoiceDialog(List<Group> list, int [] choice, GroupChoiceListener listener) {
         this.listener = listener;
         setContentPane(contentPane);

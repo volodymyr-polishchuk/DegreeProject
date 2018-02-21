@@ -48,7 +48,7 @@ public class LessonDialogModify extends JDialog {
             }
         });
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM auditorys")){
+                ResultSet rs = st.executeQuery("SELECT * FROM auditorys ORDER BY name")){
             while (rs.next()) {
                 comboBoxModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
             }

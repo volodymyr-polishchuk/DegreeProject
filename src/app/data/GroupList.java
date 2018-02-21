@@ -59,4 +59,8 @@ public class GroupList {
     public boolean isEmpty() {
         return list.isEmpty();
     }
+
+    public void refresh() {
+        loadFromDatabase();
+    }
 }

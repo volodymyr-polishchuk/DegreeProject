@@ -49,7 +49,7 @@ public class GroupDialogModify extends JDialog{
             }
         });
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM departments")){
+             ResultSet rs = st.executeQuery("SELECT * FROM departments ORDER BY name")){
             while (rs.next()) {
                 comboBoxModel.addElement(new Department(rs.getInt("k"), rs.getString("name")));
             }
