@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="frame.LessonsPanel">
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="0" left="10" bottom="10" right="10"/>
+    <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="20" y="20" width="823" height="385"/>
+      <xy x="20" y="20" width="833" height="385"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -113,7 +113,7 @@
               <model/>
             </properties>
           </component>
-          <component id="5d0e7" class="javax.swing.JButton" binding="зберегтиButton" default-binding="true">
+          <component id="5d0e7" class="javax.swing.JButton" binding="saveButton">
             <constraints>
               <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -137,7 +137,7 @@
           </component>
         </children>
       </grid>
-      <grid id="898fe" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="898fe" layout-manager="GridLayoutManager" row-count="1" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -145,33 +145,49 @@
         <properties/>
         <border type="none"/>
         <children>
+          <hspacer id="e7594">
+            <constraints>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
+          <component id="8c32b" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Навантаження"/>
+            </properties>
+          </component>
+          <component id="9191f" class="javax.swing.JLabel" binding="workHourInWeekLabel">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="f2401" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Кількість пар"/>
+            </properties>
+          </component>
+          <component id="d0116" class="javax.swing.JLabel" binding="studyPairInWeekLabel">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
           <component id="2c4e" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Група"/>
-            </properties>
-          </component>
-          <hspacer id="e7594">
-            <constraints>
-              <grid row="0" column="2" row-span="3" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </hspacer>
-          <component id="8c32b" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Навантаження"/>
-            </properties>
-          </component>
-          <component id="f2401" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Кількість пар"/>
             </properties>
           </component>
           <component id="ec1af" class="javax.swing.JLabel" binding="groupNameLabel">
@@ -182,50 +198,24 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="9191f" class="javax.swing.JLabel" binding="workHourInWeekLabel">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="0"/>
-            </properties>
-          </component>
-          <component id="d0116" class="javax.swing.JLabel" binding="studyPairInWeekLabel">
-            <constraints>
-              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="0"/>
-            </properties>
-          </component>
         </children>
       </grid>
-      <grid id="d1659" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
+      <scrollpane id="4968">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <horizontalScrollBarPolicy value="30"/>
+          <verticalScrollBarPolicy value="20"/>
+        </properties>
         <border type="none"/>
         <children>
-          <scrollpane id="4968">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <horizontalScrollBarPolicy value="30"/>
-              <verticalScrollBarPolicy value="20"/>
-            </properties>
-            <border type="none"/>
-            <children>
-              <component id="eb792" class="javax.swing.JTable" binding="jTable">
-                <constraints/>
-                <properties/>
-              </component>
-            </children>
-          </scrollpane>
+          <component id="eb792" class="javax.swing.JTable" binding="jTable">
+            <constraints/>
+            <properties/>
+          </component>
         </children>
-      </grid>
+      </scrollpane>
     </children>
   </grid>
 </form>

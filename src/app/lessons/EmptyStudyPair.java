@@ -27,7 +27,7 @@ public class EmptyStudyPair extends StudyPair {
     }
 
     @Override
-    public Forbidden[] getSelfForbidden() {
+    public Forbidden[] getSelfForbidden(int row, int col, int pairPerDay, int dayPerWeek) {
         return new Forbidden[0];
     }
 

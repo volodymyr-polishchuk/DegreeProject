@@ -5,7 +5,8 @@ import app.data.Lesson;
 import app.data.Teacher;
 
 import javax.swing.*;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by Vladimir on 06/02/18.
@@ -86,7 +87,10 @@ public class StudyPairLonely extends StudyPair {
     }
 
     @Override
-    public Forbidden[] getSelfForbidden() {
+    public Forbidden[] getSelfForbidden(int row, int col, int pairPerDay, int dayPerWeek) {
+        if (!teacher.getPreference().getByIndex(row / pairPerDay)) {
+            return new Forbidden[] {Forbidden.DAY_FORBIDDEN};
+        }
         return new Forbidden[0];
     }
 }

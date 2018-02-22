@@ -31,5 +31,5 @@ public abstract class StudyPair {
 
     abstract public StudyPair.Forbidden[] getForbidden(StudyPair studyPair, List<LessonsUnit> units, int row, int col, int pairPerDay, int dayPerWeek);
 
-    abstract public StudyPair.Forbidden[] getSelfForbidden();
+    abstract public StudyPair.Forbidden[] getSelfForbidden(int row, int col, int pairPerDay, int dayPerWeek);
 }

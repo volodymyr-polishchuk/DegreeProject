@@ -55,10 +55,6 @@ public class Teacher implements StudyData, Comparable<Teacher> {
     public void setPreference(Preference preference) {
         this.preference = preference;
     }
-//
-//    @Override
-//    public String toString() {return "Teacher{" + name + '}';}
-
 
     @Override
     public String toString() {
@@ -72,13 +68,16 @@ public class Teacher implements StudyData, Comparable<Teacher> {
 
         Teacher teacher = (Teacher) o;
 
-        return name != null ? name.equals(teacher.name) : teacher.name == null;
+        if (name != null ? !name.equals(teacher.name) : teacher.name != null) return false;
+        return preference != null ? preference.equals(teacher.preference) : teacher.preference == null;
 
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (preference != null ? preference.hashCode() : 0);
+        return result;
     }
 
     @Override

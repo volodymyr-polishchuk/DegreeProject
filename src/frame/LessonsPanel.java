@@ -3,6 +3,7 @@ package frame;
 import app.DegreeProject;
 import app.data.*;
 import app.lessons.*;
+import javafx.collections.transformation.SortedList;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -11,9 +12,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class LessonsPanel extends JPanel{
     private JTable jTable;
     private JButton settingButton;
-    private JButton зберегтиButton;
+    private JButton saveButton;
     private JPanel contentPane;
     private JToggleButton button1;
     private JToggleButton button2;
@@ -116,13 +116,22 @@ public class LessonsPanel extends JPanel{
             if (!b) listFromTable.add(new LessonsUnit(tGroup, PAIR_IN_DAY, DAY_AT_WEEK));
             b = false;
         }
-
+        Collections.sort(listFromTable, (o1, o2) -> o1.getGroup().getName().compareTo(o2.getGroup().getName()));
         tableModel.units.addAll(listFromTable);
         tableModel.fireTableStructureChanged();
         tableModel.fireTableDataChanged();
     }
 
     private void InitialData() {
+        lessonCBox.addActionListener(e -> {
+            if(lessonCBox.getSelectedItem() instanceof Lesson) {
+                Lesson lesson = (Lesson) lessonCBox.getSelectedItem();
+                Auditory auditory = lesson.getAuditory();
+                if (auditory != null) {
+                    auditoryCBox.setSelectedItem(auditory);
+                }
+            }
+        });
         try (Statement s = DegreeProject.databaseData.getConnection().createStatement()) {
             DefaultComboBoxModel<Lesson> lessonModel = new DefaultComboBoxModel<>();
             lessonCBox.setModel(lessonModel);
@@ -376,17 +385,17 @@ public class LessonsPanel extends JPanel{
             labelTop.setBackground(new Color(242, 242, 242));
             labelTop.setFont(new Font(labelTop.getFont().getName(), Font.BOLD, labelTop.getFont().getSize()));
             labelTop.setHorizontalAlignment(CENTER);
-            if ((row * 2) % (PAIR_IN_DAY * 2) < daysName[row / DAY_AT_WEEK].length()) {
+            if ((row * 2) % (PAIR_IN_DAY * 2) < daysName[row / PAIR_IN_DAY].length()) {
                 labelTop.setText(String.valueOf(
-                        daysName[row / DAY_AT_WEEK].charAt((row * 2) % (PAIR_IN_DAY * 2))
+                        daysName[row / PAIR_IN_DAY].charAt((row * 2) % (PAIR_IN_DAY * 2))
                 ));
             }
 
             JLabel labelBottom = new JLabel();
 
-            if (((row * 2) + 1) % (PAIR_IN_DAY * 2) < daysName[row / DAY_AT_WEEK].length()) {
+            if (((row * 2) + 1) % (PAIR_IN_DAY * 2) < daysName[row / PAIR_IN_DAY].length()) {
                 labelBottom.setText(String.valueOf(
-                        daysName[row / DAY_AT_WEEK].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))
+                        daysName[row / PAIR_IN_DAY].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))
                 ));
             }
             labelBottom.setHorizontalAlignment(CENTER);
@@ -427,6 +436,12 @@ public class LessonsPanel extends JPanel{
                 component.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
             component.setBackground(new Color(0xC5DCA0));
             component.setOpaque(true);
+            for (StudyPair.Forbidden forbidden : nowStudyPair.getSelfForbidden(row, column, PAIR_IN_DAY, DAY_AT_WEEK)) {
+                if (forbidden == StudyPair.Forbidden.DAY_FORBIDDEN) {
+                    component.setBackground(new Color(0xBBBAB8));
+                    return component;
+                }
+            }
             StudyPair.Forbidden forbidden = ((TableModel)table.getModel()).getForbidden(tableModel, row, column);
 
             switch (forbidden) {
