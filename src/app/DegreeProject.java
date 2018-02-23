@@ -4,6 +4,7 @@ import app.data.GroupList;
 import app.data.WeekList;
 import frame.ConnectionForm;
 import frame.HelloPanel;
+import frame.HelloPanel2;
 import frame.MainForm;
 
 import javax.swing.*;
@@ -22,8 +23,8 @@ public class DegreeProject {
     public static void main(String[] args) throws IOException, SQLException {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
-            UIManager.put("OptionPane.yesButtonText"   , "Да"    );
-            UIManager.put("OptionPane.noButtonText"    , "Ні"   );
+            UIManager.put("OptionPane.yesButtonText"   , "Да");
+            UIManager.put("OptionPane.noButtonText"    , "Ні");
             UIManager.put("OptionPane.cancelButtonText", "Відміна");
             UIManager.put("OptionPane.okButtonText"    , "Готово");
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
@@ -44,7 +45,8 @@ public class DegreeProject {
 
     public static void InitialMainFrame() {
         mainForm = new MainForm();
-        mainForm.addTab(new HelloPanel("Головне меню програми"));
+//        mainForm.addTab(new HelloPanel("Головне меню програми"));
+        mainForm.addTab(new HelloPanel2("Головне меню програми"));
         try {
             WEEKLIST = new WeekList(databaseData.getConnection());
             GROUPLIST = new GroupList(databaseData.getConnection());
