@@ -6,10 +6,14 @@ import app.DegreeProject;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Created by Vladimir on 26/12/17.
@@ -56,6 +60,22 @@ public class ConnectionForm extends JFrame{
                         userTextField.getText(),
                         passwordField.getPassword(),
                         "asfsc");
+                ResultSet rs = DegreeProject.databaseData.getConnection().createStatement().executeQuery("SHOW TABLES");
+                HashSet<String> set = new HashSet<>();
+                set.add("auditorys"); set.add("departments");
+                set.add("groups"); set.add("lessons");
+                set.add("lessons_data"); set.add("lessons_schedules");
+                set.add("schedules"); set.add("schedules_data");
+                set.add("teachers"); set.add("weeks");
+                while (rs.next()) {
+                    if (!set.contains(rs.getString(1))) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "База даних не відповідає потрібній структурі!",
+                                "Помилка",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             } catch (SQLException e1) {
                 if (e1.getSQLState().equals("42000")) {
                     int r = JOptionPane.showConfirmDialog(null, "База даних 'asfcs' потрібна для роботи не знайдена! \n\r" +

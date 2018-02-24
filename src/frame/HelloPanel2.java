@@ -8,14 +8,14 @@ import java.awt.*;
  **/
 public class HelloPanel2 extends JPanel {
     private JPanel contentPane;
-    private JButton перейтиButton;
-    private JButton перейтиButton3;
-    private JButton перейтиButton2;
-    private JButton перейтиButton1;
-    private JButton перейтиButton4;
-    private JButton перейтиButton5;
-    private JButton перейтиButton6;
-    private JButton перейтиButton7;
+    private JButton створитиButton;
+    private JButton переглянутиButton1;
+    private JButton створитиButton1;
+    private JButton переглянутиButton;
+    private JButton додатиButton;
+    private JButton додатиButton1;
+    private JButton додатиButton2;
+    private JButton додатиButton3;
     private JButton перейтиButton8;
     private JButton перейтиButton9;
 

@@ -20,6 +20,8 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
+import static javax.swing.JOptionPane.YES_OPTION;
+
 /**
  * Created by Vladimir on 10/01/18.
  **/
@@ -62,22 +64,23 @@ public class SchedulePanel extends JPanel{
     private void saveButtonClick(ActionEvent e) {
         try {
             Connection c = DegreeProject.databaseData.getConnection();
-            Statement st = c.createStatement();
+            Statement statement = c.createStatement();
             int schedule_key = 0;
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
-            if (st.execute("SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'")) {
-                int r = JOptionPane.showConfirmDialog(
+            String sqlQuery = "SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'";
+            if (statement.execute(sqlQuery)) {
+                int rewriteOption = JOptionPane.showConfirmDialog(
                         null,
                         "В базі даних уже існує графік навчання\n\rза цей період. Перезаписати?",
                         "Попередження",
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (r == JOptionPane.YES_OPTION) {
-                    st.execute(
+                if (rewriteOption == YES_OPTION) {
+                    statement.execute(
                             "DELETE FROM schedules_data WHERE schedule LIKE " +
                                     "(SELECT k FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "')"
                     );
-                    st.execute("DELETE FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'");
+                    statement.execute("DELETE FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'");
                 } else {
                     return;
                 }
@@ -89,7 +92,7 @@ public class SchedulePanel extends JPanel{
             ps.setString(3, ""); // TODO Не реалізовані коментарі для графіків навчання
             ps.execute();
 
-            ResultSet rs = st.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
+            ResultSet rs = statement.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
             while (rs.next()) {
                 schedule_key = rs.getInt("k");
             }
@@ -105,7 +108,7 @@ public class SchedulePanel extends JPanel{
                 ps.execute();
             }
             rs.close();
-            st.close();
+            statement.close();
             ps.close();
             JOptionPane.showMessageDialog(null, "Дані успішно збережено");
         } catch (SQLException | ClassCastException e1) {

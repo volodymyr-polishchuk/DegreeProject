@@ -8,6 +8,8 @@ import frame.HelloPanel2;
 import frame.MainForm;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -47,6 +49,18 @@ public class DegreeProject {
         mainForm = new MainForm();
 //        mainForm.addTab(new HelloPanel("Головне меню програми"));
         mainForm.addTab(new HelloPanel2("Головне меню програми"));
+        mainForm.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                try {
+                    DegreeProject.databaseData.getConnection().close();
+                } catch (SQLException e1) {
+                    JOptionPane.showMessageDialog(null, e1.getMessage());
+                    e1.printStackTrace();
+                }
+            }
+        });
         try {
             WEEKLIST = new WeekList(databaseData.getConnection());
             GROUPLIST = new GroupList(databaseData.getConnection());

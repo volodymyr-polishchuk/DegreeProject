@@ -3,7 +3,6 @@ package frame;
 import app.DegreeProject;
 import app.data.*;
 import app.lessons.*;
-import javafx.collections.transformation.SortedList;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -13,12 +12,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Vladimir on 31/01/18.
@@ -40,7 +37,7 @@ public class LessonsPanel extends JPanel{
     private JLabel studyPairInWeekLabel;
     private JButton exportButton;
     private ButtonGroup buttonGroup;
-    private TableModel tableModel;
+    private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
     /**
      * Кількість пар в одному дні
@@ -66,6 +63,7 @@ public class LessonsPanel extends JPanel{
         InitialGroupButton();
         setButton.addActionListener(this::setButtonClick);
         settingButton.addActionListener(this::settingGroupClick);
+        saveButton.addActionListener(this::saveButtonClick);
         InitialData();
     }
 
@@ -74,14 +72,20 @@ public class LessonsPanel extends JPanel{
         setName(title);
     }
 
+    private void saveButtonClick(ActionEvent event) {
+        LessonTableModel lessonTableModel = ((LessonTableModel) jTable.getModel());
+        ArrayList<LessonsUnit> units = lessonTableModel.units;
+
+    }
+
     private void settingGroupClick(ActionEvent e) {
         DegreeProject.GROUPLIST.refresh();
         int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
         int count = 0;
         ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
         for (int i = 0; i < tList.size(); i++) {
-            for (int j = 0; j < tableModel.units.size(); j++) {
-                if (tList.get(i).equals(tableModel.units.get(j).getGroup())) {
+            for (int j = 0; j < lessonTableModel.units.size(); j++) {
+                if (tList.get(i).equals(lessonTableModel.units.get(j).getGroup())) {
                     choice[count++] = i;
                 }
             }
@@ -92,11 +96,11 @@ public class LessonsPanel extends JPanel{
     }
 
     private void afterSettingGroup(ArrayList<Group> list) {
-        ArrayList<LessonsUnit> listFromTable = new ArrayList<>(tableModel.units);
+        ArrayList<LessonsUnit> listFromTable = new ArrayList<>(lessonTableModel.units);
         LessonsUnit tLessonUnit;
 
-        for (int i = tableModel.units.size() - 1; i >= 0; i--) {
-            tLessonUnit = tableModel.units.remove(i);
+        for (int i = lessonTableModel.units.size() - 1; i >= 0; i--) {
+            tLessonUnit = lessonTableModel.units.remove(i);
             for (Group group : list) {
                 if (tLessonUnit.getGroup().equals(group)) {
                     listFromTable.add(tLessonUnit);
@@ -117,9 +121,9 @@ public class LessonsPanel extends JPanel{
             b = false;
         }
         Collections.sort(listFromTable, (o1, o2) -> o1.getGroup().getName().compareTo(o2.getGroup().getName()));
-        tableModel.units.addAll(listFromTable);
-        tableModel.fireTableStructureChanged();
-        tableModel.fireTableDataChanged();
+        lessonTableModel.units.addAll(listFromTable);
+        lessonTableModel.fireTableStructureChanged();
+        lessonTableModel.fireTableDataChanged();
     }
 
     private void InitialData() {
@@ -188,7 +192,7 @@ public class LessonsPanel extends JPanel{
                             (Auditory) auditoryCBox.getModel().getSelectedItem())
             ); break;
         }
-        tableModel.updateForbids(nowStudyPair);
+        lessonTableModel.updateForbids(nowStudyPair);
     }
 
     private void InitialGroupButton() {
@@ -196,24 +200,24 @@ public class LessonsPanel extends JPanel{
         Border outCenter = BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY);
         Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
         button1.setBorder(BorderFactory.createCompoundBorder(out, in));
-        button1.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        button1.addActionListener(e -> ((LessonTableModel)jTable.getModel()).fireTableDataChanged());
         button2.setBorder(BorderFactory.createCompoundBorder(outCenter, in));
-        button2.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        button2.addActionListener(e -> ((LessonTableModel)jTable.getModel()).fireTableDataChanged());
         button3.setBorder(BorderFactory.createCompoundBorder(out, in));
-        button3.addActionListener(e -> ((TableModel)jTable.getModel()).fireTableDataChanged());
+        button3.addActionListener(e -> ((LessonTableModel)jTable.getModel()).fireTableDataChanged());
         buttonGroup = new ButtonGroup();
         buttonGroup.add(button1);
         buttonGroup.add(button2);
         buttonGroup.add(button3);
     }
 
-    public TableModel getTableModel() {
-        return tableModel;
+    public LessonTableModel getLessonTableModel() {
+        return lessonTableModel;
     }
 
     private void InitialTable() {
-        tableModel = new TableModel();
-        jTable.setModel(tableModel);
+        lessonTableModel = new LessonTableModel();
+        jTable.setModel(lessonTableModel);
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         jTable.setShowGrid(false);
         jTable.setIntercellSpacing(new Dimension(0, 0));
@@ -233,7 +237,7 @@ public class LessonsPanel extends JPanel{
             }
         });
 
-        tableModel.addTableModelListener(e -> {
+        lessonTableModel.addTableModelListener(e -> {
             Enumeration<TableColumn> columns = jTable.getColumnModel().getColumns();
             while (columns.hasMoreElements()) {
                 TableColumn column = columns.nextElement();
@@ -266,20 +270,20 @@ public class LessonsPanel extends JPanel{
         }
     }
 
-    private class TableModel extends AbstractTableModel {
+    private class LessonTableModel extends AbstractTableModel {
         private ArrayList<LessonsUnit> units = new ArrayList<>();
         private HashMap<app.lessons.StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
-        public TableModel() {
+        public LessonTableModel() {
         }
 
         public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {
             return fMap;
         }
 
-        public StudyPair.Forbidden getForbidden(TableModel tableModel, int row, int column) {
+        public StudyPair.Forbidden getForbidden(LessonTableModel lessonTableModel, int row, int column) {
             StudyPair.Forbidden forbidden = StudyPair.Forbidden.UNKNOWN_FORBIDDEN;
-            HashMap<StudyPair.Forbidden, HashSet<Point>> map = tableModel.getfMap();
+            HashMap<StudyPair.Forbidden, HashSet<Point>> map = lessonTableModel.getfMap();
             if (map.get(StudyPair.Forbidden.ROW_FORBIDDEN) != null) {
                 for (Point point: map.get(StudyPair.Forbidden.ROW_FORBIDDEN)) {
                     if (point.getX() == row) {
@@ -442,7 +446,7 @@ public class LessonsPanel extends JPanel{
                     return component;
                 }
             }
-            StudyPair.Forbidden forbidden = ((TableModel)table.getModel()).getForbidden(tableModel, row, column);
+            StudyPair.Forbidden forbidden = ((LessonTableModel)table.getModel()).getForbidden(lessonTableModel, row, column);
 
             switch (forbidden) {
                 case SELF_FORBIDDEN: component.setBackground(new Color(0x818AA3));
@@ -460,12 +464,12 @@ public class LessonsPanel extends JPanel{
     private void mouseTableClick(MouseEvent e) {
         int row = jTable.rowAtPoint(e.getPoint());
         int column = jTable.columnAtPoint(e.getPoint());
-        tableModel.setValueAt(nowStudyPair, row, column);
+        lessonTableModel.setValueAt(nowStudyPair, row, column);
         analyzeTable(row, column);
     }
 
     private void analyzeTable(int row, int column) {
-        LessonsUnit unit = getTableModel().units.get(column / COLUMN_REPEAT);
+        LessonsUnit unit = getLessonTableModel().units.get(column / COLUMN_REPEAT);
         int pairCountNumerator = 0;
         int pairCountDenominator = 0;
         for (StudyPair pair : unit.getPairs()) {
