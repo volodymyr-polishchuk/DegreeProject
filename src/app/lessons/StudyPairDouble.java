@@ -117,7 +117,6 @@ public class StudyPairDouble extends StudyPair {
         return new Forbidden[0];
     }
 
-
     public static StudyPair unite(StudyPairDouble pair1, StudyPairDouble pair2) {
         if (pair1.numerator.isEmpty() && pair2.denominator.isEmpty()) {
             return new StudyPairDouble(pair2.numerator, pair1.denominator);

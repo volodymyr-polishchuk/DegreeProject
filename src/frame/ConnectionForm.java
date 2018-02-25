@@ -34,18 +34,18 @@ public class ConnectionForm extends JFrame{
         setResizable(false);
         setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize().getWidth() - this.getWidth()) / 2),
                 (int) ((Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight()) / 2));
-        String line = "";
+        String fileDataInput = "";
         try {
             File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
                     new File(new URI(file.getParentFile().toURI() + "/database.txt")))));
-            line = reader.readLine();
+            fileDataInput = reader.readLine();
             reader.close();
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
-        if (!line.isEmpty()) {
-            String[] lines = line.split(";");
+        if (!fileDataInput.isEmpty()) {
+            String[] lines = fileDataInput.split(";");
             if (lines.length == 5) {
                 addressTextField.setText(lines[0]);
                 portTextField.setText(lines[1]);
