@@ -36,8 +36,9 @@ public class ConnectionForm extends JFrame{
                 (int) ((Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight()) / 2));
         String line = "";
         try {
+            File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-                    new File(new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/database.txt")))));
+                    new File(new URI(file.getParentFile().toURI() + "/database.txt")))));
             line = reader.readLine();
             reader.close();
         } catch (URISyntaxException | IOException e) {
@@ -104,8 +105,9 @@ public class ConnectionForm extends JFrame{
 
     private void logDate() {
         try {
+            File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    new File(new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/log.txt")))));
+                    new File(new URI(file.getParentFile().toURI() + "/log.txt")))));
             writer.write((new Date(System.currentTimeMillis())).toString());
             writer.flush();
             writer.close();
@@ -116,11 +118,12 @@ public class ConnectionForm extends JFrame{
 
     private void rememberMe() {
         try {
+            File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(
                             new FileOutputStream(
                                     new File(
-                                            new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/database.txt")
+                                            new URI(file.getParentFile().toURI() + "/database.txt")
                                     ))));
             writer.write(addressTextField.getText() + ";");
             writer.write(portTextField.getText() + ";");

@@ -105,6 +105,15 @@ public class StudyPairDouble extends StudyPair {
 
     @Override
     public Forbidden[] getSelfForbidden(int row, int col, int pairPerDay, int dayPerWeek) {
+        if (numerator != null && !numerator.isEmpty()) {
+            if (!numerator.getTeacher().getPreference().getByIndex(row / pairPerDay)) {
+                return new Forbidden[] {Forbidden.DAY_FORBIDDEN};
+            }
+        } else if (denominator != null && !denominator.isEmpty()) {
+            if (!denominator.getTeacher().getPreference().getByIndex(row / pairPerDay)) {
+                return new Forbidden[] {Forbidden.DAY_FORBIDDEN};
+            }
+        }
         return new Forbidden[0];
     }
 

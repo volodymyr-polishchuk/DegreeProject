@@ -75,7 +75,12 @@ public class LessonsPanel extends JPanel{
     private void saveButtonClick(ActionEvent event) {
         LessonTableModel lessonTableModel = ((LessonTableModel) jTable.getModel());
         ArrayList<LessonsUnit> units = lessonTableModel.units;
-
+        try (Statement st = DegreeProject.databaseData.getConnection().createStatement()) {
+//            ResultSet rs = st.executeQuery("SELECT * FROM lessons_schedules");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void settingGroupClick(ActionEvent e) {
@@ -221,7 +226,7 @@ public class LessonsPanel extends JPanel{
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         jTable.setShowGrid(false);
         jTable.setIntercellSpacing(new Dimension(0, 0));
-        jTable.setRowHeight(jTable.getRowHeight() * 2);
+        jTable.setRowHeight((int) (jTable.getRowHeight() * 1.5));
 
         jTable.getTableHeader().setReorderingAllowed(false);
         jTable.getTableHeader().setResizingAllowed(false);
@@ -243,13 +248,16 @@ public class LessonsPanel extends JPanel{
                 TableColumn column = columns.nextElement();
                 switch (column.getModelIndex() % COLUMN_REPEAT) {
                     case DAY_NAME_NUMBER:case PAIR_NUMBER: {
-                        column.setMaxWidth(25); column.setMinWidth(25);
+                        column.setMaxWidth(20); column.setMinWidth(20);
                     } break;
-                    case LESSONS_NAME_NUMBER:case TEACHER_NAME_NUMBER: {
-                        column.setMinWidth(130); column.setMaxWidth(130);
+                    case LESSONS_NAME_NUMBER: {
+                        column.setMinWidth(120); column.setMaxWidth(120);
+                    } break;
+                    case TEACHER_NAME_NUMBER: {
+                        column.setMinWidth(100); column.setMaxWidth(100);
                     } break;
                     case AUDITORY_NUMBER: {
-                        column.setMinWidth(40); column.setMaxWidth(40);
+                        column.setMinWidth(30); column.setMaxWidth(30);
                     } break;
                 }
             }
