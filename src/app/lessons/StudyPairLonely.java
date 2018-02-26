@@ -88,6 +88,7 @@ public class StudyPairLonely extends StudyPair {
 
     @Override
     public Forbidden[] getSelfForbidden(int row, int col, int pairPerDay, int dayPerWeek) {
+        if (isEmpty()) return new Forbidden[0];
         if (!teacher.getPreference().getByIndex(row / pairPerDay)) {
             return new Forbidden[] {Forbidden.DAY_FORBIDDEN};
         }

@@ -63,11 +63,11 @@ public class ConnectionForm extends JFrame{
                         "asfsc");
                 ResultSet rs = DegreeProject.databaseData.getConnection().createStatement().executeQuery("SHOW TABLES");
                 HashSet<String> set = new HashSet<>();
-                set.add("auditorys"); set.add("departments");
-                set.add("groups"); set.add("lessons");
-                set.add("lessons_data"); set.add("lessons_schedules");
-                set.add("schedules"); set.add("schedules_data");
-                set.add("teachers"); set.add("weeks");
+                set.add("auditorys");       set.add("departments");
+                set.add("groups");          set.add("lessons");
+                set.add("lessons_data");    set.add("lessons_schedules");
+                set.add("schedules");       set.add("schedules_data");
+                set.add("teachers");        set.add("weeks");
                 while (rs.next()) {
                     if (!set.contains(rs.getString(1))) {
                         JOptionPane.showMessageDialog(

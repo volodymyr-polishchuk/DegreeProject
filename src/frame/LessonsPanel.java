@@ -12,9 +12,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 /**
@@ -28,7 +27,6 @@ public class LessonsPanel extends JPanel{
     private JToggleButton button1;
     private JToggleButton button2;
     private JToggleButton button3;
-    private JButton setButton;
     private JComboBox<Lesson> lessonCBox;
     private JComboBox<Teacher> teacherCBox;
     private JComboBox<Auditory> auditoryCBox;
@@ -36,6 +34,9 @@ public class LessonsPanel extends JPanel{
     private JLabel workHourInWeekLabel;
     private JLabel studyPairInWeekLabel;
     private JButton exportButton;
+    private JButton prevPeriodButton;
+    private JButton nextPeriodButton;
+    private JLabel periodLabel;
     private ButtonGroup buttonGroup;
     private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
@@ -61,10 +62,51 @@ public class LessonsPanel extends JPanel{
         add(contentPane);
         InitialTable();
         InitialGroupButton();
-        setButton.addActionListener(this::setButtonClick);
         settingButton.addActionListener(this::settingGroupClick);
         saveButton.addActionListener(this::saveButtonClick);
         InitialData();
+        button1.addActionListener(this::setButtonClick);
+        button2.addActionListener(this::setButtonClick);
+        button3.addActionListener(this::setButtonClick);
+        auditoryCBox.addActionListener(this::setButtonClick);
+        teacherCBox.addActionListener(this::setButtonClick);
+        lessonCBox.addActionListener(this::setButtonClick);
+        nextPeriodButton.addActionListener(this::nextPeriodButtonClick);
+        prevPeriodButton.addActionListener(this::prevPeriodButtonClick);
+    }
+
+    private void prevPeriodButtonClick(ActionEvent event) {
+        String periodLine = periodLabel.getText();
+        String[] args = periodLine.split("/");
+        if (args.length != 2) {
+            periodLabel.setText("2017-2018/1");
+            return;
+        }
+        if (Integer.parseInt(args[1]) == 2) {
+            periodLabel.setText(args[0] + "/1");
+        } else if (Integer.parseInt(args[1]) == 1) {
+            String[] years = args[0].split("-");
+            years[0] = String.valueOf(Integer.valueOf(years[0]) - 1);
+            years[1] = String.valueOf(Integer.valueOf(years[1]) - 1);
+            periodLabel.setText(years[0] + "-" + years[1] + "/2");
+        }
+    }
+
+    private void nextPeriodButtonClick(ActionEvent event) {
+        String periodLine = periodLabel.getText();
+        String[] args = periodLine.split("/");
+        if (args.length != 2) {
+            periodLabel.setText("2017-2018/1");
+            return;
+        }
+        if (Integer.parseInt(args[1]) == 1) {
+            periodLabel.setText(args[0] + "/2");
+        } else if (Integer.parseInt(args[1]) == 2) {
+            String[] years = args[0].split("-");
+            years[0] = String.valueOf(Integer.valueOf(years[0]) + 1);
+            years[1] = String.valueOf(Integer.valueOf(years[1]) + 1);
+            periodLabel.setText(years[0] + "-" + years[1] + "/1");
+        }
     }
 
     public LessonsPanel(String title) {
@@ -76,7 +118,65 @@ public class LessonsPanel extends JPanel{
         LessonTableModel lessonTableModel = ((LessonTableModel) jTable.getModel());
         ArrayList<LessonsUnit> units = lessonTableModel.units;
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement()) {
-//            ResultSet rs = st.executeQuery("SELECT * FROM lessons_schedules");
+            if (st.execute("SELECT * FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'")) {
+                // TODO Не правильно визначає чи існує уже такий запис у таблиці чи ні
+                int inputResult = JOptionPane.showConfirmDialog(null,
+                        "За даний період уже є розклад занять!\n\rПерезаписати?",
+                        "Попередження", JOptionPane.YES_NO_CANCEL_OPTION);
+                if (inputResult != JOptionPane.YES_OPTION) return;
+                st.execute("DELETE FROM lessons_data WHERE lessons_schedule LIKE (SELECT k FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "')");
+                st.execute("DELETE FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
+            }
+
+            String sql = "INSERT INTO lessons_schedules(period, date_of_create, coments) VALUE (?, ?, ?)";
+            PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(sql);
+            ps.setString(1, periodLabel.getText());
+            ps.setDate(2, new Date(System.currentTimeMillis()));
+            ps.setString(3, JOptionPane.showInputDialog(null, "Введіть коментар", "Коментар", JOptionPane.QUESTION_MESSAGE)); // TODO Потрібно реалізувати коментарі до розкладу занять
+            ps.execute();
+
+            int k = -1;
+            ResultSet rs = st.executeQuery("SELECT k FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
+            while (rs.next()) k = rs.getInt("k");
+            if (k == -1) throw new SQLException("Значення ключа не змінилося, отже запис не було додано");
+
+            String sqlLessonsData = "INSERT INTO lessons_data(lessons_schedule, groups, pair_number, lesson, teacher, auditory) VALUE (?, ?, ?, ?, ?, ?)";
+            ps = DegreeProject.databaseData.getConnection().prepareStatement(sqlLessonsData);
+            ps.setInt(1, k);
+            for (LessonsUnit unit : units) {
+                ps.setInt(2, unit.getGroup().getKey());
+                StudyPair[] pairs = unit.getPairs();
+                for (int i = 0; i < pairs.length; i++) {
+                    StudyPair pair = pairs[i];
+                    if (pair instanceof StudyPairLonely) {
+//                      Якщо пара одиночна, тоді записуємо
+                        StudyPairLonely pairLonely = (StudyPairLonely) pair;
+                        ps.setString(3, String.valueOf(i));
+                        ps.setInt(4, pairLonely.getLesson().getKey());
+                        ps.setInt(5, pairLonely.getTeacher().getKey());
+                        ps.setInt(6, pairLonely.getAuditory().getKey());
+                        ps.execute();
+                    } else if (pair instanceof StudyPairDouble) {
+//                      Якщо пара двойна - перевіряємо який з елементів пари дійсний і записуємо
+                        StudyPairDouble pairDouble = (StudyPairDouble) pair;
+                        if (pairDouble.getNumerator() != null && !pairDouble.getNumerator().isEmpty()) {
+                            ps.setString(3, String.valueOf(i) + "/1");
+                            ps.setInt(4, pairDouble.getNumerator().getLesson().getKey());
+                            ps.setInt(5, pairDouble.getNumerator().getTeacher().getKey());
+                            ps.setInt(6, pairDouble.getNumerator().getAuditory().getKey());
+                            ps.execute();
+                        }
+                        if (pairDouble.getDenominator() != null && !pairDouble.getDenominator().isEmpty()) {
+                            ps.setString(3, String.valueOf(i) + "/2");
+                            ps.setInt(4, pairDouble.getDenominator().getLesson().getKey());
+                            ps.setInt(5, pairDouble.getDenominator().getTeacher().getKey());
+                            ps.setInt(6, pairDouble.getDenominator().getAuditory().getKey());
+                            ps.execute();
+                        }
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Дані успішно збережено!", "Повідомлення з бази даних", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
@@ -97,7 +197,6 @@ public class LessonsPanel extends JPanel{
         }
         choice = Arrays.copyOf(choice, count);
         new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
-//        saveButton.setEnabled(true);
     }
 
     private void afterSettingGroup(ArrayList<Group> list) {
@@ -172,7 +271,6 @@ public class LessonsPanel extends JPanel{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     private void setButtonClick(ActionEvent event) {
@@ -232,7 +330,7 @@ public class LessonsPanel extends JPanel{
         jTable.getTableHeader().setResizingAllowed(false);
         jTable.getTableHeader().setDefaultRenderer(new TableHeaderCellRenderer());
 
-        jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer());
+        jTable.setDefaultRenderer(String.class, new TableCellDayNameRenderer(PAIR_IN_DAY));
         jTable.setDefaultRenderer(Integer.class, new TableCellPairNumberRenderer());
         jTable.setDefaultRenderer(StudyPair.class, new TableCellSubjectRenderer());
 
@@ -329,8 +427,6 @@ public class LessonsPanel extends JPanel{
             fireTableDataChanged();
         }
 
-
-
         @Override
         public int getRowCount() {
             return DAY_AT_WEEK * PAIR_IN_DAY;
@@ -379,50 +475,10 @@ public class LessonsPanel extends JPanel{
                     } else {
                         units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
                     }
-//                    units.get(columnIndex / COLUMN_REPEAT).setPair(rowIndex, (StudyPair)aValue);
                 }
             }
             updateForbids(nowStudyPair);
             fireTableDataChanged();
-        }
-    }
-
-    private class TableCellDayNameRenderer extends DefaultTableCellRenderer {
-        private final String[] daysName = new String[] {
-            "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
-        };
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel labelTop = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            labelTop.setBackground(new Color(242, 242, 242));
-            labelTop.setFont(new Font(labelTop.getFont().getName(), Font.BOLD, labelTop.getFont().getSize()));
-            labelTop.setHorizontalAlignment(CENTER);
-            if ((row * 2) % (PAIR_IN_DAY * 2) < daysName[row / PAIR_IN_DAY].length()) {
-                labelTop.setText(String.valueOf(
-                        daysName[row / PAIR_IN_DAY].charAt((row * 2) % (PAIR_IN_DAY * 2))
-                ));
-            }
-
-            JLabel labelBottom = new JLabel();
-
-            if (((row * 2) + 1) % (PAIR_IN_DAY * 2) < daysName[row / PAIR_IN_DAY].length()) {
-                labelBottom.setText(String.valueOf(
-                        daysName[row / PAIR_IN_DAY].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))
-                ));
-            }
-            labelBottom.setHorizontalAlignment(CENTER);
-            labelBottom.setFont(new Font(labelBottom.getFont().getName(), Font.BOLD, labelBottom.getFont().getSize()));
-
-            JPanel panel = new JPanel(new GridLayout(2, 1));
-            panel.add(labelTop);
-            panel.add(labelBottom);
-            panel.setBorder(row % PAIR_IN_DAY == PAIR_IN_DAY - 1 ?
-                    BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY)
-                    :
-                    BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY)
-            );
-            if (row % PAIR_IN_DAY == PAIR_IN_DAY - 1) panel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 1, Color.LIGHT_GRAY));
-            return panel;
         }
     }
 
@@ -502,21 +558,6 @@ public class LessonsPanel extends JPanel{
                 (pairCountNumerator) + " пар; в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10) :
                 "(Ч) " + (pairCountNumerator) + " годин; (З) " + (pairCountDenominator) + " годин;  в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10)
         );
-    }
-
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
-        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        frame.setLayout(new GridLayout());
-        frame.add(new LessonsPanel());
-        frame.setVisible(true);
     }
 }
 
