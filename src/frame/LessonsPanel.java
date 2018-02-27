@@ -118,7 +118,8 @@ public class LessonsPanel extends JPanel{
         LessonTableModel lessonTableModel = ((LessonTableModel) jTable.getModel());
         ArrayList<LessonsUnit> units = lessonTableModel.units;
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement()) {
-            if (st.execute("SELECT * FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'")) {
+            ResultSet rs2 = st.executeQuery("SELECT * FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
+            if (rs2.next()) {
                 // TODO Не правильно визначає чи існує уже такий запис у таблиці чи ні
                 int inputResult = JOptionPane.showConfirmDialog(null,
                         "За даний період уже є розклад занять!\n\rПерезаписати?",
@@ -127,6 +128,7 @@ public class LessonsPanel extends JPanel{
                 st.execute("DELETE FROM lessons_data WHERE lessons_schedule LIKE (SELECT k FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "')");
                 st.execute("DELETE FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
             }
+            rs2.close();
 
             String sql = "INSERT INTO lessons_schedules(period, date_of_create, coments) VALUE (?, ?, ?)";
             PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(sql);
