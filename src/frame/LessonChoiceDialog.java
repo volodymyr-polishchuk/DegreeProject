@@ -15,8 +15,8 @@ public class LessonChoiceDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JList<String> jList;
-    private DefaultListModel<String> listModel = new DefaultListModel<>();
+    private JList<ListItem> jList;
+    private DefaultListModel<ListItem> listModel = new DefaultListModel<>();
     private Connection connection;
 
     public LessonChoiceDialog(Connection connection) {
@@ -28,19 +28,9 @@ public class LessonChoiceDialog extends JDialog {
         jList.setModel(listModel);
         listData();
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -48,42 +38,73 @@ public class LessonChoiceDialog extends JDialog {
             }
         });
 
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void listData() {
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM lessons_schedules");
-            while (rs.next()) {
-                listModel.addElement("Розклад занять за " + rs.getString("period"));
-            }
+            while (rs.next()) listModel.addElement(new ListItem(rs.getString("period")));
+            rs.close();
+            st.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
 
     private void onOK() {
-        // add your code here
+        ListItem item = jList.getSelectedValue();
+        DegreeProject.mainForm.addTab(new LessonsPanel("Розклад занять за " + item.getPeriod(), item.getPeriod()));
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
 
     public static void main(String[] args) {
-//TODO Connection не створений в цей момент
         LessonChoiceDialog dialog = new LessonChoiceDialog(DegreeProject.databaseData.getConnection());
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
+    }
+
+    private class ListItem {
+        private String period;
+
+        public ListItem(String period) {
+            this.period = period;
+        }
+
+        public String getPeriod() {
+            return period;
+        }
+
+        public void setPeriod(String period) {
+            this.period = period;
+        }
+
+        @Override
+        public String toString() {
+            return "Розклад занять за період " + period;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ListItem listItem = (ListItem) o;
+
+            return period != null ? period.equals(listItem.period) : listItem.period == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            return period != null ? period.hashCode() : 0;
+        }
     }
 }

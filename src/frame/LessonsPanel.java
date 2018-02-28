@@ -56,7 +56,7 @@ public class LessonsPanel extends JPanel{
      */
     private final int DAY_AT_WEEK = 6;
 
-    public LessonsPanel() {
+    private LessonsPanel() {
         nowStudyPair = new EmptyStudyPair();
         setLayout(new GridLayout());
         add(contentPane);
@@ -92,6 +92,44 @@ public class LessonsPanel extends JPanel{
         }
     }
 
+    public LessonsPanel(String title) {
+        this();
+        setName(title);
+    }
+
+    public LessonsPanel(String title, String period) {
+        this(title);
+//        TODO Створювати розклад занять відносно переданого періоду
+        try {
+            String sql = "SELECT * FROM lessons_schedules WHERE period LIKE ?";
+            PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(sql);
+            ps.setString(1, period);
+            ResultSet rs = ps.executeQuery();
+            int k = -1;
+            while (rs.next()) {
+                k = rs.getInt("k");
+            }
+            if (k == -1) throw new IllegalArgumentException("Period not found {" + period + "}");
+            String sqlGetAll = "SELECT * FROM lessons_data INNER JOIN groups ON groups = groups.k INNER JOIN departments ON groups.department = departments.k \n" +
+                    "INNER JOIN lessons ON lessons_data.lesson = lessons.k INNER JOIN teachers ON lessons_data.teacher = teachers.k\n" +
+                    "INNER JOIN auditorys ON lessons_data.auditory = auditorys.k WHERE lessons_data.lessons_schedule = ?;";
+            ps = DegreeProject.databaseData.getConnection().prepareStatement(sqlGetAll);
+            ps.setInt(1, k);
+            rs = ps.executeQuery();
+//  TODO Потрібно реалізувати обратне переведення із бази даних до структури даних в Java. Проблема з двойними парами
+//            HashMap<Group, HashSet<StudyPair>> map = new HashMap<>();
+//            while (rs.next()) {
+//                Group group = new Group(new Department(rs.getInt("departments.k"), rs.getString("departments.name")), rs.getString("groups.name"));
+//                if (map.containsKey(group)) {
+//                    map.get(group).add(new St)
+//                }
+//            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private void nextPeriodButtonClick(ActionEvent event) {
         String periodLine = periodLabel.getText();
         String[] args = periodLine.split("/");
@@ -107,11 +145,6 @@ public class LessonsPanel extends JPanel{
             years[1] = String.valueOf(Integer.valueOf(years[1]) + 1);
             periodLabel.setText(years[0] + "-" + years[1] + "/1");
         }
-    }
-
-    public LessonsPanel(String title) {
-        this();
-        setName(title);
     }
 
     private void saveButtonClick(ActionEvent event) {
