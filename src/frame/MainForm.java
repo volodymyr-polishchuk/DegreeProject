@@ -138,7 +138,7 @@ public class MainForm extends JFrame {
             JMenu lessonsMenu = new JMenu("Розклад занять");
             lessonsMenu.add(new JMenuItem("Створити розклад занять")).addActionListener(this::MenuItemCreateLessons);
             lessonsMenu.add(new JPopupMenu.Separator());
-            lessonsMenu.add(new JMenuItem("Переглянути/редагувати розклад"));
+            lessonsMenu.add(new JMenuItem("Переглянути/редагувати розклад")).addActionListener(this::MenuItemViewLessons);
             lessonsMenu.add(new JMenuItem("Видалити розклад"));
             add(lessonsMenu);
 
@@ -162,6 +162,12 @@ public class MainForm extends JFrame {
             JMenuItem MenuItemAbout = new JMenuItem("Про програму");
             helpMenu.add(MenuItemAbout);
             add(helpMenu);
+        }
+
+        private void MenuItemViewLessons(ActionEvent event) {
+            LessonChoiceDialog dialog = new LessonChoiceDialog(DegreeProject.databaseData.getConnection());
+            dialog.pack();
+            dialog.setVisible(true);
         }
 
         private void MenuItemSetting(ActionEvent event) {

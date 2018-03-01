@@ -24,6 +24,7 @@ public class LessonChoiceDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        setBounds(100, 100, 200, 200);
 
         jList.setModel(listModel);
         listData();
@@ -56,7 +57,7 @@ public class LessonChoiceDialog extends JDialog {
 
     private void onOK() {
         ListItem item = jList.getSelectedValue();
-        DegreeProject.mainForm.addTab(new LessonsPanel("Розклад занять за " + item.getPeriod(), item.getPeriod()));
+        DegreeProject.mainForm.addTab(new LessonsPanel("Розклад занять за " + item.getPeriod(), item.getPeriod()), "Розклад занять за " + item.getPeriod());
         dispose();
     }
 

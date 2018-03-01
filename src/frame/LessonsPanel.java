@@ -99,31 +99,97 @@ public class LessonsPanel extends JPanel{
 
     public LessonsPanel(String title, String period) {
         this(title);
-//        TODO Створювати розклад занять відносно переданого періоду
         try {
+            periodLabel.setText(period);
+
             String sql = "SELECT * FROM lessons_schedules WHERE period LIKE ?";
             PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(sql);
             ps.setString(1, period);
             ResultSet rs = ps.executeQuery();
             int k = -1;
-            while (rs.next()) {
-                k = rs.getInt("k");
-            }
+            while (rs.next()) k = rs.getInt("k");
+
             if (k == -1) throw new IllegalArgumentException("Period not found {" + period + "}");
             String sqlGetAll = "SELECT * FROM lessons_data INNER JOIN groups ON groups = groups.k INNER JOIN departments ON groups.department = departments.k \n" +
                     "INNER JOIN lessons ON lessons_data.lesson = lessons.k INNER JOIN teachers ON lessons_data.teacher = teachers.k\n" +
-                    "INNER JOIN auditorys ON lessons_data.auditory = auditorys.k WHERE lessons_data.lessons_schedule = ?;";
+                    "INNER JOIN auditorys ON lessons_data.auditory = auditorys.k WHERE lessons_data.lessons_schedule LIKE ?;";
+            System.out.println(k);
             ps = DegreeProject.databaseData.getConnection().prepareStatement(sqlGetAll);
             ps.setInt(1, k);
             rs = ps.executeQuery();
-//  TODO Потрібно реалізувати обратне переведення із бази даних до структури даних в Java. Проблема з двойними парами
-//            HashMap<Group, HashSet<StudyPair>> map = new HashMap<>();
-//            while (rs.next()) {
-//                Group group = new Group(new Department(rs.getInt("departments.k"), rs.getString("departments.name")), rs.getString("groups.name"));
-//                if (map.containsKey(group)) {
-//                    map.get(group).add(new St)
-//                }
-//            }
+
+            ArrayList<LessonsUnit> units = new ArrayList<>();
+
+            while (rs.next()) {
+                Group group = new Group(rs.getInt("groups.k"), new Department(rs.getInt("departments.k"), rs.getString("departments.name")), rs.getString("groups.name"));
+                StudyPairLonely pairLonely = new StudyPairLonely(
+                        new Lesson(rs.getInt("lessons.k"), rs.getString("lessons.name"), new Auditory("")),
+                        new Teacher(rs.getInt("teachers.k"), rs.getString("teachers.name"), Preference.parsePreference(rs.getString("teachers.preferences"))),
+                        new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name"))
+                );
+                StudyPairLonely pairEmpty = new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory(""));
+                String[] line = rs.getString("pair_number").split("/");
+                boolean flag = false;
+                for (LessonsUnit unit : units) {
+
+                    if (unit.getGroup().equals(group)) {
+                        flag = true;
+                        switch (line.length) {
+                            case 1: {
+                                int pair_number = Integer.parseInt(line[0]);
+                                unit.setPair(pair_number, pairLonely);
+                                break;
+                            }
+                            case 2: {
+                                int pair_number = Integer.parseInt(line[0]);
+                                int position = Integer.parseInt(line[1]);
+                                switch (position) {
+                                    case 1: {
+                                        if (unit.getPair(pair_number) instanceof StudyPairDouble)
+                                            unit.setPair(pair_number, StudyPairDouble.unite((StudyPairDouble) unit.getPair(pair_number), new StudyPairDouble(pairLonely, pairEmpty)));
+                                        else unit.setPair(pair_number, new StudyPairDouble(pairLonely, pairEmpty));
+                                        break;
+                                    }
+                                    case 2: {
+                                        if (unit.getPair(pair_number) instanceof StudyPairDouble)
+                                            unit.setPair(pair_number, StudyPairDouble.unite((StudyPairDouble) unit.getPair(pair_number), new StudyPairDouble(pairEmpty, pairLonely)));
+                                        else unit.setPair(pair_number, new StudyPairDouble(pairEmpty, pairLonely));
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (flag) continue;
+                LessonsUnit tUnit = new LessonsUnit(group, PAIR_IN_DAY, COLUMN_REPEAT);
+                switch (line.length) {
+                    case 1: {
+                        int pair_number = Integer.parseInt(line[0]);
+                        tUnit.setPair(pair_number, pairLonely);
+                        break;
+                    }
+                    case 2: {
+                        int pair_number = Integer.parseInt(line[0]);
+                        int position = Integer.parseInt(line[1]);
+                        switch (position) {
+                            case 1:
+                                tUnit.setPair(pair_number, new StudyPairDouble(pairLonely, pairEmpty));
+                                break;
+                            case 2:
+                                tUnit.setPair(pair_number, new StudyPairDouble(pairEmpty, pairLonely));
+                                break;
+                        }
+                        break;
+                    }
+                }
+                units.add(tUnit);
+            }
+            lessonTableModel.units = units;
+            lessonTableModel.fireTableStructureChanged();
+            lessonTableModel.fireTableDataChanged();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
@@ -132,6 +198,12 @@ public class LessonsPanel extends JPanel{
 
     private void nextPeriodButtonClick(ActionEvent event) {
         String periodLine = periodLabel.getText();
+        String tPeriodLine = "";
+        for (int i = 0; i < periodLine.length(); i++) {
+            if (periodLine.charAt(i) != ' ')
+                tPeriodLine += periodLine.charAt(i);
+        }
+        periodLine = tPeriodLine;
         String[] args = periodLine.split("/");
         if (args.length != 2) {
             periodLabel.setText("2017-2018/1");
