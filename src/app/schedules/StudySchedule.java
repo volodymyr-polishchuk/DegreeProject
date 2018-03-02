@@ -11,6 +11,7 @@ import java.util.ArrayList;
 /**
  * Created by Vladimir on 03/01/18.
  **/
+@Deprecated
 public class StudySchedule {
     private int year;
     private String author;

@@ -12,9 +12,7 @@ import sun.swing.table.DefaultTableCellHeaderRenderer;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.sql.*;
 import java.sql.Date;
@@ -89,7 +87,7 @@ public class SchedulePanel extends JPanel{
             PreparedStatement ps = c.prepareStatement("INSERT IGNORE schedules(period, date_of_create, coments) VALUE (?, ?, ?);");
             ps.setString(1, yearsLabel.getText());
             ps.setDate(2, new Date(System.currentTimeMillis()));
-            ps.setString(3, ""); // TODO Не реалізовані коментарі для графіків навчання
+            ps.setString(3, JOptionPane.showInputDialog(null, "Коментар", "Введіть коментар", JOptionPane.QUESTION_MESSAGE));
             ps.execute();
 
             ResultSet rs = statement.executeQuery("SELECT k FROM schedules WHERE period = '" + yearsLabel.getText() + "';");
@@ -262,14 +260,10 @@ public class SchedulePanel extends JPanel{
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
+            public void mouseEntered(MouseEvent e) {}
 
             @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
+            public void mouseExited(MouseEvent e) {}
         });
         jTable.getTableHeader().setDefaultRenderer(new DefaultTableCellHeaderRenderer() {
             @Override

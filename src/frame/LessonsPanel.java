@@ -225,7 +225,6 @@ public class LessonsPanel extends JPanel{
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement()) {
             ResultSet rs2 = st.executeQuery("SELECT * FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
             if (rs2.next()) {
-                // TODO Не правильно визначає чи існує уже такий запис у таблиці чи ні
                 int inputResult = JOptionPane.showConfirmDialog(null,
                         "За даний період уже є розклад занять!\n\rПерезаписати?",
                         "Попередження", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -239,7 +238,7 @@ public class LessonsPanel extends JPanel{
             PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(sql);
             ps.setString(1, periodLabel.getText());
             ps.setDate(2, new Date(System.currentTimeMillis()));
-            ps.setString(3, JOptionPane.showInputDialog(null, "Введіть коментар", "Коментар", JOptionPane.QUESTION_MESSAGE)); // TODO Потрібно реалізувати коментарі до розкладу занять
+            ps.setString(3, JOptionPane.showInputDialog(null, "Введіть коментар", "Коментар", JOptionPane.QUESTION_MESSAGE));
             ps.execute();
 
             int k = -1;
