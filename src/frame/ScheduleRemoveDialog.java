@@ -11,7 +11,7 @@ import java.sql.Statement;
 /**
  * Created by Vladimir on 16/02/18.
  **/
-public class ScheduleRemoveForm extends JFrame{
+public class ScheduleRemoveDialog extends JDialog{
     private JButton removeButton;
     private JButton cancelButton;
     private JList<String> jList;
@@ -19,11 +19,14 @@ public class ScheduleRemoveForm extends JFrame{
     private Connection connection;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
 
-    public ScheduleRemoveForm(Connection connection) throws HeadlessException {
+    public ScheduleRemoveDialog(Connection connection) throws HeadlessException {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(new Dimension(400, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+        setModal(true);
+        setTitle("Видалення графіку навчання");
+
         setContentPane(ContentPane);
         jList.setModel(listModel);
         this.connection = connection;

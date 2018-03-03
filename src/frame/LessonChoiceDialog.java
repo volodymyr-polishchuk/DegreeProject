@@ -5,6 +5,7 @@ import app.data.Group;
 import app.lessons.LessonsUnit;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -24,7 +25,10 @@ public class LessonChoiceDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        setBounds(100, 100, 200, 200);
+        setSize(new Dimension(400, 300));
+        setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
+                (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+        setTitle("Перегляд/редагування розкладу занять");
 
         jList.setModel(listModel);
         listData();

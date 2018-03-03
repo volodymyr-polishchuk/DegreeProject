@@ -19,19 +19,22 @@ import java.util.HashSet;
 /**
  * Created by Vladimir on 15/02/18.
  **/
-public class ScheduleChoiceForm extends JFrame {
+public class ScheduleChoiceDialog extends JDialog {
     private JButton choiceButton;
     private JButton cancelButton;
     private JList<String> jList;
     private JPanel ContentPane;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
-    Connection connection;
+    private Connection connection;
 
-    public ScheduleChoiceForm(Connection connection) {
+    public ScheduleChoiceDialog(Connection connection) {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(new Dimension(400, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+        setModal(true);
+        setTitle("Перегляд/редагування графіку навчання");
+
         setContentPane(ContentPane);
         jList.setModel(listModel);
         this.connection = connection;

@@ -2,9 +2,11 @@ package app.data;
 
 import org.jetbrains.annotations.Contract;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Created by Vladimir on 12/01/18.
@@ -29,6 +31,13 @@ public class Period {
     public static ArrayList<Period> GetWeekList(Date date) {
         final int DAY = 1000*60*60*24;
 
+//        HashSet<Date> dates = new HashSet<>();
+//        dates.add(new Date(1514764800000L));
+//        dates.add(new Date(1515283200000L));
+//        dates.add(new Date(1515369600000L));
+//        dates.add(new Date(1520467200000L));
+//        dates.add(new Date(1520553600000L));
+
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(date.getTime());
         Date first;
@@ -44,6 +53,11 @@ public class Period {
             c.add(Calendar.DAY_OF_MONTH, Calendar.FRIDAY - c.get(Calendar.DAY_OF_WEEK));
             second = c.getTime();
             workDay = (int) ((second.getTime() - first.getTime()) / DAY) + 1;
+//            for (Date d : dates) {
+//                if (first.getTime() < d.getTime() && second.getTime() > d.getTime()) {
+//                    workDay--;
+//                }
+//            }
             c.add(Calendar.DAY_OF_MONTH, 3);
             arr.add(new Period(first, second, workDay));
         }

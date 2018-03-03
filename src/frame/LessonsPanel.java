@@ -44,6 +44,14 @@ public class LessonsPanel extends JPanel{
      * Кількість пар в одному дні
      */
     private final int PAIR_IN_DAY = 5;
+    /**
+     * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок...Вівторок, 3 - Понеділок...Середа
+     */
+    private final int DAY_AT_WEEK = 6;
+
+    /**
+     * Кількість колонок, що виділяться під одну групу
+     */
     private final int COLUMN_REPEAT = 5;
     // Константи, що позначають положення колонок в таблиці
     private final int DAY_NAME_NUMBER = 0;
@@ -51,10 +59,6 @@ public class LessonsPanel extends JPanel{
     private final int LESSONS_NAME_NUMBER = 2;
     private final int TEACHER_NAME_NUMBER = 3;
     private final int AUDITORY_NUMBER = 4;
-    /**
-     * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок...Вівторок, 3 - Понеділок...Середа
-     */
-    private final int DAY_AT_WEEK = 6;
 
     private LessonsPanel() {
         nowStudyPair = new EmptyStudyPair();
@@ -73,23 +77,6 @@ public class LessonsPanel extends JPanel{
         lessonCBox.addActionListener(this::setButtonClick);
         nextPeriodButton.addActionListener(this::nextPeriodButtonClick);
         prevPeriodButton.addActionListener(this::prevPeriodButtonClick);
-    }
-
-    private void prevPeriodButtonClick(ActionEvent event) {
-        String periodLine = periodLabel.getText();
-        String[] args = periodLine.split("/");
-        if (args.length != 2) {
-            periodLabel.setText("2017-2018/1");
-            return;
-        }
-        if (Integer.parseInt(args[1]) == 2) {
-            periodLabel.setText(args[0] + "/1");
-        } else if (Integer.parseInt(args[1]) == 1) {
-            String[] years = args[0].split("-");
-            years[0] = String.valueOf(Integer.valueOf(years[0]) - 1);
-            years[1] = String.valueOf(Integer.valueOf(years[1]) - 1);
-            periodLabel.setText(years[0] + "-" + years[1] + "/2");
-        }
     }
 
     public LessonsPanel(String title) {
@@ -164,7 +151,7 @@ public class LessonsPanel extends JPanel{
                     }
                 }
                 if (flag) continue;
-                LessonsUnit tUnit = new LessonsUnit(group, PAIR_IN_DAY, COLUMN_REPEAT);
+                LessonsUnit tUnit = new LessonsUnit(group, PAIR_IN_DAY, DAY_AT_WEEK);
                 switch (line.length) {
                     case 1: {
                         int pair_number = Integer.parseInt(line[0]);
@@ -193,6 +180,23 @@ public class LessonsPanel extends JPanel{
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void prevPeriodButtonClick(ActionEvent event) {
+        String periodLine = periodLabel.getText();
+        String[] args = periodLine.split("/");
+        if (args.length != 2) {
+            periodLabel.setText("2017-2018/1");
+            return;
+        }
+        if (Integer.parseInt(args[1]) == 2) {
+            periodLabel.setText(args[0] + "/1");
+        } else if (Integer.parseInt(args[1]) == 1) {
+            String[] years = args[0].split("-");
+            years[0] = String.valueOf(Integer.valueOf(years[0]) - 1);
+            years[1] = String.valueOf(Integer.valueOf(years[1]) - 1);
+            periodLabel.setText(years[0] + "-" + years[1] + "/2");
         }
     }
 
