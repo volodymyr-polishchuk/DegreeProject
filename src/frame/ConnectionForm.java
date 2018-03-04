@@ -44,15 +44,6 @@ public class ConnectionForm extends JFrame{
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
-        if (!fileDataInput.isEmpty()) {
-            String[] lines = fileDataInput.split(";");
-            if (lines.length == 5) {
-                addressTextField.setText(lines[0]);
-                portTextField.setText(lines[1]);
-                userTextField.setText(lines[2]);
-                passwordField.setText(lines[3]);
-            }
-        }
 
         connectButton.addActionListener(e -> {
             try {
@@ -101,6 +92,17 @@ public class ConnectionForm extends JFrame{
             DegreeProject.InitialMainFrame();
             dispose();
         });
+
+        if (!fileDataInput.isEmpty()) {
+            String[] lines = fileDataInput.split(";");
+            if (lines.length == 5) {
+                addressTextField.setText(lines[0]);
+                portTextField.setText(lines[1]);
+                userTextField.setText(lines[2]);
+                passwordField.setText(lines[3]);
+//                connectButton.doClick();
+            }
+        }
     }
 
     private void logDate() {

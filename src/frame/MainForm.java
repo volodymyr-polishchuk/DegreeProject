@@ -15,9 +15,11 @@ public class MainForm extends JFrame {
     private JTabbedPane tabbedPane;
     private JLabel statusBar;
     private JToolBar toolBar;
+    private MainFormMenuBar menuBar;
 
     public MainForm() {
-        setJMenuBar(new MainFormMenuBar(this));
+        menuBar = new MainFormMenuBar(this);
+        setJMenuBar(menuBar);
 
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -80,7 +82,9 @@ public class MainForm extends JFrame {
 
     private void InitJToolBar(JToolBar jToolBar) {
         try {
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png")))));
+            JButton button = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png"))));
+            button.addActionListener(menuBar::MenuItemSetting);
+            jToolBar.add(button);
             jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/settingsIcon.png")))));
             jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/exitIcon.png")))));
             jToolBar.add(new JToolBar.Separator());

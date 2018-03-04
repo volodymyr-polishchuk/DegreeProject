@@ -66,21 +66,21 @@ public class MainFormMenuBar extends JMenuBar {
         add(helpMenu);
     }
 
-    private void MenuItemRemoveLessons(ActionEvent event) {
+    public void MenuItemRemoveLessons(ActionEvent event) {
         LessonsRemoveDialog removeDialog = new LessonsRemoveDialog(DegreeProject.databaseData.getConnection());
         removeDialog.setVisible(true);
     }
 
-    private void MenuItemViewLessons(ActionEvent event) {
+    public void MenuItemViewLessons(ActionEvent event) {
         LessonChoiceDialog dialog = new LessonChoiceDialog(DegreeProject.databaseData.getConnection());
         dialog.setVisible(true);
     }
 
-    private void MenuItemSetting(ActionEvent event) {
+    public void MenuItemSetting(ActionEvent event) {
         (new SettingForm()).setVisible(true);
     }
 
-    private void MenuItemDataGroup(ActionEvent event) {
+    public void MenuItemDataGroup(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k ORDER BY groups.name")
         ) {
