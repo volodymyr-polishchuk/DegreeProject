@@ -2,10 +2,9 @@ package app;
 
 import app.data.GroupList;
 import app.data.WeekList;
-import frame.ConnectionForm;
-import frame.HelloPanel;
-import frame.HelloPanel2;
-import frame.MainForm;
+import app.frame.ConnectionForm;
+import app.frame.HelloPanel2;
+import app.frame.MainForm;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -33,21 +32,12 @@ public class DegreeProject {
             e.printStackTrace();
         }
 
-        ConnectionForm connectionForm = new ConnectionForm();
+        ConnectionForm connectionForm = new ConnectionForm(true);
         connectionForm.setVisible(true);
-//        try {
-//            databaseData = new DatabaseData("localhost", "3306", "Volodymyr", new char[]{'0', '0', '0', '0'}, "mydata");
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(null, "Помилка підключення до бази даних. \n\r" + e.getMessage());
-//            e.printStackTrace();
-//
-//        }
-//        InitialMainFrame();
     }
 
     public static void InitialMainFrame() {
         mainForm = new MainForm();
-//        mainForm.addTab(new HelloPanel("Головне меню програми"));
         mainForm.addTab(new HelloPanel2("Головне меню програми"));
         mainForm.addWindowListener(new WindowAdapter() {
             @Override

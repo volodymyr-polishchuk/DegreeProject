@@ -1,7 +1,7 @@
 package app;
 
 import app.data.*;
-import frame.*;
+import app.frame.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -175,7 +175,7 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemDataLesson(ActionEvent event) {
+    public void MenuItemDataLesson(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k")
         ) {
@@ -253,7 +253,7 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemDataTeacher(ActionEvent event) {
+    public void MenuItemDataTeacher(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM teachers")) {
             TreeSet<Teacher> teacherTreeSet = new TreeSet<>();
@@ -329,7 +329,7 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemDataAuditory(ActionEvent event) {
+    public void MenuItemDataAuditory(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM auditorys")) {
             TreeSet<Auditory> auditoryTreeSet = new TreeSet<>();
@@ -398,25 +398,25 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemCreateLessons(ActionEvent event) {
+    public void MenuItemCreateLessons(ActionEvent event) {
         this.mainForm.addEmptyLessonsSchedule();
     }
 
-    private void MenuItemRemoveSchedule(ActionEvent event) {
+    public void MenuItemRemoveSchedule(ActionEvent event) {
         ScheduleRemoveDialog form = new ScheduleRemoveDialog(DegreeProject.databaseData.getConnection());
         form.setVisible(true);
     }
 
-    private void MenuItemViewSchedule(ActionEvent event) {
+    public void MenuItemViewSchedule(ActionEvent event) {
         ScheduleChoiceDialog form = new ScheduleChoiceDialog(DegreeProject.databaseData.getConnection());
         form.setVisible(true);
     }
 
-    private void MenuItemCreateSchedule(ActionEvent event) {
+    public void MenuItemCreateSchedule(ActionEvent event) {
         this.mainForm.addEmptyStudySchedule();
     }
 
-    private void MenuItemExit(ActionEvent event) {
+    public void MenuItemExit(ActionEvent event) {
         int result = JOptionPane.showConfirmDialog(null, "Увага! Всі не збережені зміни будуть видалені\n\rПродовжити?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
         switch (result) {
             case JOptionPane.YES_OPTION:
@@ -430,7 +430,7 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemReconnect(ActionEvent event) {
+    public void MenuItemReconnect(ActionEvent event) {
         (new ConnectionForm()).setVisible(true);
         mainForm.dispose();
     }
