@@ -15,7 +15,6 @@ public class SettingForm extends JDialog {
     private JButton зберегтиButton;
     private JButton скасуватиButton;
     private JComboBox<LAFItem> LAFComboBox;
-    private DefaultComboBoxModel<LAFItem> listModel = new DefaultComboBoxModel<>();
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -25,6 +24,7 @@ public class SettingForm extends JDialog {
         setContentPane(ContentPane);
         setModal(true);
 
+        DefaultComboBoxModel<LAFItem> listModel = new DefaultComboBoxModel<>();
         listModel.addElement(new LAFItem("Windows"));
         listModel.addElement(new LAFItem("Java"));
         listModel.addElement(new LAFItem("JTattoo"));

@@ -6,6 +6,11 @@ import app.data.Period;
 import app.data.Week;
 import app.schedules.ScheduleUnit;
 import app.schedules.SchedulerTableModel;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -13,10 +18,14 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
+import static javax.swing.JOptionPane.NO_OPTION;
 import static javax.swing.JOptionPane.YES_OPTION;
 
 /**
@@ -34,7 +43,7 @@ public class SchedulePanel extends JPanel{
     private JLabel studyDaysLabel;
     private JLabel weeksLabel;
     private JComboBox<Week> jComboBox;
-    private JButton друкButton;
+    private JButton exportButton;
 
     private SchedulerTableModel tableModel;
 
@@ -47,6 +56,30 @@ public class SchedulePanel extends JPanel{
         InitialYearsPanel();
         initialComboBox();
         saveButton.addActionListener(this::saveButtonClick);
+        exportButton.addActionListener(this::exportButtonClick);
+    }
+
+    private void exportButtonClick(ActionEvent event) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.showSaveDialog(null);
+        Workbook workbook = new HSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Графік навчання");
+        Row row = sheet.createRow(0);
+        Cell cell = row.createCell(0);
+        cell.setCellValue("Test");
+        File file = chooser.getSelectedFile();
+        if (!file.setWritable(true)) {
+            if (JOptionPane.showConfirmDialog(null, "Файл не вдається зробити змінним. Продовжити?", "Помилка", JOptionPane.YES_NO_CANCEL_OPTION) != YES_OPTION) {
+                return;
+            }
+        }
+        try {
+            workbook.write(new FileOutputStream(file));
+            JOptionPane.showMessageDialog(null, "Успішно збережено до файлу " + file.getPath(), "Успіх", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public SchedulerTableModel getTableModel() {
