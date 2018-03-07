@@ -7,15 +7,15 @@ import app.data.Week;
 import app.schedules.ScheduleUnit;
 import app.schedules.SchedulerTableModel;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -61,25 +61,132 @@ public class SchedulePanel extends JPanel{
 
     private void exportButtonClick(ActionEvent event) {
         JFileChooser chooser = new JFileChooser();
-        chooser.showSaveDialog(null);
-        Workbook workbook = new HSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Графік навчання");
-        Row row = sheet.createRow(0);
-        Cell cell = row.createCell(0);
-        cell.setCellValue("Test");
-        File file = chooser.getSelectedFile();
-        if (!file.setWritable(true)) {
-            if (JOptionPane.showConfirmDialog(null, "Файл не вдається зробити змінним. Продовжити?", "Помилка", JOptionPane.YES_NO_CANCEL_OPTION) != YES_OPTION) {
-                return;
-            }
-        }
+        if (chooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) return;
         try {
-            workbook.write(new FileOutputStream(file));
-            JOptionPane.showMessageDialog(null, "Успішно збережено до файлу " + file.getPath(), "Успіх", JOptionPane.INFORMATION_MESSAGE);
+            tableModel.export(chooser.getSelectedFile());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
+//        JFileChooser chooser = new JFileChooser();
+//        if (chooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
+//            return;
+//        }
+//        Workbook workbook = new HSSFWorkbook();
+//        Sheet sheet = workbook.createSheet("Графік навчання");
+//
+//        CellStyle dateStyle = workbook.createCellStyle();
+//        dateStyle.setRotation((short)90);
+//        dateStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//        dateStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+//        dateStyle.setBorderBottom(BorderStyle.THIN);
+//        dateStyle.setBorderRight(BorderStyle.THIN);
+//        org.apache.poi.ss.usermodel.Font dateFont = workbook.createFont();
+//        dateFont.setFontName("Calibri");
+//        dateStyle.setFont(dateFont);
+//
+//        CellStyle groupStyle = workbook.createCellStyle();
+//        groupStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//        groupStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+//        groupStyle.setBorderBottom(BorderStyle.THIN);
+//        groupStyle.setBorderRight(BorderStyle.THIN);
+//        groupStyle.setFont(dateFont);
+//
+//        CellStyle monthStyle = workbook.createCellStyle();
+//        monthStyle.cloneStyleFrom(groupStyle);
+//        monthStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
+//
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 5));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 6, 10));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 11, 15));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 16, 20));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 21, 25));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 26, 30));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 31, 35));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 36, 40));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 41, 45));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 46, 50));
+//        sheet.addMergedRegion(new CellRangeAddress(0, 0, 51, 52));
+//
+//        Row monthRow = sheet.createRow(0);
+//        for (int i = 1; i < 52; i++) {
+//            Cell cell = monthRow.createCell(i);
+//            cell.setCellValue("Вересень");
+//            cell.setCellStyle(groupStyle);
+//        }
+//
+//        Row dateRow = sheet.createRow(1);
+//
+//        for (int i = 0; i < 52; i++) {
+//            Cell nowCell = dateRow.createCell(i + 1);
+//            nowCell.setCellStyle(dateStyle);
+//            nowCell.setCellValue("10/12..12/12");
+//        }
+//
+//        CellStyle style[] = new CellStyle[6];
+//        for (int i = 0; i < 6; i++) {
+//            style[i] = workbook.createCellStyle();
+//            style[i].cloneStyleFrom(monthStyle);
+//            style[i].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//        }
+//        for (int i = 2; i < 10; i++) {
+//            Row groupRow = sheet.createRow(i);
+//            Cell nowCell = groupRow.createCell(0);
+//            nowCell.setCellValue("Group " + i);
+//            nowCell.setCellStyle(groupStyle);
+//            for (int j = 1; j < 53; j++) {
+//                Cell dCell = groupRow.createCell(j);
+//                switch ((int)(Math.random() * 6)) {
+//                    case 0:
+//                        dCell.setCellValue("Н");
+//                        style[0].setFillForegroundColor(IndexedColors.AQUA.getIndex());
+//                        dCell.setCellStyle(style[0]);
+//                        break;
+//                    case 1:
+//                        dCell.setCellValue("П");
+//                        style[1].setFillForegroundColor(IndexedColors.BLUE.getIndex());
+//                        dCell.setCellStyle(style[1]);
+//                        break;
+//                    case 2:
+//                        dCell.setCellValue("С");
+//                        style[2].setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
+//                        dCell.setCellStyle(style[2]);
+//                        break;
+//                    case 3:
+//                        dCell.setCellValue("Д");
+//                        style[3].setFillForegroundColor(IndexedColors.BROWN.getIndex());
+//                        dCell.setCellStyle(style[3]);
+//                        break;
+//                    case 4:
+//                        dCell.setCellValue("А");
+//                        style[4].setFillForegroundColor(IndexedColors.GREEN.getIndex());
+//                        dCell.setCellStyle(style[4]);
+//                        break;
+//                    case 5:
+//                        dCell.setCellValue("К");
+//                        style[5].setFillForegroundColor(IndexedColors.DARK_GREEN.getIndex());
+//                        dCell.setCellStyle(style[5]);
+//                        break;
+//                }
+//            }
+//
+//        }
+//
+//        for (int i = 0; i < 53; i++) {
+//            sheet.autoSizeColumn(i);
+//        }
+//
+//        File file = chooser.getSelectedFile();
+//        try {
+//            workbook.write(new FileOutputStream(file));
+//            if (!file.setWritable(true)) {
+//                JOptionPane.showMessageDialog(null, "Файл не вдалося зробити змінним", "Помилка", JOptionPane.WARNING_MESSAGE);
+//            }
+//            JOptionPane.showMessageDialog(null, "Успішно збережено до файлу " + file.getPath(), "Успіх", JOptionPane.INFORMATION_MESSAGE);
+//        } catch (IOException e) {
+//            JOptionPane.showMessageDialog(null, e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     public SchedulerTableModel getTableModel() {

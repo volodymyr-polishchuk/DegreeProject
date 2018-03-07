@@ -1,13 +1,22 @@
 package app.schedules;
 
+import app.DegreeProject;
+import app.data.Group;
 import app.data.Period;
 import app.data.Week;
+import org.apache.poi.hssf.usermodel.HSSFPalette;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Created by Vladimir on 14/01/18.
@@ -23,6 +32,120 @@ public class SchedulerTableModel extends AbstractTableModel {
         Calendar c = Calendar.getInstance();
         c.set(2017, Calendar.SEPTEMBER, 1);
         periods = Period.GetWeekList(c.getTime());
+    }
+
+    public void export(File file) throws IOException {
+        final int trRow = 0;
+        final int trCell = 0;
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        Font font = workbook.createFont();
+        font.setFontName("Calibri");
+        HSSFPalette customPalette = workbook.getCustomPalette();
+        for (int i = 0; i < DegreeProject.WEEKLIST.GetAllWeek().size(); i++) {
+            java.awt.Color color = DegreeProject.WEEKLIST.GetAllWeek().get(i).getColor();
+            customPalette.setColorAtIndex((short) (i + 55), (byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue());
+        }
+        HashMap<Week, CellStyle> styleHashMap = new HashMap<>();
+        for (int i = 0; i < DegreeProject.WEEKLIST.GetAllWeek().size(); i++) {
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setBorderBottom(BorderStyle.THIN);
+            cellStyle.setBorderRight(BorderStyle.THIN);
+            cellStyle.setFillForegroundColor((short) (i + 55));
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            cellStyle.setFont(font);
+            styleHashMap.put(DegreeProject.WEEKLIST.GetAllWeek().get(i), cellStyle);
+        }
+
+        Sheet sheet = workbook.createSheet("Графік навчання");
+//Місяці
+        int first = 1 + trCell;
+        int last = 0;
+        int prevMonth;
+        c.setTime(periods.get(0).getStartDate());
+        prevMonth = c.get(Calendar.MONTH);
+        for (int i = 0; i < 52 - 1; i++) {
+            c.setTime(periods.get(i).getStartDate());
+            if (c.get(Calendar.MONTH) == prevMonth) {
+                last = i + 1;
+            } else {
+                sheet.addMergedRegion(new CellRangeAddress(trRow, trRow, first + trCell, last + trCell));
+                first = i + 1;
+                prevMonth = c.get(Calendar.MONTH);
+            }
+        }
+        sheet.addMergedRegion(new CellRangeAddress(trRow, trRow, first + trCell, last + trCell + 1));
+
+        CellStyle monthStyle = workbook.createCellStyle();
+        monthStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        monthStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        monthStyle.setBorderBottom(BorderStyle.THIN);
+        monthStyle.setBorderRight(BorderStyle.THIN);
+        monthStyle.setFont(font);
+        Row monthRow = sheet.createRow(trRow);
+        for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
+            Cell monthCell = monthRow.createCell(i);
+            monthCell.setCellStyle(monthStyle);
+            c.setTime(periods.get(i - 1).getStartDate());
+            monthCell.setCellValue(MONTHS[c.get(Calendar.MONTH)]);
+        }
+//Дати
+        CellStyle dateStyle = workbook.createCellStyle();
+        dateStyle.setRotation((short)90);
+        dateStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        dateStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        dateStyle.setBorderBottom(BorderStyle.THIN);
+        dateStyle.setBorderRight(BorderStyle.THIN);
+        dateStyle.setFont(font);
+        Row dateRow = sheet.createRow(1 + trRow);
+        for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
+            Cell dateCell = dateRow.createCell(i);
+            dateCell.setCellStyle(dateStyle);
+            String line = "";
+            c.setTime(periods.get(i - 1).getStartDate());
+            line += AddZeroBefore(c.get(Calendar.DATE)) + ".";
+            line += AddZeroBefore(c.get(Calendar.MONTH) + 1) +  "-";
+            c.setTime(periods.get(i - 1).getLastDate());
+            line += AddZeroBefore(c.get(Calendar.DATE)) + ".";
+            line += AddZeroBefore(c.get(Calendar.MONTH) + 1);
+            dateCell.setCellValue(line);
+        }
+//Кількість робочих днів
+        Row workDayRow = sheet.createRow(2 + trRow);
+        for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
+            Cell workDayCell = workDayRow.createCell(i);
+            workDayCell.setCellStyle(monthStyle);
+            workDayCell.setCellValue(periods.get(i - 1).getWorkDay());
+        }
+//Номер тижня
+        Row weekRow = sheet.createRow(3 + trRow);
+        for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
+            Cell weekCell = weekRow.createCell(i);
+            weekCell.setCellStyle(monthStyle);
+            weekCell.setCellValue(i - trCell);
+        }
+//Дані
+        for (int i = 0; i < units.size(); i++) {
+            Group group = units.get(i);
+            Row groupRow = sheet.createRow(4 + trRow + i);
+            Cell nameCell = groupRow.createCell(trCell);
+            nameCell.setCellStyle(monthStyle);
+            nameCell.setCellValue(group.getName());
+            for (int j = 0; j < 52; j++) {
+                Cell dataCell = groupRow.createCell(j + trCell + 1);
+                dataCell.setCellStyle(styleHashMap.getOrDefault(units.get(i).getWeek(j), workbook.createCellStyle()));
+                dataCell.setCellValue(units.get(i).getWeek(j).getAbbreviation());
+            }
+        }
+
+
+        for (int i = trCell; i < 53 + trCell; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        workbook.write(new FileOutputStream(file));
+        workbook.close();
+
     }
 
     public void setPeriods(Date date) {
