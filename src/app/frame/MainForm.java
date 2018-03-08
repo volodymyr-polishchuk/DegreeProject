@@ -96,10 +96,17 @@ public class MainForm extends JFrame {
 
             jToolBar.add(new JToolBar.Separator());
 
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarIcon.png")))));
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarSearchIcon.png")))));
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarExportIcon.png")))));
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarRemoveIcon.png")))));
+            JButton scheduleCreateToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarIcon.png"))));
+            scheduleCreateToolButton.addActionListener(menuBar::MenuItemCreateSchedule);
+            jToolBar.add(scheduleCreateToolButton);
+
+            JButton scheduleOpenToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarSearchIcon.png"))));
+            scheduleOpenToolButton.addActionListener(menuBar::MenuItemViewSchedule);
+            jToolBar.add(scheduleOpenToolButton);
+
+            JButton scheduleRemoveToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarRemoveIcon.png"))));
+            scheduleRemoveToolButton.addActionListener(menuBar::MenuItemRemoveSchedule);
+            jToolBar.add(scheduleRemoveToolButton);
             jToolBar.add(new JToolBar.Separator());
             jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIcon.png")))));
         } catch (IOException e) {

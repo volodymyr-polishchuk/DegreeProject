@@ -422,10 +422,7 @@ public class MainFormMenuBar extends JMenuBar {
             case JOptionPane.YES_OPTION:
                 System.exit(0);
                 break;
-            case JOptionPane.NO_OPTION:
-                System.exit(0);
-                break;
-            case JOptionPane.CANCEL_OPTION:
+            case JOptionPane.NO_OPTION: case JOptionPane.CANCEL_OPTION:
                 break;
         }
     }

@@ -61,9 +61,13 @@ public class SchedulePanel extends JPanel{
 
     private void exportButtonClick(ActionEvent event) {
         JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File("schedule.xls"));
         if (chooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) return;
+        if (!chooser.getSelectedFile().getPath().endsWith(".xls")) {
+            chooser.setSelectedFile(new File(chooser.getSelectedFile().getPath() + ".xls"));
+        }
         try {
-            tableModel.export(chooser.getSelectedFile());
+            tableModel.export(chooser.getSelectedFile(), yearsLabel.getText());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();

@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.io.File;
@@ -34,8 +35,8 @@ public class SchedulerTableModel extends AbstractTableModel {
         periods = Period.GetWeekList(c.getTime());
     }
 
-    public void export(File file) throws IOException {
-        final int trRow = 0;
+    public void export(File file, String period) throws IOException {
+        final int trRow = 5;
         final int trCell = 0;
 
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -54,10 +55,14 @@ public class SchedulerTableModel extends AbstractTableModel {
             cellStyle.setFillForegroundColor((short) (i + 55));
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             cellStyle.setFont(font);
+            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            cellStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            cellStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            cellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
             styleHashMap.put(DegreeProject.WEEKLIST.GetAllWeek().get(i), cellStyle);
         }
 
-        Sheet sheet = workbook.createSheet("Графік навчання");
+        Sheet sheet = workbook.createSheet("Графік навчання за " + period);
 //Місяці
         int first = 1 + trCell;
         int last = 0;
@@ -82,7 +87,14 @@ public class SchedulerTableModel extends AbstractTableModel {
         monthStyle.setBorderBottom(BorderStyle.THIN);
         monthStyle.setBorderRight(BorderStyle.THIN);
         monthStyle.setFont(font);
+        monthStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
+        monthStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        monthStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        monthStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Row monthRow = sheet.createRow(trRow);
+        Cell nameMonthCell = monthRow.createCell(trCell);
+        nameMonthCell.setCellStyle(monthStyle);
+        nameMonthCell.setCellValue("Місяць");
         for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
             Cell monthCell = monthRow.createCell(i);
             monthCell.setCellStyle(monthStyle);
@@ -97,7 +109,12 @@ public class SchedulerTableModel extends AbstractTableModel {
         dateStyle.setBorderBottom(BorderStyle.THIN);
         dateStyle.setBorderRight(BorderStyle.THIN);
         dateStyle.setFont(font);
+        dateStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        dateStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Row dateRow = sheet.createRow(1 + trRow);
+        Cell nameDateCell = dateRow.createCell(trCell);
+        nameDateCell.setCellStyle(monthStyle);
+        nameDateCell.setCellValue("Період");
         for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
             Cell dateCell = dateRow.createCell(i);
             dateCell.setCellStyle(dateStyle);
@@ -112,6 +129,9 @@ public class SchedulerTableModel extends AbstractTableModel {
         }
 //Кількість робочих днів
         Row workDayRow = sheet.createRow(2 + trRow);
+        Cell nameWordDayCell = workDayRow.createCell(trCell);
+        nameWordDayCell.setCellValue("Робочих");
+        nameWordDayCell.setCellStyle(monthStyle);
         for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
             Cell workDayCell = workDayRow.createCell(i);
             workDayCell.setCellStyle(monthStyle);
@@ -119,6 +139,9 @@ public class SchedulerTableModel extends AbstractTableModel {
         }
 //Номер тижня
         Row weekRow = sheet.createRow(3 + trRow);
+        Cell nameWeekCell = weekRow.createCell(trCell);
+        nameWeekCell.setCellStyle(monthStyle);
+        nameWeekCell.setCellValue("Тиждень");
         for (int i = 1 + trCell; i < 52 + 1 + trCell; i++) {
             Cell weekCell = weekRow.createCell(i);
             weekCell.setCellStyle(monthStyle);
@@ -138,6 +161,16 @@ public class SchedulerTableModel extends AbstractTableModel {
             }
         }
 
+        for (int i = 0; i < DegreeProject.WEEKLIST.GetAllWeek().size(); i++) {
+            Row weekNameRow = sheet.createRow(i + 6 + units.size() + trRow);
+            Cell colorCell = weekNameRow.createCell(1 + trCell);
+            colorCell.setCellStyle(styleHashMap.getOrDefault(DegreeProject.WEEKLIST.GetAllWeek().get(i), workbook.createCellStyle()));
+            colorCell.setCellValue(DegreeProject.WEEKLIST.GetAllWeek().get(i).getAbbreviation());
+            sheet.addMergedRegion(new CellRangeAddress(i + 6 + units.size() + trRow, i + 6 + units.size() + trRow, 2 + trCell, 2 + 10 + trCell));
+            Cell nameCell = weekNameRow.createCell(2 + trCell);
+            nameCell.setCellStyle(monthStyle);
+            nameCell.setCellValue(DegreeProject.WEEKLIST.GetAllWeek().get(i).getName());
+        }
 
         for (int i = trCell; i < 53 + trCell; i++) {
             sheet.autoSizeColumn(i);
@@ -145,6 +178,15 @@ public class SchedulerTableModel extends AbstractTableModel {
 
         workbook.write(new FileOutputStream(file));
         workbook.close();
+        file.setWritable(true);
+        if (JOptionPane.showConfirmDialog(
+                null,
+                "Графік навчання збережено до\n" + file.getPath() + "\n Відкрити файл?",
+                "Повідомлення",
+                JOptionPane.YES_NO_CANCEL_OPTION
+        ) == JOptionPane.YES_OPTION) {
+            Desktop.getDesktop().open(file);
+        }
 
     }
 
