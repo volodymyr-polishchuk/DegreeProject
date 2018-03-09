@@ -3,6 +3,9 @@ package app.frame;
 import app.DegreeProject;
 import app.data.*;
 import app.lessons.*;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -13,8 +16,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -50,7 +55,7 @@ public class LessonsPanel extends JPanel{
     /**
      * Кількість днів в тижні починаючи від понеділка, де 1 - Понеділок, 2 - Понеділок...Вівторок, 3 - Понеділок...Середа
      */
-    private final int DAY_AT_WEEK = 6;
+    private final int DAY_AT_WEEK = 5;
 
     /**
      * Кількість колонок, що виділяться під одну групу
@@ -81,14 +86,6 @@ public class LessonsPanel extends JPanel{
         nextPeriodButton.addActionListener(this::nextPeriodButtonClick);
         prevPeriodButton.addActionListener(this::prevPeriodButtonClick);
         exportButton.addActionListener(this::exportButtonClick);
-    }
-
-    private void exportButtonClick(ActionEvent event) {
-        JFileChooser chooser = new JFileChooser();
-        if  (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-            JOptionPane.showMessageDialog(null, "Ви обрати для збереження файл\n" + chooser.getSelectedFile().getPath());
-        }
-
     }
 
     public LessonsPanel(String title) {
@@ -194,6 +191,32 @@ public class LessonsPanel extends JPanel{
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void exportButtonClick(ActionEvent event) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File("lessons_scheduler.xls"));
+        if  (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (!chooser.getSelectedFile().getPath().endsWith(".xls")) {
+                chooser.setSelectedFile(new File(chooser.getSelectedFile().getPath() + ".xls"));
+            }
+            try {
+                lessonTableModel.export(chooser.getSelectedFile(), periodLabel.getText());
+                int r = JOptionPane.showConfirmDialog(
+                        null,
+                        "Розклад занять збережено до файлу\n" + chooser.getSelectedFile().getPath() + "\nВідкрити розклад занять?",
+                        "Повідомлення",
+                        JOptionPane.YES_NO_CANCEL_OPTION
+                );
+                if (r == JOptionPane.YES_OPTION) {
+                    Desktop.getDesktop().open(chooser.getSelectedFile());
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void prevPeriodButtonClick(ActionEvent event) {
@@ -514,7 +537,145 @@ public class LessonsPanel extends JPanel{
         private ArrayList<LessonsUnit> units = new ArrayList<>();
         private HashMap<app.lessons.StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
-        public LessonTableModel() {
+        public void export(File file, String period) throws IOException {
+            final String[] daysName = new String[]{
+                "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
+            };
+            final int trCell = 0;
+            final int trRow = 2;
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet("Розклад занять за період " + period);
+
+            HSSFCellStyle dataCellStyle = workbook.createCellStyle();
+            dataCellStyle.setBorderRight(BorderStyle.THIN);
+            dataCellStyle.setBorderBottom(BorderStyle.THIN);
+            dataCellStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            dataCellStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            HSSFFont defaultFont = workbook.createFont();
+            defaultFont.setFontName("Calibri");
+            dataCellStyle.setFont(defaultFont);
+            dataCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            dataCellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
+
+            HSSFCellStyle dataBoldCellStyle = workbook.createCellStyle();
+            dataBoldCellStyle.cloneStyleFrom(dataCellStyle);
+            dataBoldCellStyle.setBorderTop(BorderStyle.DOUBLE);
+
+            HSSFCellStyle dataWithoutBorderCellStyle = workbook.createCellStyle();
+            dataWithoutBorderCellStyle.cloneStyleFrom(dataCellStyle);
+            dataWithoutBorderCellStyle.setBorderBottom(BorderStyle.NONE);
+
+            HSSFCellStyle subscribeCellStyle = workbook.createCellStyle();
+            subscribeCellStyle.cloneStyleFrom(dataCellStyle);
+            subscribeCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            subscribeCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+
+            HSSFCellStyle subscribeBoldCellStyle = workbook.createCellStyle();
+            subscribeBoldCellStyle.cloneStyleFrom(subscribeCellStyle);
+            subscribeBoldCellStyle.setBorderTop(BorderStyle.DOUBLE);
+
+            HSSFCellStyle headerCellStyle = workbook.createCellStyle();
+            headerCellStyle.cloneStyleFrom(dataCellStyle);
+            headerCellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+            headerCellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+
+            HSSFRow headerRow = sheet.createRow(trRow - 1);
+            for (int i = 0; i < units.size() * COLUMN_REPEAT; i++) {
+                HSSFCell cell = headerRow.createCell(i);
+                cell.setCellStyle(headerCellStyle);
+                if (i % COLUMN_REPEAT == 0)
+                    cell.setCellValue(units.get(i / COLUMN_REPEAT).getGroup().getName());
+            }
+            for (int i = 0; i < units.size(); i++) {
+                sheet.addMergedRegion(new CellRangeAddress(trRow - 1, trRow - 1, i * COLUMN_REPEAT, i * COLUMN_REPEAT + COLUMN_REPEAT - 1));
+            }
+
+            HSSFCell[][] cells = new HSSFCell[DAY_AT_WEEK * PAIR_IN_DAY * 2][units.size() * COLUMN_REPEAT];
+            for (int i = 0; i < cells.length; i++) {
+                HSSFRow row = sheet.createRow(i + trRow);
+
+                for (int j = 0; j < cells[0].length; j++) {
+                    cells[i][j] = row.createCell(j + trCell);
+                    boolean pos = true;
+                    switch (j % COLUMN_REPEAT) {
+                        case DAY_NAME_NUMBER:
+                            if (i % (PAIR_IN_DAY * 2) == 0 && i != 0)
+                                cells[i][j].setCellStyle(subscribeBoldCellStyle);
+                            else
+                                cells[i][j].setCellStyle(subscribeCellStyle);
+                            if (i % (PAIR_IN_DAY * 2) < daysName[i / (DAY_AT_WEEK * 2)].length()) {
+                                cells[i][j].setCellValue(String.valueOf(daysName[i / (DAY_AT_WEEK * 2)].charAt(i % (PAIR_IN_DAY * 2))));
+                            } else {
+                                cells[i][j].setCellValue(" ");
+                            }
+                            break;
+                        case PAIR_NUMBER:
+                            if (i % (PAIR_IN_DAY * 2) == 0 && i != 0)
+                                cells[i][j].setCellStyle(subscribeBoldCellStyle);
+                            else
+                                cells[i][j].setCellStyle(subscribeCellStyle);
+                            cells[i][j].setCellValue(((i % (PAIR_IN_DAY * 2)) / 2) + 1 == 0 ? PAIR_IN_DAY : ((i % (PAIR_IN_DAY * 2)) / 2) + 1);
+                            if (i % 2 == 0)
+                                sheet.addMergedRegion(new CellRangeAddress(i + trRow, i + 1 + trRow, j + trCell, j + trCell));
+                            break;
+                        default:
+                            if (i % (PAIR_IN_DAY * 2) == 0 && i != 0)
+                                cells[i][j].setCellStyle(dataBoldCellStyle);
+                            else
+                                cells[i][j].setCellStyle(dataCellStyle);
+                            switch (j % COLUMN_REPEAT) {
+                                case LESSONS_NAME_NUMBER:
+                                    StudyPair studyPair = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
+                                    if (studyPair instanceof StudyPairLonely) {
+                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair).getLesson().getName());
+                                    } else if (studyPair instanceof StudyPairDouble) {
+                                        if (i % 2 == 0) {
+                                            cells[i][j].setCellValue("Ч/" + ((StudyPairDouble) studyPair).getNumerator().getLesson().getName());
+                                        } else {
+                                            cells[i][j].setCellValue("З\\" + ((StudyPairDouble) studyPair).getDenominator().getLesson().getName());
+                                        }
+                                        pos = false;
+                                    }
+                                    break;
+                                case TEACHER_NAME_NUMBER:
+                                    StudyPair studyPair2 = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
+                                    if (studyPair2 instanceof StudyPairLonely) {
+                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair2).getTeacher().getName());
+                                    }else if (studyPair2 instanceof StudyPairDouble) {
+                                        if (i % 2 == 0) {
+                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair2).getNumerator().getTeacher().getName());
+                                        } else {
+                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair2).getDenominator().getTeacher().getName());
+                                        }
+                                        pos = false;
+                                    }
+                                    break;
+                                case AUDITORY_NUMBER:
+                                    StudyPair studyPair3 = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
+                                    if (studyPair3 instanceof StudyPairLonely) {
+                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair3).getAuditory().getName());
+                                    } else if (studyPair3 instanceof StudyPairDouble) {
+                                        if (i % 2 == 0) {
+                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair3).getNumerator().getAuditory().getName());
+                                        } else {
+                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair3).getDenominator().getAuditory().getName());
+                                        }
+                                        pos = false;
+                                    }
+                                    break;
+                            }
+                            if (i % 2 == 0 && pos)
+                                sheet.addMergedRegion(new CellRangeAddress(i + trRow, i + 1 + trRow, j + trCell, j + trCell));
+                    }
+                }
+            }
+
+            for (int i = 0; i < units.size() * COLUMN_REPEAT; i++) {
+                sheet.autoSizeColumn(i, true);
+            }
+
+            workbook.write(file);
+            workbook.close();
         }
 
         public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {

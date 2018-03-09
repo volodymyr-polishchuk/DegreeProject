@@ -65,7 +65,7 @@ public class DatabaseData {
         return connection;
     }
 
-    public void CreateDatabase() {
+    public void createDatabase() {
         try {
             Statement st = connection.createStatement();
             st.execute("CREATE DATABASE DegreeProjectBase");

@@ -6,6 +6,8 @@ import app.schedules.GroupChoiceListener;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GroupChoiceDialog extends JDialog {
@@ -28,8 +30,8 @@ public class GroupChoiceDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pack();
-        setSize(550, getHeight());
-        setResizable(false);
+//        setSize(550, getHeight());
+//        setResizable(false);
         setLocationRelativeTo(null);
         setTitle("Налаштування груп");
 
@@ -67,33 +69,35 @@ public class GroupChoiceDialog extends JDialog {
 
     private void InitialList(List<Group> list, int [] choice) {
         listLeftModel = new DefaultListModel<>();
-        listLeftModel.clear();
+        ArrayList<Group> leftGroups = new ArrayList<>();
+        ArrayList<Group> rightGroups = new ArrayList<>();
+        boolean b = false;
         for (int i = 0; i < list.size(); i++) {
-            boolean b = false;
             for (int j : choice) {if (j == i) b = true;}
-            if (!b) listLeftModel.addElement(list.get(i));
+            if (!b) leftGroups.add(list.get(i));
             b = false;
         }
+        Collections.sort(leftGroups);
+        leftGroups.forEach(listLeftModel::addElement);
         listLeft.setModel(listLeftModel);
 
         listRightModel = new DefaultListModel<>();
-        listRightModel.clear();
-        for (int i : choice) {listRightModel.addElement(list.get(i));}
+        for (int i : choice) {rightGroups.add(list.get(i));}
+        Collections.sort(rightGroups);
+        rightGroups.forEach(listRightModel::addElement);
         listRight.setModel(listRightModel);
     }
 
     private void onOK() {
-        // add your code here
         ArrayList<Group> tList = new ArrayList<>();
         for (int i = 0; i < listRightModel.size(); i++) {
             tList.add(listRightModel.get(i));
         }
-        listener.GroupChoiceListener(tList);
+        listener.groupChoiceListener(tList);
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
 }
