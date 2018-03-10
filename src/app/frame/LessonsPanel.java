@@ -11,7 +11,6 @@ import sun.swing.table.DefaultTableCellHeaderRenderer;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -618,54 +617,44 @@ public class LessonsPanel extends JPanel{
                             if (i % 2 == 0)
                                 sheet.addMergedRegion(new CellRangeAddress(i + trRow, i + 1 + trRow, j + trCell, j + trCell));
                             break;
-                        default:
-                            if (i % (PAIR_IN_DAY * 2) == 0 && i != 0)
-                                cells[i][j].setCellStyle(dataBoldCellStyle);
-                            else
-                                cells[i][j].setCellStyle(dataCellStyle);
+                        default: {
+                            if (i % (PAIR_IN_DAY * 2) == 0 && i != 0) cells[i][j].setCellStyle(dataBoldCellStyle);
+                                                        else cells[i][j].setCellStyle(dataCellStyle);
                             switch (j % COLUMN_REPEAT) {
-                                case LESSONS_NAME_NUMBER:
+                                case LESSONS_NAME_NUMBER: {
                                     StudyPair studyPair = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
                                     if (studyPair instanceof StudyPairLonely) {
                                         cells[i][j].setCellValue(((StudyPairLonely) studyPair).getLesson().getName());
                                     } else if (studyPair instanceof StudyPairDouble) {
-                                        if (i % 2 == 0) {
-                                            cells[i][j].setCellValue("Ч/" + ((StudyPairDouble) studyPair).getNumerator().getLesson().getName());
-                                        } else {
-                                            cells[i][j].setCellValue("З\\" + ((StudyPairDouble) studyPair).getDenominator().getLesson().getName());
-                                        }
+                                        if (i % 2 == 0) cells[i][j].setCellValue("Ч/" + ((StudyPairDouble) studyPair).getNumerator().getLesson().getName());
+                                        else cells[i][j].setCellValue("З\\" + ((StudyPairDouble) studyPair).getDenominator().getLesson().getName());
                                         pos = false;
                                     }
-                                    break;
-                                case TEACHER_NAME_NUMBER:
-                                    StudyPair studyPair2 = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
-                                    if (studyPair2 instanceof StudyPairLonely) {
-                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair2).getTeacher().getName());
-                                    }else if (studyPair2 instanceof StudyPairDouble) {
-                                        if (i % 2 == 0) {
-                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair2).getNumerator().getTeacher().getName());
-                                        } else {
-                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair2).getDenominator().getTeacher().getName());
-                                        }
+                                } break;
+                                case TEACHER_NAME_NUMBER: {
+                                    StudyPair studyPair = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
+                                    if (studyPair instanceof StudyPairLonely) {
+                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair).getTeacher().getName());
+                                    }else if (studyPair instanceof StudyPairDouble) {
+                                        if (i % 2 == 0) cells[i][j].setCellValue(((StudyPairDouble) studyPair).getNumerator().getTeacher().getName());
+                                        else cells[i][j].setCellValue(((StudyPairDouble) studyPair).getDenominator().getTeacher().getName());
                                         pos = false;
                                     }
-                                    break;
-                                case AUDITORY_NUMBER:
-                                    StudyPair studyPair3 = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
-                                    if (studyPair3 instanceof StudyPairLonely) {
-                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair3).getAuditory().getName());
-                                    } else if (studyPair3 instanceof StudyPairDouble) {
-                                        if (i % 2 == 0) {
-                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair3).getNumerator().getAuditory().getName());
-                                        } else {
-                                            cells[i][j].setCellValue(((StudyPairDouble) studyPair3).getDenominator().getAuditory().getName());
-                                        }
+                                } break;
+                                case AUDITORY_NUMBER: {
+                                    StudyPair studyPair = units.get(j / COLUMN_REPEAT).getPairs()[i / 2];
+                                    if (studyPair instanceof StudyPairLonely) {
+                                        cells[i][j].setCellValue(((StudyPairLonely) studyPair).getAuditory().getName());
+                                    } else if (studyPair instanceof StudyPairDouble) {
+                                        if (i % 2 == 0) cells[i][j].setCellValue(((StudyPairDouble) studyPair).getNumerator().getAuditory().getName());
+                                        else cells[i][j].setCellValue(((StudyPairDouble) studyPair).getDenominator().getAuditory().getName());
                                         pos = false;
                                     }
-                                    break;
+                                } break;
                             }
                             if (i % 2 == 0 && pos)
                                 sheet.addMergedRegion(new CellRangeAddress(i + trRow, i + 1 + trRow, j + trCell, j + trCell));
+                        }
                     }
                 }
             }

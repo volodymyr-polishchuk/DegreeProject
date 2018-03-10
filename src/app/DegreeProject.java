@@ -38,7 +38,6 @@ public class DegreeProject {
 
     public static void InitialMainFrame() {
         mainForm = new MainForm();
-        mainForm.addTab(new HelloPanel2("Головне меню програми"));
         mainForm.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

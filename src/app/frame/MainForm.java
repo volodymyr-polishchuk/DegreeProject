@@ -28,6 +28,11 @@ public class MainForm extends JFrame {
         setTitle("Система автоматизації складання розкладу занять");
         InitJToolBar(toolBar);
         setVisible(true);
+        addTab(new HelloPanel2("Головне меню програми", this));
+    }
+
+    public MainFormMenuBar getMainFormMenuBar() {
+        return menuBar;
     }
 
     public void removeSelectedTab() {
