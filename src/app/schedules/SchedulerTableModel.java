@@ -86,11 +86,13 @@ public class SchedulerTableModel extends AbstractTableModel {
         monthStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         monthStyle.setBorderBottom(BorderStyle.THIN);
         monthStyle.setBorderRight(BorderStyle.THIN);
+        monthStyle.setBorderTop(BorderStyle.THIN);
         monthStyle.setFont(font);
         monthStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
         monthStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         monthStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         monthStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        monthStyle.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Row monthRow = sheet.createRow(trRow);
         Cell nameMonthCell = monthRow.createCell(trCell);
         nameMonthCell.setCellStyle(monthStyle);
@@ -178,7 +180,7 @@ public class SchedulerTableModel extends AbstractTableModel {
 
         workbook.write(new FileOutputStream(file));
         workbook.close();
-        file.setWritable(true);
+        System.out.println(file.getPath() + "->setWritable: " + file.setWritable(true));
         if (JOptionPane.showConfirmDialog(
                 null,
                 "Графік навчання збережено до\n" + file.getPath() + "\n Відкрити файл?",
