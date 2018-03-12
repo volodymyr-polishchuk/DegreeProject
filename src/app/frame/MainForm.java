@@ -161,8 +161,6 @@ public class MainForm extends JFrame {
             jToolBar.add(Box.createHorizontalGlue());
 
             jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/info.png")))));
-            jToolBar.add(new JList<>(new DefaultListModel<>()));
-
         } catch (IOException e) {
             e.printStackTrace();
         }

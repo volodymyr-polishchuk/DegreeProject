@@ -844,5 +844,3 @@ public class LessonsPanel extends JPanel{
         );
     }
 }
-
-
