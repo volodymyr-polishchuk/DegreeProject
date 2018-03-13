@@ -65,8 +65,12 @@ public class MainFormMenuBar extends JMenuBar {
         helpMenu.add(new JMenuItem("Перевірка оновлень")).addActionListener(this::MenuItemCheckUpdate);
         //TODO Реалізувати форму Про програму
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
-        helpMenu.add(MenuItemAbout);
+        helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemAbout(ActionEvent event) {
+        new AboutFrame().setVisible(true);
     }
 
     private void MenuItemCheckUpdate(ActionEvent event) {
