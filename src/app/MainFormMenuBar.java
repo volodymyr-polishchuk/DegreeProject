@@ -4,7 +4,11 @@ import app.data.*;
 import app.frame.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,12 +62,23 @@ public class MainFormMenuBar extends JMenuBar {
         //TODO Реалізувати форму допомоги користувачеві
         JMenuItem MenuItemHelp = new JMenuItem("Допомога користувачеві");
         helpMenu.add(MenuItemHelp);
-        //TODO Реалізувати форму перевірки оновлення та передення на сторінку GitHub
-        helpMenu.add(new JMenuItem("Перевірка оновлень"));
+        helpMenu.add(new JMenuItem("Перевірка оновлень")).addActionListener(this::MenuItemCheckUpdate);
         //TODO Реалізувати форму Про програму
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
-        helpMenu.add(MenuItemAbout);
+        helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemAbout(ActionEvent event) {
+        new AboutFrame().setVisible(true);
+    }
+
+    private void MenuItemCheckUpdate(ActionEvent event) {
+        try {
+            Desktop.getDesktop().browse(new URI("https://github.com/volodymyr-polishchuk/DegreeProject"));
+        } catch (IOException | URISyntaxException e1) {
+            e1.printStackTrace();
+        }
     }
 
     public void MenuItemRemoveLessons(ActionEvent event) {
@@ -116,7 +131,7 @@ public class MainFormMenuBar extends JMenuBar {
                 public void exit(StudyData[] t) {
 
                 }
-            });
+            }, "Налаштування груп");
 
             boolean b = true;
             if (outputData.length == inputData.length)
@@ -213,7 +228,7 @@ public class MainFormMenuBar extends JMenuBar {
                 public void exit(StudyData[] t) {
 
                 }
-            });
+            }, "Налаштування предметів");
 
             boolean b = true;
             if (outputData.length == inputData.length)
@@ -287,7 +302,7 @@ public class MainFormMenuBar extends JMenuBar {
                 public void exit(StudyData[] t) {
 
                 }
-            });
+            }, "Налаштування викладачів");
 
             boolean b = true;
             if (outputData.length == inputData.length)
@@ -359,7 +374,7 @@ public class MainFormMenuBar extends JMenuBar {
                 public void exit(StudyData[] t) {
 
                 }
-            });
+            }, "Налаштування аудиторій");
 
             boolean b = true;
             if (outputData.length == inputData.length)

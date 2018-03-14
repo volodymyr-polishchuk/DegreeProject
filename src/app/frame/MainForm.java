@@ -28,6 +28,11 @@ public class MainForm extends JFrame {
         setTitle("Система автоматизації складання розкладу занять");
         InitJToolBar(toolBar);
         setVisible(true);
+        addTab(new HelloPanel2("Головне меню програми", this));
+    }
+
+    public MainFormMenuBar getMainFormMenuBar() {
+        return menuBar;
     }
 
     public void removeSelectedTab() {
@@ -84,31 +89,78 @@ public class MainForm extends JFrame {
         try {
             JButton reconnectToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/cloud-computing.png"))));
             reconnectToolButton.addActionListener(menuBar::MenuItemReconnect);
+            reconnectToolButton.setToolTipText("Виконати перепідключення");
             jToolBar.add(reconnectToolButton);
 
             JButton settingToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/settingsIcon.png"))));
             settingToolButton.addActionListener(menuBar::MenuItemSetting);
+            settingToolButton.setToolTipText("Налаштування");
             jToolBar.add(settingToolButton);
 
             JButton exitToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/exitIcon.png"))));
             exitToolButton.addActionListener(menuBar::MenuItemExit);
+            exitToolButton.setToolTipText("Вийти");
             jToolBar.add(exitToolButton);
 
             jToolBar.add(new JToolBar.Separator());
 
             JButton scheduleCreateToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarIcon.png"))));
             scheduleCreateToolButton.addActionListener(menuBar::MenuItemCreateSchedule);
+            scheduleCreateToolButton.setToolTipText("Створити графік навчання");
             jToolBar.add(scheduleCreateToolButton);
 
             JButton scheduleOpenToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarSearchIcon.png"))));
             scheduleOpenToolButton.addActionListener(menuBar::MenuItemViewSchedule);
+            scheduleOpenToolButton.setToolTipText("Переглянути/редагувати графік навчання");
             jToolBar.add(scheduleOpenToolButton);
 
             JButton scheduleRemoveToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/calendarRemoveIcon.png"))));
             scheduleRemoveToolButton.addActionListener(menuBar::MenuItemRemoveSchedule);
+            scheduleRemoveToolButton.setToolTipText("Видалити графік навчання");
             jToolBar.add(scheduleRemoveToolButton);
+
             jToolBar.add(new JToolBar.Separator());
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIcon.png")))));
+
+            JButton lessonsCreateToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIconAdd.png"))));
+            lessonsCreateToolButton.addActionListener(menuBar::MenuItemCreateLessons);
+            lessonsCreateToolButton.setToolTipText("Створити розклад занять");
+            jToolBar.add(lessonsCreateToolButton);
+
+            JButton lessonsViewToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIconView.png"))));
+            lessonsViewToolButton.addActionListener(menuBar::MenuItemViewLessons);
+            lessonsViewToolButton.setToolTipText("Переглянути/редагувати розклад занять");
+            jToolBar.add(lessonsViewToolButton);
+
+            JButton lessonsRemoveToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lessonIconRemove.png"))));
+            lessonsRemoveToolButton.addActionListener(menuBar::MenuItemRemoveLessons);
+            lessonsRemoveToolButton.setToolTipText("Видалення розкладу занять");
+            jToolBar.add(lessonsRemoveToolButton);
+
+            jToolBar.add(new JToolBar.Separator());
+
+            JButton groupsToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/users-group.png"))));
+            groupsToolButton.setToolTipText("Додати групу");
+            groupsToolButton.addActionListener(menuBar::MenuItemDataGroup);
+            jToolBar.add(groupsToolButton);
+
+            JButton teachersToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/teachers.png"))));
+            teachersToolButton.setToolTipText("Додати викладача");
+            teachersToolButton.addActionListener(menuBar::MenuItemDataTeacher);
+            jToolBar.add(teachersToolButton);
+
+            JButton lessonsToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/lesson.png"))));
+            lessonsToolButton.setToolTipText("Додати предмет");
+            lessonsToolButton.addActionListener(menuBar::MenuItemDataLesson);
+            jToolBar.add(lessonsToolButton);
+
+            JButton auditoryToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/auditory.png"))));
+            auditoryToolButton.setToolTipText("Додати аудиторію");
+            auditoryToolButton.addActionListener(menuBar::MenuItemDataAuditory);
+            jToolBar.add(auditoryToolButton);
+
+            jToolBar.add(Box.createHorizontalGlue());
+
+            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/info.png")))));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -23,8 +23,9 @@ public class DataModifyDialog extends JDialog {
     private JButton saveButton;
     private DataModifyInterface anInterface;
 
-    private DataModifyDialog(StudyData[] arr, DataModifyInterface anInterface) {
+    private DataModifyDialog(StudyData[] arr, DataModifyInterface anInterface, String title) {
         this.anInterface = anInterface;
+        setTitle(title);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(new Dimension(400, 300));
@@ -65,8 +66,8 @@ public class DataModifyDialog extends JDialog {
         });
     }
 
-    public static StudyData[] getInstance(StudyData[] studyData, DataModifyInterface anInterface) {
-        DataModifyDialog dialog = new DataModifyDialog(studyData, anInterface);
+    public static StudyData[] getInstance(StudyData[] studyData, DataModifyInterface anInterface, String title) {
+        DataModifyDialog dialog = new DataModifyDialog(studyData, anInterface, title);
         dialog.setVisible(true);
         StudyData[] arr = new StudyData[dialog.listModel.getSize()];
         for (int i = 0; i < dialog.listModel.getSize(); i++) {

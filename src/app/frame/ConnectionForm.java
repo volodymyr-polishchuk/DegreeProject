@@ -11,8 +11,10 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -109,9 +111,18 @@ public class ConnectionForm extends JFrame{
                         "Створити нову базу?", "Налаштування бази даних", JOptionPane.YES_NO_CANCEL_OPTION);
                 switch (r) {
                     case JOptionPane.YES_OPTION: {
-                        //TODO Виконувати створення і накатування бази даних
-                        return;
-                    }
+                        try {
+                            DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
+                                    portTextField.getText(),
+                                    userTextField.getText(),
+                                    passwordField.getPassword());
+                            DegreeProject.databaseData.getConnection().createStatement().execute("CREATE DATABASE asfsc;");
+                            DegreeProject.databaseData.getConnection().createStatement().execute("USE asfsc;");
+                            dataBaseCreate(DegreeProject.databaseData.getConnection());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    } break;
                     default: return;
                 }
             }
@@ -126,6 +137,64 @@ public class ConnectionForm extends JFrame{
         logDate();
         DegreeProject.InitialMainFrame();
         dispose();
+    }
+
+    private void dataBaseCreate(Connection connection) {
+        try {
+            Statement statement = connection.createStatement();
+            String createDepartment = "CREATE TABLE departments (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL);";
+            statement.execute(createDepartment);
+            String createWeeks = "CREATE TABLE weeks (mark VARCHAR(1) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL, color INT(11) NOT NULL, abbreviation VARCHAR(16) NOT NULL);";
+            statement.execute(createWeeks);
+            String addUniqueKeyWeeks = "CREATE UNIQUE INDEX weeks_mark_uindex ON weeks (mark);";
+            statement.execute(addUniqueKeyWeeks);
+            String createGroups = "CREATE TABLE groups (name VARCHAR(256) NOT NULL, department INT(11) NOT NULL, dateofcreate DATE NOT NULL, comments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, CONSTRAINT groups_departments_k_fk FOREIGN KEY (department) REFERENCES departments (k));";
+            statement.execute(createGroups);
+            String addPrimaryKeyGroup = "CREATE INDEX groups_departments_k_fk ON groups (department);";
+            statement.execute(addPrimaryKeyGroup);
+            String createSchedules = "CREATE TABLE schedules (period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
+            statement.execute(createSchedules);
+            String createAuditorys = "CREATE TABLE auditorys (name VARCHAR(256) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
+            statement.execute(createAuditorys);
+            String createTeachers = "CREATE TABLE teachers (name VARCHAR(256) NOT NULL, preferences VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
+            statement.execute(createTeachers);
+            String createLessons = "CREATE TABLE lessons (name VARCHAR(256) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, auditory INT(11) NOT NULL, CONSTRAINT lessons_ibfk_1 FOREIGN KEY (auditory) REFERENCES auditorys (k));";
+            statement.execute(createLessons);
+            String addPrimaryKeyLessons = "CREATE INDEX auditory ON lessons (auditory);";
+            statement.execute(addPrimaryKeyLessons);
+            String createSchedulesData = "CREATE TABLE schedules_data (schedule INT(11) NOT NULL, groups INT(11) NOT NULL, data VARCHAR(52) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, CONSTRAINT schedules_data_ibfk_1 FOREIGN KEY (schedule) REFERENCES schedules (k), CONSTRAINT schedules_data_ibfk_2 FOREIGN KEY (groups) REFERENCES groups (k) ON DELETE CASCADE);";
+            statement.execute(createSchedulesData);
+            String addPrimaryKeySchedulesData1 = "CREATE INDEX schedule ON schedules_data (schedule);";
+            statement.execute(addPrimaryKeySchedulesData1);
+            String addPrimaryKeySchedulesData2 = "CREATE INDEX schedules_data_ibfk_2 ON schedules_data (groups);";
+            statement.execute(addPrimaryKeySchedulesData2);
+            String createLessonsSchedules = "CREATE TABLE lessons_schedules (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256));";
+            statement.execute(createLessonsSchedules);
+            String createLessonsData = "CREATE TABLE lessons_data (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, lessons_schedule INT(11) NOT NULL, groups INT(11) NOT NULL, pair_number VARCHAR(256) NOT NULL, lesson INT(11) NOT NULL, teacher INT(11) NOT NULL, auditory INT(11) NOT NULL, CONSTRAINT lessons_data_ibfk_1 FOREIGN KEY (lessons_schedule) REFERENCES lessons_schedules (k), CONSTRAINT lessons_data_ibfk_2 FOREIGN KEY (groups) REFERENCES groups (k), CONSTRAINT lessons_data_ibfk_3 FOREIGN KEY (lesson) REFERENCES lessons (k), CONSTRAINT lessons_data_ibfk_4 FOREIGN KEY (teacher) REFERENCES teachers (k), CONSTRAINT lessons_data_ibfk_5 FOREIGN KEY (auditory) REFERENCES auditorys (k));";
+            statement.execute(createLessonsData);
+            String addPrimaryKeyLessonsData1 = "CREATE INDEX auditory ON lessons_data (auditory);";
+            statement.execute(addPrimaryKeyLessonsData1);
+            String addPrimaryKeyLessonsData2 = "CREATE INDEX groups ON lessons_data (groups);";
+            statement.execute(addPrimaryKeyLessonsData2);
+            String addPrimaryKeyLessonsData3 = "CREATE INDEX lesson ON lessons_data (lesson);";
+            statement.execute(addPrimaryKeyLessonsData3);
+            String addPrimaryKeyLessonsData4 = "CREATE INDEX lessons_schedule ON lessons_data (lessons_schedule);";
+            statement.execute(addPrimaryKeyLessonsData4);
+            String addPrimaryKeyLessonsData5 = "CREATE INDEX teacher ON lessons_data (teacher);";
+            statement.execute(addPrimaryKeyLessonsData5);
+            statement.execute("INSERT INTO departments (name) VALUE ('Будівельне відділення')");
+            statement.execute("INSERT INTO departments (name) VALUE ('Відділення економіки-програмування')");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/asfsc_weeks.sql")));
+            reader.lines().forEach(s -> {
+                try {
+                    statement.execute(s);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void logDate() {

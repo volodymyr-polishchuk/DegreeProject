@@ -10,10 +10,10 @@ import java.awt.event.ActionEvent;
  * Created by Vladimir on 15/02/18.
  **/
 public class SettingForm extends JDialog {
-    private JTabbedPane tabbedPane1;
+    private JTabbedPane jTabbedPane;
     private JPanel ContentPane;
-    private JButton зберегтиButton;
-    private JButton скасуватиButton;
+    private JButton saveButton;
+    private JButton cancelButton;
     private JComboBox<LAFItem> LAFComboBox;
 
     public SettingForm() {
@@ -31,6 +31,8 @@ public class SettingForm extends JDialog {
 
         LAFComboBox.setModel(listModel);
         LAFComboBox.addActionListener(this::lafChoice);
+        saveButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(e -> dispose());
     }
 
     private void lafChoice(ActionEvent event) {
@@ -52,15 +54,15 @@ public class SettingForm extends JDialog {
     private class LAFItem {
         private String name;
 
-        public LAFItem(String name) {
+        LAFItem(String name) {
             this.name = name;
         }
 
-        public String getName() {
+        String getName() {
             return name;
         }
 
-        public void setName(String name) {
+        void setName(String name) {
             this.name = name;
         }
 

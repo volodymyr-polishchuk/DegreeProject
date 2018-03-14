@@ -4,6 +4,7 @@ import app.DegreeProject;
 import app.data.Group;
 import app.data.Period;
 import app.data.Week;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -47,6 +48,8 @@ public class SchedulerTableModel extends AbstractTableModel {
             java.awt.Color color = DegreeProject.WEEKLIST.GetAllWeek().get(i).getColor();
             customPalette.setColorAtIndex((short) (i + 55), (byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue());
         }
+        customPalette.setColorAtIndex(IndexedColors.GREY_25_PERCENT.index, (byte)238, (byte)238, (byte)238);
+        customPalette.setColorAtIndex(IndexedColors.GREY_50_PERCENT.index, (byte)164, (byte)164, (byte)164);
         HashMap<Week, CellStyle> styleHashMap = new HashMap<>();
         for (int i = 0; i < DegreeProject.WEEKLIST.GetAllWeek().size(); i++) {
             CellStyle cellStyle = workbook.createCellStyle();
@@ -63,6 +66,21 @@ public class SchedulerTableModel extends AbstractTableModel {
         }
 
         Sheet sheet = workbook.createSheet("Графік навчання за " + period);
+
+//Шапка, якщо є місце
+        if (trRow > 3) {
+            CellStyle headerCellStyle = workbook.createCellStyle();
+            headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            headerCellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
+            HSSFFont headerFont = workbook.createFont();
+            headerFont.setFontHeightInPoints((short)18);
+            headerCellStyle.setFont(headerFont);
+            Row headerRow = sheet.createRow(trRow - 3);
+            Cell headerCell = headerRow.createCell(trCell);
+            headerCell.setCellStyle(headerCellStyle);
+            headerCell.setCellValue("Зведений графік навчального процесу на " + period + " навчальний рік");
+            sheet.addMergedRegion(new CellRangeAddress(trRow - 3, trRow - 2, trCell, 52));
+        }
 //Місяці
         int first = 1 + trCell;
         int last = 0;
@@ -86,11 +104,13 @@ public class SchedulerTableModel extends AbstractTableModel {
         monthStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         monthStyle.setBorderBottom(BorderStyle.THIN);
         monthStyle.setBorderRight(BorderStyle.THIN);
+        monthStyle.setBorderTop(BorderStyle.THIN);
         monthStyle.setFont(font);
         monthStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION);
         monthStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         monthStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         monthStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        monthStyle.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Row monthRow = sheet.createRow(trRow);
         Cell nameMonthCell = monthRow.createCell(trCell);
         nameMonthCell.setCellStyle(monthStyle);
@@ -108,9 +128,11 @@ public class SchedulerTableModel extends AbstractTableModel {
         dateStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         dateStyle.setBorderBottom(BorderStyle.THIN);
         dateStyle.setBorderRight(BorderStyle.THIN);
+        dateStyle.setBorderTop(BorderStyle.THIN);
         dateStyle.setFont(font);
         dateStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         dateStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        dateStyle.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
         Row dateRow = sheet.createRow(1 + trRow);
         Cell nameDateCell = dateRow.createCell(trCell);
         nameDateCell.setCellStyle(monthStyle);
@@ -178,7 +200,7 @@ public class SchedulerTableModel extends AbstractTableModel {
 
         workbook.write(new FileOutputStream(file));
         workbook.close();
-        file.setWritable(true);
+        System.out.println(file.getPath() + "->setWritable: " + file.setWritable(true));
         if (JOptionPane.showConfirmDialog(
                 null,
                 "Графік навчання збережено до\n" + file.getPath() + "\n Відкрити файл?",
