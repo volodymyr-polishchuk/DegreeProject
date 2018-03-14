@@ -1,6 +1,7 @@
 package app.frame;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,6 +13,9 @@ public class AboutFrame extends JDialog {
     public AboutFrame() {
         setContentPane(contentPane);
         setModal(true);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(new Dimension(450, 400));
+        setLocationRelativeTo(null);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
@@ -22,10 +26,4 @@ public class AboutFrame extends JDialog {
         dispose();
     }
 
-    public static void main(String[] args) {
-        AboutFrame dialog = new AboutFrame();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
 }
