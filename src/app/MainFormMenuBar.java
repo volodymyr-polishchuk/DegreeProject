@@ -428,7 +428,12 @@ public class MainFormMenuBar extends JMenuBar {
     }
 
     public void MenuItemCreateSchedule(ActionEvent event) {
-        this.mainForm.addEmptyStudySchedule();
+        try {
+            this.mainForm.addEmptyStudySchedule();
+        } catch (NoClassDefFoundError e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void MenuItemExit(ActionEvent event) {

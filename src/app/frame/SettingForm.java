@@ -15,6 +15,9 @@ public class SettingForm extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private JComboBox<LAFItem> LAFComboBox;
+    private JButton знищитиButton;
+    private JTextField asfcsTextField;
+    private JButton очиститиButton;
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

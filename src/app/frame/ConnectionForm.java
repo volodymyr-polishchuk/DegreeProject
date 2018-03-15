@@ -5,12 +5,11 @@ import app.DegreeProject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,6 +28,7 @@ public class ConnectionForm extends JFrame{
     private JPasswordField passwordField;
     private JButton connectButton;
     private JCheckBox rememberCheckBox;
+    private JLabel otherConnectionLabel;
     private boolean autoConnect = false;
     private boolean doConnect = false;
 
@@ -51,6 +51,25 @@ public class ConnectionForm extends JFrame{
 
         connectButton.addActionListener(this::connectionButtonClick);
         researchSaveData();
+        otherConnectionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                JOptionPane.showMessageDialog(null, "Інші варіанти не доступні", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                super.mouseExited(e);
+                otherConnectionLabel.setForeground(new Color(0x000E9C));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                super.mouseEntered(e);
+                otherConnectionLabel.setForeground(new Color(0x4049E9));
+            }
+        });
     }
 
     public ConnectionForm(boolean autoConnect) {
@@ -121,16 +140,18 @@ public class ConnectionForm extends JFrame{
                             dataBaseCreate(DegreeProject.databaseData.getConnection());
                         } catch (SQLException e) {
                             e.printStackTrace();
+                            return;
                         }
-                    } break;
+                    }
                     default: return;
                 }
+            } else {
+                JOptionPane.showMessageDialog(this, "Підключення не встановлено. \n\r " +
+                                "Сервер повернув помилку:" + e1.getMessage(),
+                        "Помилка сервера", JOptionPane.ERROR_MESSAGE);
+                e1.printStackTrace();
+                return;
             }
-            JOptionPane.showMessageDialog(this, "Підключення не встановлено. \n\r " +
-                            "Сервер повернув помилку:" + e1.getMessage(),
-                    "Помилка сервера", JOptionPane.ERROR_MESSAGE);
-            e1.printStackTrace();
-            return;
         }
 
         if (rememberCheckBox.isSelected()) rememberMe();
@@ -140,8 +161,7 @@ public class ConnectionForm extends JFrame{
     }
 
     private void dataBaseCreate(Connection connection) {
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             String createDepartment = "CREATE TABLE departments (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL);";
             statement.execute(createDepartment);
             String createWeeks = "CREATE TABLE weeks (mark VARCHAR(1) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL, color INT(11) NOT NULL, abbreviation VARCHAR(16) NOT NULL);";
@@ -184,7 +204,7 @@ public class ConnectionForm extends JFrame{
             statement.execute(addPrimaryKeyLessonsData5);
             statement.execute("INSERT INTO departments (name) VALUE ('Будівельне відділення')");
             statement.execute("INSERT INTO departments (name) VALUE ('Відділення економіки-програмування')");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/asfsc_weeks.sql")));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/asfsc_weeks.sql"), Charset.forName("UTF-8")));
             reader.lines().forEach(s -> {
                 try {
                     statement.execute(s);
@@ -192,7 +212,8 @@ public class ConnectionForm extends JFrame{
                     e.printStackTrace();
                 }
             });
-        } catch (SQLException e) {
+            reader.close();
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }

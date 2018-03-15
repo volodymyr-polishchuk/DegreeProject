@@ -1,6 +1,7 @@
 package test;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by Vladimir on 05/03/18.
