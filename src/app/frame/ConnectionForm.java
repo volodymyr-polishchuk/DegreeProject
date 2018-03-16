@@ -55,7 +55,7 @@ public class ConnectionForm extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                JOptionPane.showMessageDialog(null, "Інші варіанти не доступні", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                DegreeProject.defaultDB = JOptionPane.showInputDialog(null, "Введіть назву бази даних для підключення", "Зміна бази даних", JOptionPane.QUESTION_MESSAGE);
             }
 
             @Override
@@ -68,6 +68,34 @@ public class ConnectionForm extends JFrame{
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
                 otherConnectionLabel.setForeground(new Color(0x4049E9));
+            }
+        });
+        addressTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) portTextField.requestFocus();
+            }
+        });
+        portTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) userTextField.requestFocus();
+            }
+        });
+        userTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) passwordField.requestFocus();
+            }
+        });
+        passwordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) connectButton.doClick();
             }
         });
     }
@@ -96,6 +124,7 @@ public class ConnectionForm extends JFrame{
                 portTextField.setText(lines[1]);
                 userTextField.setText(lines[2]);
                 passwordField.setText(lines[3]);
+                DegreeProject.defaultDB = lines[4];
                 doConnect = true;
             }
         }
@@ -107,7 +136,7 @@ public class ConnectionForm extends JFrame{
                     portTextField.getText(),
                     userTextField.getText(),
                     passwordField.getPassword(),
-                    "asfsc");
+                    DegreeProject.defaultDB);
             ResultSet rs = DegreeProject.databaseData.getConnection().createStatement().executeQuery("SHOW TABLES");
             HashSet<String> set = new HashSet<>();
             set.add("auditorys");       set.add("departments");
@@ -126,22 +155,48 @@ public class ConnectionForm extends JFrame{
             }
         } catch (SQLException e1) {
             if (e1.getSQLState().equals("42000")) {
-                int r = JOptionPane.showConfirmDialog(null, "База даних 'asfcs' потрібна для роботи не знайдена! \n\r" +
+                int r = JOptionPane.showConfirmDialog(null, "База даних '" + DegreeProject.defaultDB + "' потрібна для роботи не знайдена! \n\r" +
                         "Створити нову базу?", "Налаштування бази даних", JOptionPane.YES_NO_CANCEL_OPTION);
                 switch (r) {
                     case JOptionPane.YES_OPTION: {
-                        try {
-                            DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
-                                    portTextField.getText(),
-                                    userTextField.getText(),
-                                    passwordField.getPassword());
-                            DegreeProject.databaseData.getConnection().createStatement().execute("CREATE DATABASE asfsc;");
-                            DegreeProject.databaseData.getConnection().createStatement().execute("USE asfsc;");
-                            dataBaseCreate(DegreeProject.databaseData.getConnection());
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            return;
-                        }
+                        JProgressBar jProgressBar = new JProgressBar(0, 20);
+                        jProgressBar.setValue(0);
+                        jProgressBar.setStringPainted(true);
+
+                        jProgressBar.setPreferredSize(new Dimension(200, 5));
+                        JFrame jFrame = new JFrame();
+                        jFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                        jFrame.setLayout(new GridLayout(4, 1));
+                        jFrame.setSize(200, 80);
+                        jFrame.setLocationRelativeTo(null);
+                        jFrame.add(Box.createVerticalGlue());
+                        jFrame.add(new JLabel("Створення бази даних"));
+                        jFrame.add(jProgressBar);
+                        jFrame.add(Box.createVerticalGlue());
+                        jFrame.setResizable(false);
+                        jFrame.setUndecorated(true);
+                        jFrame.setVisible(true);
+                        jFrame.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowOpened(WindowEvent e) {
+                                super.windowOpened(e);
+                                new Thread(() -> {
+                                    try {
+                                        DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
+                                                portTextField.getText(),
+                                                userTextField.getText(),
+                                                passwordField.getPassword());
+                                        DegreeProject.databaseData.getConnection().createStatement().execute("CREATE DATABASE " + DegreeProject.defaultDB + ";");
+                                        DegreeProject.databaseData.getConnection().createStatement().execute("USE " + DegreeProject.defaultDB + ";");
+                                        dataBaseCreate(DegreeProject.databaseData.getConnection(), jProgressBar);
+                                        jFrame.dispose();
+                                        JOptionPane.showMessageDialog(null, "База успішно створена", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                                    } catch (SQLException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }).start();
+                            }
+                        });
                     }
                     default: return;
                 }
@@ -155,51 +210,70 @@ public class ConnectionForm extends JFrame{
         }
 
         if (rememberCheckBox.isSelected()) rememberMe();
-        logDate();
+//        logDate();
         DegreeProject.InitialMainFrame();
         dispose();
     }
 
-    private void dataBaseCreate(Connection connection) {
+    private void dataBaseCreate(Connection connection, JProgressBar jProgressBar) {
         try (Statement statement = connection.createStatement()) {
             String createDepartment = "CREATE TABLE departments (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL);";
             statement.execute(createDepartment);
+            jProgressBar.setValue(1);
             String createWeeks = "CREATE TABLE weeks (mark VARCHAR(1) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, name VARCHAR(256) NOT NULL, color INT(11) NOT NULL, abbreviation VARCHAR(16) NOT NULL);";
             statement.execute(createWeeks);
+            jProgressBar.setValue(2);
             String addUniqueKeyWeeks = "CREATE UNIQUE INDEX weeks_mark_uindex ON weeks (mark);";
             statement.execute(addUniqueKeyWeeks);
+            jProgressBar.setValue(3);
             String createGroups = "CREATE TABLE groups (name VARCHAR(256) NOT NULL, department INT(11) NOT NULL, dateofcreate DATE NOT NULL, comments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, CONSTRAINT groups_departments_k_fk FOREIGN KEY (department) REFERENCES departments (k));";
             statement.execute(createGroups);
+            jProgressBar.setValue(4);
             String addPrimaryKeyGroup = "CREATE INDEX groups_departments_k_fk ON groups (department);";
             statement.execute(addPrimaryKeyGroup);
+            jProgressBar.setValue(5);
             String createSchedules = "CREATE TABLE schedules (period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
             statement.execute(createSchedules);
+            jProgressBar.setValue(6);
             String createAuditorys = "CREATE TABLE auditorys (name VARCHAR(256) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
             statement.execute(createAuditorys);
+            jProgressBar.setValue(7);
             String createTeachers = "CREATE TABLE teachers (name VARCHAR(256) NOT NULL, preferences VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
             statement.execute(createTeachers);
+            jProgressBar.setValue(8);
             String createLessons = "CREATE TABLE lessons (name VARCHAR(256) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, auditory INT(11) NOT NULL, CONSTRAINT lessons_ibfk_1 FOREIGN KEY (auditory) REFERENCES auditorys (k));";
             statement.execute(createLessons);
+            jProgressBar.setValue(9);
             String addPrimaryKeyLessons = "CREATE INDEX auditory ON lessons (auditory);";
             statement.execute(addPrimaryKeyLessons);
+            jProgressBar.setValue(10);
             String createSchedulesData = "CREATE TABLE schedules_data (schedule INT(11) NOT NULL, groups INT(11) NOT NULL, data VARCHAR(52) NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, CONSTRAINT schedules_data_ibfk_1 FOREIGN KEY (schedule) REFERENCES schedules (k), CONSTRAINT schedules_data_ibfk_2 FOREIGN KEY (groups) REFERENCES groups (k) ON DELETE CASCADE);";
             statement.execute(createSchedulesData);
+            jProgressBar.setValue(11);
             String addPrimaryKeySchedulesData1 = "CREATE INDEX schedule ON schedules_data (schedule);";
             statement.execute(addPrimaryKeySchedulesData1);
+            jProgressBar.setValue(12);
             String addPrimaryKeySchedulesData2 = "CREATE INDEX schedules_data_ibfk_2 ON schedules_data (groups);";
             statement.execute(addPrimaryKeySchedulesData2);
+            jProgressBar.setValue(13);
             String createLessonsSchedules = "CREATE TABLE lessons_schedules (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256));";
             statement.execute(createLessonsSchedules);
+            jProgressBar.setValue(14);
             String createLessonsData = "CREATE TABLE lessons_data (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, lessons_schedule INT(11) NOT NULL, groups INT(11) NOT NULL, pair_number VARCHAR(256) NOT NULL, lesson INT(11) NOT NULL, teacher INT(11) NOT NULL, auditory INT(11) NOT NULL, CONSTRAINT lessons_data_ibfk_1 FOREIGN KEY (lessons_schedule) REFERENCES lessons_schedules (k), CONSTRAINT lessons_data_ibfk_2 FOREIGN KEY (groups) REFERENCES groups (k), CONSTRAINT lessons_data_ibfk_3 FOREIGN KEY (lesson) REFERENCES lessons (k), CONSTRAINT lessons_data_ibfk_4 FOREIGN KEY (teacher) REFERENCES teachers (k), CONSTRAINT lessons_data_ibfk_5 FOREIGN KEY (auditory) REFERENCES auditorys (k));";
             statement.execute(createLessonsData);
+            jProgressBar.setValue(15);
             String addPrimaryKeyLessonsData1 = "CREATE INDEX auditory ON lessons_data (auditory);";
             statement.execute(addPrimaryKeyLessonsData1);
+            jProgressBar.setValue(16);
             String addPrimaryKeyLessonsData2 = "CREATE INDEX groups ON lessons_data (groups);";
             statement.execute(addPrimaryKeyLessonsData2);
+            jProgressBar.setValue(17);
             String addPrimaryKeyLessonsData3 = "CREATE INDEX lesson ON lessons_data (lesson);";
             statement.execute(addPrimaryKeyLessonsData3);
+            jProgressBar.setValue(18);
             String addPrimaryKeyLessonsData4 = "CREATE INDEX lessons_schedule ON lessons_data (lessons_schedule);";
             statement.execute(addPrimaryKeyLessonsData4);
+            jProgressBar.setValue(19);
             String addPrimaryKeyLessonsData5 = "CREATE INDEX teacher ON lessons_data (teacher);";
             statement.execute(addPrimaryKeyLessonsData5);
             statement.execute("INSERT INTO departments (name) VALUE ('Будівельне відділення')");
@@ -213,6 +287,7 @@ public class ConnectionForm extends JFrame{
                 }
             });
             reader.close();
+            jProgressBar.setValue(20);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -244,7 +319,7 @@ public class ConnectionForm extends JFrame{
             writer.write(portTextField.getText() + ";");
             writer.write(userTextField.getText() + ";");
             writer.write(String.valueOf(passwordField.getPassword()) + ";");
-            writer.write("asfsc");
+            writer.write(DegreeProject.defaultDB);
             writer.flush();
             writer.close();
         } catch (IOException | URISyntaxException e1) {

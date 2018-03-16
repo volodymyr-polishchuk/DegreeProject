@@ -197,7 +197,7 @@
                 </constraints>
                 <properties>
                   <foreground color="-16773476"/>
-                  <text value="&lt;html&gt;&lt;body&gt;&lt;u&gt;Інші варіанти під'єднання&lt;/u&gt;&lt;/body&gt;&lt;/html&gt;"/>
+                  <text value="&lt;html&gt;&lt;body&gt;&lt;u&gt;Змінити базу даних&lt;/u&gt;&lt;/body&gt;&lt;/html&gt;"/>
                 </properties>
               </component>
             </children>

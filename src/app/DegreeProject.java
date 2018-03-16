@@ -20,8 +20,15 @@ public class DegreeProject {
     public static WeekList WEEKLIST;
     public static GroupList GROUPLIST;
     public static MainForm mainForm;
+    public static String defaultDB = "asfsc";
 
     public static void main(String[] args) throws IOException, SQLException {
+        setCustomLookAndFeel();
+        ConnectionForm connectionForm = new ConnectionForm(true);
+        connectionForm.setVisible(true);
+    }
+
+    private static void setCustomLookAndFeel() {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
             UIManager.put("OptionPane.yesButtonText"   , "Да");
@@ -31,12 +38,26 @@ public class DegreeProject {
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        ConnectionForm connectionForm = new ConnectionForm(true);
-        connectionForm.setVisible(true);
     }
 
     public static void InitialMainFrame() {
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(1000 * 20);
+                    if (!databaseData.getConnection().isValid(10)) {
+                        int r = JOptionPane.showConfirmDialog(null, "З'єднання розірвано!\nДа - зачекати, Ні - вийти", "Повідомлення", JOptionPane.YES_NO_OPTION);
+                        if (r == JOptionPane.NO_OPTION) {
+                            DegreeProject.mainForm.getMainFormMenuBar().MenuItemReconnect(null);
+                        }
+                        else Thread.sleep(1000 * 10);
+                        return;
+                    }
+                }
+            } catch (SQLException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
         mainForm = new MainForm();
         mainForm.addWindowListener(new WindowAdapter() {
             @Override
