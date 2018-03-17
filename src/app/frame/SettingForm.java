@@ -5,6 +5,9 @@ import app.DegreeProject;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -15,6 +18,9 @@ public class SettingForm extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private JComboBox<LAFItem> LAFComboBox;
+    private JButton dropDatabaseButton;
+    private JButton clearDatabaseButton;
+    private JTextField databaseNameTextField;
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -29,10 +35,26 @@ public class SettingForm extends JDialog {
         listModel.addElement(new LAFItem("Java"));
         listModel.addElement(new LAFItem("JTattoo"));
 
+
         LAFComboBox.setModel(listModel);
         LAFComboBox.addActionListener(this::lafChoice);
         saveButton.addActionListener(e -> dispose());
         cancelButton.addActionListener(e -> dispose());
+
+        databaseNameTextField.setText(DegreeProject.defaultDB);
+
+        dropDatabaseButton.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(null, "Ви намагаєтеся видалити базу даних!\nЦі дії відмінити не можливо!\nПродовжити?", "Увага", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                try (Statement statement = DegreeProject.databaseData.getConnection().createStatement()) {
+                    statement.execute("DROP DATABASE " + DegreeProject.defaultDB);
+                    DegreeProject.mainForm.getMainFormMenuBar().MenuItemReconnect(null);
+                    dispose();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
 
     private void lafChoice(ActionEvent event) {

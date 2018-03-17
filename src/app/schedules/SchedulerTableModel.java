@@ -57,7 +57,7 @@ public class SchedulerTableModel extends AbstractTableModel {
             cellStyle.setBorderRight(BorderStyle.THIN);
             cellStyle.setFillForegroundColor((short) (i + 55));
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            cellStyle.setFont(font);
+//            cellStyle.setFont(font);
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             cellStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
             cellStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
