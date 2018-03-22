@@ -60,13 +60,20 @@ public class MainFormMenuBar extends JMenuBar {
 //          Створення меню Довідка
         JMenu helpMenu = new JMenu("Довідка");
         //TODO Реалізувати форму допомоги користувачеві
-        JMenuItem MenuItemHelp = new JMenuItem("Допомога користувачеві");
-        helpMenu.add(MenuItemHelp);
+        helpMenu.add(new JMenuItem("Допомога користувачеві")).addActionListener(this::MenuItemHelp);
         helpMenu.add(new JMenuItem("Перевірка оновлень")).addActionListener(this::MenuItemCheckUpdate);
         //TODO Реалізувати форму Про програму
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
         helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemHelp(ActionEvent event) {
+        try {
+            Desktop.getDesktop().browse(new URI("https://volodymyr-polishchuk.github.io/DegreeProject/"));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private void MenuItemAbout(ActionEvent event) {
