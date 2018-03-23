@@ -5,6 +5,7 @@ import app.data.*;
 import app.lessons.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
@@ -577,6 +578,9 @@ public class LessonsPanel extends JPanel{
             headerCellStyle.cloneStyleFrom(dataCellStyle);
             headerCellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
             headerCellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+            Font headerFont = workbook.createFont();
+            headerFont.setFontHeightInPoints((short) 28);
+            headerCellStyle.setFont(headerFont);
 
             HSSFRow headerRow = sheet.createRow(trRow - 1);
             for (int i = 0; i < units.size() * COLUMN_REPEAT; i++) {
