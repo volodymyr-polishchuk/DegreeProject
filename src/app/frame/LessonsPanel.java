@@ -542,7 +542,7 @@ public class LessonsPanel extends JPanel{
                 "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
             };
             final int trCell = 0;
-            final int trRow = 2;
+            final int trRow = 3;
             HSSFWorkbook workbook = new HSSFWorkbook();
             HSSFSheet sheet = workbook.createSheet("Розклад занять за період " + period);
 
@@ -581,6 +581,22 @@ public class LessonsPanel extends JPanel{
             Font headerFont = workbook.createFont();
             headerFont.setFontHeightInPoints((short) 28);
             headerCellStyle.setFont(headerFont);
+
+            HSSFCellStyle topHeaderCellStyle = workbook.createCellStyle();
+            topHeaderCellStyle.cloneStyleFrom(headerCellStyle);
+            Font topHeaderFont = workbook.createFont();
+            topHeaderFont.setFontHeightInPoints((short) 32);
+            topHeaderCellStyle.setFont(topHeaderFont);
+
+            if (trRow >= 3) {
+                sheet.addMergedRegion(new CellRangeAddress(trRow - 3, trRow - 2, trCell, trCell + COLUMN_REPEAT * units.size()));
+                Cell cell = sheet.createRow(trRow - 3).createCell(0);
+                cell.setCellStyle(topHeaderCellStyle);
+                String[] lines = periodLabel.getText().split("/");
+                int s = Integer.parseInt(lines[1]);
+                int year = Integer.parseInt(lines[0].split("-")[0]);
+                cell.setCellValue("Розклад занять за " + (s == 1 ? "I" : "II") + " півріччя " + year + " - " + (year + 1));
+            }
 
             HSSFRow headerRow = sheet.createRow(trRow - 1);
             for (int i = 0; i < units.size() * COLUMN_REPEAT; i++) {
