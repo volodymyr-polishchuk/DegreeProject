@@ -163,33 +163,34 @@ public class MainFormMenuBar extends JMenuBar {
                 }
                 if (bool) st.execute("DELETE FROM groups WHERE k LIKE '" + in.getKey() + "'");
             }
-            PreparedStatement ps = DegreeProject.databaseData.getConnection().prepareStatement(
+            PreparedStatement preparedStatement = DegreeProject.databaseData.getConnection().prepareStatement(
                     "INSERT INTO groups(name, department, dateofcreate, k, comments) VALUE (?, ?, ?, ?, ?) " +
                             "ON DUPLICATE KEY UPDATE name = ?, department = ?, dateofcreate = ?, comments = ?");
-            PreparedStatement psElse = DegreeProject.databaseData.getConnection().prepareStatement(
+            PreparedStatement preparedStatementElse = DegreeProject.databaseData.getConnection().prepareStatement(
                     "INSERT INTO groups(name, department, dateofcreate, comments) VALUE (?, ?, ?, ?)");
             for (StudyData item : outputData) {
                 if (item.keyExist()) {
-                    ps.setString(1, item.getName());
-                    ps.setInt(2, ((Group) (item)).getDepartment().getKey());
-                    ps.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-                    ps.setInt(4, item.getKey());
-                    ps.setString(5, ((Group) item).getComments());
-                    ps.setString(6, item.getName());
-                    ps.setInt(7, ((Group) (item)).getDepartment().getKey());
-                    ps.setDate(8, new java.sql.Date(System.currentTimeMillis()));
-                    ps.setString(9, ((Group) item).getComments());
-                    ps.execute();
+                    preparedStatement.setString(1, item.getName());
+                    preparedStatement.setInt(2, ((Group) (item)).getDepartment().getKey());
+                    preparedStatement.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                    preparedStatement.setInt(4, item.getKey());
+                    preparedStatement.setString(5, ((Group) item).getComments());
+                    preparedStatement.setString(6, item.getName());
+                    preparedStatement.setInt(7, ((Group) (item)).getDepartment().getKey());
+                    preparedStatement.setDate(8, new java.sql.Date(System.currentTimeMillis()));
+                    preparedStatement.setString(9, ((Group) item).getComments());
+                    preparedStatement.execute();
                 } else {
-                    psElse.setString(1, item.getName());
-                    psElse.setInt(2, ((Group) item).getDepartment().getKey());
-                    psElse.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-                    psElse.setString(4, ((Group) item).getComments());
-                    psElse.execute();
+                    preparedStatementElse.setString(1, item.getName());
+                    preparedStatementElse.setInt(2, ((Group) item).getDepartment().getKey());
+                    preparedStatementElse.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                    preparedStatementElse.setString(4, ((Group) item).getComments());
+                    preparedStatementElse.execute();
                 }
             }
-            ps.close();
-            psElse.close();
+            preparedStatement.close();
+            preparedStatementElse.close();
+            DegreeProject.mainForm.setStatusBar("Дані успішно збережено до бази даних");
             JOptionPane.showMessageDialog(null, "Дані успішно змінено");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -268,6 +269,7 @@ public class MainFormMenuBar extends JMenuBar {
                 else
                     st.execute("INSERT INTO lessons(name, auditory) VALUE ('" + item.getName() + "', '" + ((Lesson) item).getAuditory().getKey() + "');");
             }
+            DegreeProject.mainForm.setStatusBar("Дані успішно збережено до бази даних");
             JOptionPane.showMessageDialog(null, "Дані успішно змінено");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -344,6 +346,7 @@ public class MainFormMenuBar extends JMenuBar {
                             + item.getName() + "', '"
                             + ((Teacher) item).getPreference().getData() + "');");
             }
+            DegreeProject.mainForm.setStatusBar("Дані успішно збережено до бази даних");
             JOptionPane.showMessageDialog(null, "Дані успішно змінено");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -413,6 +416,7 @@ public class MainFormMenuBar extends JMenuBar {
                 else
                     st.execute("INSERT INTO auditorys(name) VALUE ('" + item.getName() + "');");
             }
+            DegreeProject.mainForm.setStatusBar("Дані успішно збережено до бази даних");
             JOptionPane.showMessageDialog(null, "Дані успішно змінено");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());

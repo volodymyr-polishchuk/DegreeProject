@@ -200,16 +200,6 @@ public class SchedulerTableModel extends AbstractTableModel {
 
         workbook.write(new FileOutputStream(file));
         workbook.close();
-        System.out.println(file.getPath() + "->setWritable: " + file.setWritable(true));
-        if (JOptionPane.showConfirmDialog(
-                null,
-                "Графік навчання збережено до\n" + file.getPath() + "\n Відкрити файл?",
-                "Повідомлення",
-                JOptionPane.YES_NO_CANCEL_OPTION
-        ) == JOptionPane.YES_OPTION) {
-            Desktop.getDesktop().open(file);
-        }
-
     }
 
     public void setPeriods(Date date) {

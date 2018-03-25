@@ -45,6 +45,8 @@ public class LessonsPanel extends JPanel{
     private JButton prevPeriodButton;
     private JButton nextPeriodButton;
     private JLabel periodLabel;
+    private JButton rButton;
+    private JButton cButton;
     private ButtonGroup buttonGroup;
     private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
@@ -72,11 +74,11 @@ public class LessonsPanel extends JPanel{
         nowStudyPair = new EmptyStudyPair();
         setLayout(new GridLayout());
         add(contentPane);
-        InitialTable();
-        InitialGroupButton();
+        initialTable();
+        initialGroupButton();
         settingButton.addActionListener(this::settingGroupClick);
         saveButton.addActionListener(this::saveButtonClick);
-        InitialData();
+        initialData();
         button1.addActionListener(this::setButtonClick);
         button2.addActionListener(this::setButtonClick);
         button3.addActionListener(this::setButtonClick);
@@ -86,6 +88,7 @@ public class LessonsPanel extends JPanel{
         nextPeriodButton.addActionListener(this::nextPeriodButtonClick);
         prevPeriodButton.addActionListener(this::prevPeriodButtonClick);
         exportButton.addActionListener(this::exportButtonClick);
+        rButton.addActionListener(e -> initialData());
     }
 
     public LessonsPanel(String title) {
@@ -208,6 +211,7 @@ public class LessonsPanel extends JPanel{
                         "Повідомлення",
                         JOptionPane.YES_NO_CANCEL_OPTION
                 );
+                DegreeProject.mainForm.setStatusBar("Дані успішно збережено до файлу " + chooser.getSelectedFile().getPath());
                 if (r == JOptionPane.YES_OPTION) {
                     Desktop.getDesktop().open(chooser.getSelectedFile());
                 }
@@ -384,7 +388,7 @@ public class LessonsPanel extends JPanel{
         lessonTableModel.fireTableDataChanged();
     }
 
-    private void InitialData() {
+    private void initialData() {
         lessonCBox.addActionListener(e -> {
             if(lessonCBox.getSelectedItem() instanceof Lesson) {
                 Lesson lesson = (Lesson) lessonCBox.getSelectedItem();
@@ -453,7 +457,7 @@ public class LessonsPanel extends JPanel{
         lessonTableModel.updateForbids(nowStudyPair);
     }
 
-    private void InitialGroupButton() {
+    private void initialGroupButton() {
         Border out = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY);
         Border outCenter = BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY);
         Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
@@ -473,7 +477,7 @@ public class LessonsPanel extends JPanel{
         return lessonTableModel;
     }
 
-    private void InitialTable() {
+    private void initialTable() {
         lessonTableModel = new LessonTableModel();
         jTable.setModel(lessonTableModel);
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);

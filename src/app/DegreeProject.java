@@ -23,9 +23,15 @@ public class DegreeProject {
     public static String defaultDB = "asfsc";
 
     public static void main(String[] args) throws IOException, SQLException {
-        setCustomLookAndFeel();
-        ConnectionForm connectionForm = new ConnectionForm(true);
-        connectionForm.setVisible(true);
+        try {
+            setCustomLookAndFeel();
+            ConnectionForm connectionForm = new ConnectionForm(true);
+            connectionForm.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            throw e;
+        }
     }
 
     private static void setCustomLookAndFeel() {
