@@ -50,6 +50,7 @@ public class LessonsPanel extends JPanel{
     private ButtonGroup buttonGroup;
     private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
+    private PopupMenu tablePopupMenu = new PopupMenu();
     /**
      * Кількість пар в одному дні
      */
@@ -500,6 +501,9 @@ public class LessonsPanel extends JPanel{
         });
 
         lessonTableModel.addTableModelListener(this::tableModelChange);
+        tablePopupMenu.add(new MenuItem("Редагувати"));
+        tablePopupMenu.add(new MenuItem("Очистити"));
+        jTable.add(tablePopupMenu);
     }
 
     private void tableModelChange(TableModelEvent event) {
@@ -834,10 +838,16 @@ public class LessonsPanel extends JPanel{
     }
 
     private void mouseTableClick(MouseEvent e) {
-        int row = jTable.rowAtPoint(e.getPoint());
-        int column = jTable.columnAtPoint(e.getPoint());
-        lessonTableModel.setValueAt(nowStudyPair, row, column);
-        analyzeTable(row, column);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            int row = jTable.rowAtPoint(e.getPoint());
+            int column = jTable.columnAtPoint(e.getPoint());
+            lessonTableModel.setValueAt(nowStudyPair, row, column);
+            analyzeTable(row, column);
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            tablePopupMenu.show(jTable, e.getX(), e.getY());
+        } /*else if (!e.isPopupTrigger()) {
+
+        }*/
     }
 
     private void analyzeTable(int row, int column) {
