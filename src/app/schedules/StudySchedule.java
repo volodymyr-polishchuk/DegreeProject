@@ -42,7 +42,7 @@ public class StudySchedule {
             preparedStatement = connection.prepareStatement("INSERT IGNORE INTO mydata.scheduleunits " +
                     "(mydata.scheduleunits.years, mydata.scheduleunits.group, mydata.scheduleunits.weeks) VALUE (?, ?, ?)");
             preparedStatement.setInt(1, year);
-            preparedStatement.setInt(2, DegreeProject.GROUPLIST.getIndexByName(unit.getName()));
+            preparedStatement.setInt(2, DegreeProject.GROUPLIST.getIndexByName(unit.getGroup().getName()));
             preparedStatement.setString(3, unit.decode());
             preparedStatement.execute();
             //TODO треба придумати інші назви колонкам в таблицях, бо поточні є резервованими під систему

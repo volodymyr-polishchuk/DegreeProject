@@ -7,11 +7,12 @@ import app.data.WeekList;
 /**
  * Created by Vladimir on 03/01/18.
  **/
-public class ScheduleUnit extends Group {
+public class ScheduleUnit implements Comparable<ScheduleUnit> {
+    private Group group;
     private Week[] weeks = new Week[52];
 
     public ScheduleUnit(Group group) {
-        super(group.getKey(), group.getDepartment(), group.getName());
+        this.group = new Group(group.getKey(), group.getDepartment(), group.getName());
         for (int i = 0; i < 52; i++) {
             weeks[i] = new Week();
         }
@@ -46,8 +47,28 @@ public class ScheduleUnit extends Group {
         return true;
     }
 
+    public Group getGroup() {
+        return group;
+    }
+
     @Override
-    public int compareTo(Group o) {
-        return this.getName().compareTo(o.getName());
+    public int compareTo(ScheduleUnit o) {
+        return this.getGroup().getName().compareTo(o.getGroup().getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ScheduleUnit unit = (ScheduleUnit) o;
+
+        return group != null ? group.equals(unit.group) : unit.group == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return group != null ? group.hashCode() : 0;
     }
 }

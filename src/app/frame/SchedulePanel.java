@@ -126,7 +126,7 @@ public class SchedulePanel extends JPanel{
             for (ScheduleUnit unit : units) {
                 ps = c.prepareStatement("INSERT IGNORE schedules_data(schedule, groups, data) VALUE (?, ?, ?);");
                 ps.setInt(1, schedule_key);
-                ps.setInt(2, unit.getKey());
+                ps.setInt(2, unit.getGroup().getKey());
                 String line = "";
                 for (int i = 0; i < 52; i++) {
                     line += unit.getWeek(i).getMark();
@@ -145,61 +145,16 @@ public class SchedulePanel extends JPanel{
     }
 
     private void settingGroupClick(ActionEvent e) {
-        int[] choice = new int[DegreeProject.GROUPLIST.getList().size()];
-        int count = 0;
-        ArrayList<Group> tList = DegreeProject.GROUPLIST.getList();
-        for (int i = 0; i < tList.size(); i++) {
-            for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
-                if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getName())) {
-                    choice[count++] = i;
-                }
-            }
-        }
-        choice = Arrays.copyOf(choice, count);
-        new GroupChoiceDialog(DegreeProject.GROUPLIST.getList(), choice, this::afterSettingGroup);
-        saveButton.setEnabled(true);
-//        DegreeProject.GROUPLIST.refresh();
-//        ArrayList<Group> groups = new ArrayList<>();
-//        tableModel.getAllScheduleUnits().forEach(a -> groups.add((Group)a));
-//        System.out.println(groups);
-//        ArrayList<Group> outlast = (ArrayList<Group>) new MultiChoiceDialog<>(DegreeProject.GROUPLIST.getList(), groups).showAndGetData();
-//        ArrayList<ScheduleUnit> outlastScheduleUnits = new ArrayList<>();
-//        tableModel.getAllScheduleUnits().stream().filter(outlast::remove).forEach(outlastScheduleUnits::add);
-//        outlast.forEach(item -> outlastScheduleUnits.add(new ScheduleUnit(item)));
-//        tableModel.setUnits(outlastScheduleUnits);
-//        tableModel.fireTableStructureChanged();
-//        tableModel.fireTableDataChanged();
-    }
-
-    private void afterSettingGroup(ArrayList<Group> list) {
-        ArrayList<ScheduleUnit> listFromTable = new ArrayList<>(tableModel.getSizeScheduleUnits());
-        ScheduleUnit tScheduleUnit;
-
-        for (int i = tableModel.getSizeScheduleUnits() - 1; i >= 0; i--) {
-            tScheduleUnit = tableModel.removeScheduleUnit(i);
-            for (Group aListFromFrame : list) {
-                if (tScheduleUnit.getName().equals(aListFromFrame.getName())) {
-                    listFromTable.add(tScheduleUnit);
-                }
-            }
-        }
-
-        Group tGroup;
-        boolean b = false;
-        for (Group aListFromFrame : list) {
-            tGroup = aListFromFrame;
-            for (ScheduleUnit aListFromTable : listFromTable) {
-                if (aListFromTable.getName().equals(tGroup.getName())) {
-                    b = true;
-                }
-            }
-            if (!b) listFromTable.add(new ScheduleUnit(tGroup));
-            b = false;
-        }
-
-        for (ScheduleUnit unit :listFromTable) {
-            tableModel.addScheduleUnit(unit);
-        }
+        DegreeProject.GROUPLIST.refresh();
+        ArrayList<Group> existsGroups = new ArrayList<>();
+        tableModel.getAllScheduleUnits().forEach(a -> existsGroups.add(a.getGroup()));
+        ArrayList<Group> outlastGroups = (ArrayList<Group>) new MultiChoiceDialog<>(DegreeProject.GROUPLIST.getList(), existsGroups).showAndGetData();
+        ArrayList<ScheduleUnit> outlastScheduleUnits = new ArrayList<>();
+        tableModel.getAllScheduleUnits().stream().filter(item -> outlastGroups.remove(item.getGroup())).forEach(outlastScheduleUnits::add);
+        outlastGroups.forEach(item -> outlastScheduleUnits.add(new ScheduleUnit(item)));
+        tableModel.setUnits(outlastScheduleUnits);
+        tableModel.fireTableStructureChanged();
+        tableModel.fireTableDataChanged();
     }
 
     private void initialComboBox() {
@@ -344,37 +299,6 @@ public class SchedulePanel extends JPanel{
             }
 
         });
-//Скрипт який виводить підсказки, хаває сильно багато процесорного часу
-//        jTable.addMouseMotionListener(new MouseMotionListener() {
-//            boolean b = false;
-//            @Override
-//            public void mouseDragged(MouseEvent e) {
-//
-//            }
-//
-//            @Override
-//            public void mouseMoved(MouseEvent e) {
-//                if (b) {
-//                    b = false;
-//                    return;
-//                }
-//                String result = "";
-//                int column = jTable.columnAtPoint(e.getPoint());
-//                int row = jTable.rowAtPoint(e.getPoint());
-//                if (column != - 1 || row != -1) {
-//                    Object o = jTable.getValueAt(row, column);
-//                    if (o.getClass() == Week.class) {
-//                        result = ((Week)o).getName();
-//                    } else if (o.getClass() == Integer.class) {
-//                        result = String.valueOf(o);
-//                    } else {
-//                        result = (String)o;
-//                    }
-//                }
-//                jTable.setToolTipText(result);
-//                b = !b;
-//            }
-//        });
     }
 
     private void mouseClickEvent(MouseEvent e) {
@@ -390,7 +314,7 @@ public class SchedulePanel extends JPanel{
     private void UpdateScheduleLabels(ScheduleUnit tScheduleUnit) {
         if (tScheduleUnit == null) return;
         // Виводить назву групи
-        groupNameLabel.setText(tScheduleUnit.getName());
+        groupNameLabel.setText(tScheduleUnit.getGroup().getName());
 
         // Виводить кількість навчальних днів
         Period tPeriod;

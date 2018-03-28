@@ -171,7 +171,7 @@ public class SchedulerTableModel extends AbstractTableModel {
         }
 //Дані
         for (int i = 0; i < units.size(); i++) {
-            Group group = units.get(i);
+            Group group = units.get(i).getGroup();
             Row groupRow = sheet.createRow(4 + trRow + i);
             Cell nameCell = groupRow.createCell(trCell);
             nameCell.setCellStyle(monthStyle);
@@ -265,7 +265,7 @@ public class SchedulerTableModel extends AbstractTableModel {
                 case 0: return "<html><b>Період</b></html>";
                 case 1: return "<html><b>Робочих днів</b></html>";
                 case 2: return "<html><b>Тиждень</b></html>";
-                default: return units.get(rowIndex - 3).getName();
+                default: return units.get(rowIndex - 3).getGroup().getName();
             }
             default: switch (rowIndex) {
                 case 0:  {
