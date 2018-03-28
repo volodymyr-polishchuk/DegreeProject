@@ -6,9 +6,6 @@ import app.data.Period;
 import app.data.Week;
 import app.schedules.ScheduleUnit;
 import app.schedules.SchedulerTableModel;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 import javax.swing.*;
@@ -19,13 +16,11 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-import static javax.swing.JOptionPane.NO_OPTION;
 import static javax.swing.JOptionPane.YES_OPTION;
 
 /**
@@ -150,9 +145,9 @@ public class SchedulePanel extends JPanel{
     }
 
     private void settingGroupClick(ActionEvent e) {
-        int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
+        int[] choice = new int[DegreeProject.GROUPLIST.getList().size()];
         int count = 0;
-        ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
+        ArrayList<Group> tList = DegreeProject.GROUPLIST.getList();
         for (int i = 0; i < tList.size(); i++) {
             for (int j = 0; j < tableModel.getAllScheduleUnits().size(); j++) {
                 if (tList.get(i).getName().equals(tableModel.getAllScheduleUnits().get(j).getName())) {
@@ -161,8 +156,19 @@ public class SchedulePanel extends JPanel{
             }
         }
         choice = Arrays.copyOf(choice, count);
-        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
+        new GroupChoiceDialog(DegreeProject.GROUPLIST.getList(), choice, this::afterSettingGroup);
         saveButton.setEnabled(true);
+//        DegreeProject.GROUPLIST.refresh();
+//        ArrayList<Group> groups = new ArrayList<>();
+//        tableModel.getAllScheduleUnits().forEach(a -> groups.add((Group)a));
+//        System.out.println(groups);
+//        ArrayList<Group> outlast = (ArrayList<Group>) new MultiChoiceDialog<>(DegreeProject.GROUPLIST.getList(), groups).showAndGetData();
+//        ArrayList<ScheduleUnit> outlastScheduleUnits = new ArrayList<>();
+//        tableModel.getAllScheduleUnits().stream().filter(outlast::remove).forEach(outlastScheduleUnits::add);
+//        outlast.forEach(item -> outlastScheduleUnits.add(new ScheduleUnit(item)));
+//        tableModel.setUnits(outlastScheduleUnits);
+//        tableModel.fireTableStructureChanged();
+//        tableModel.fireTableDataChanged();
     }
 
     private void afterSettingGroup(ArrayList<Group> list) {

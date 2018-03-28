@@ -52,7 +52,7 @@ public class GroupList {
         return -1;
     }
 
-    public ArrayList<Group> GetAllWeek() {
+    public ArrayList<Group> getList() {
         return list;
     }
 

@@ -344,47 +344,13 @@ public class LessonsPanel extends JPanel{
 
     private void settingGroupClick(ActionEvent e) {
         DegreeProject.GROUPLIST.refresh();
-        int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
-        int count = 0;
-        ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
-        for (int i = 0; i < tList.size(); i++) {
-            for (int j = 0; j < lessonTableModel.units.size(); j++) {
-                if (tList.get(i).equals(lessonTableModel.units.get(j).getGroup())) {
-                    choice[count++] = i;
-                }
-            }
-        }
-        choice = Arrays.copyOf(choice, count);
-        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
-    }
-
-    private void afterSettingGroup(ArrayList<Group> list) {
-        ArrayList<LessonsUnit> listFromTable = new ArrayList<>(lessonTableModel.units);
-        LessonsUnit tLessonUnit;
-
-        for (int i = lessonTableModel.units.size() - 1; i >= 0; i--) {
-            tLessonUnit = lessonTableModel.units.remove(i);
-            for (Group group : list) {
-                if (tLessonUnit.getGroup().equals(group)) {
-                    listFromTable.add(tLessonUnit);
-                }
-            }
-        }
-
-        Group tGroup;
-        boolean b = false;
-        for (Group group : list) {
-            tGroup = group;
-            for (LessonsUnit lessonsUnit : listFromTable) {
-                if (lessonsUnit.getGroup().equals(tGroup)) {
-                    b = true;
-                }
-            }
-            if (!b) listFromTable.add(new LessonsUnit(tGroup, PAIR_IN_DAY, DAY_AT_WEEK));
-            b = false;
-        }
-        Collections.sort(listFromTable, (o1, o2) -> o1.getGroup().getName().compareTo(o2.getGroup().getName()));
-        lessonTableModel.units.addAll(listFromTable);
+        ArrayList<Group> groups = new ArrayList<>();
+        lessonTableModel.units.forEach(lu -> groups.add(lu.getGroup()));
+        ArrayList<Group> outlast = (ArrayList<Group>) new MultiChoiceDialog<>(DegreeProject.GROUPLIST.getList(), groups).showAndGetData();
+        ArrayList<LessonsUnit> outlastLessonsUnits = new ArrayList<>();
+        lessonTableModel.units.stream().filter(lessonsUnit -> outlast.remove(lessonsUnit.getGroup())).forEach(outlastLessonsUnits::add);
+        outlast.forEach(item -> outlastLessonsUnits.add(new LessonsUnit(item, PAIR_IN_DAY, DAY_AT_WEEK)));
+        lessonTableModel.units = outlastLessonsUnits;
         lessonTableModel.fireTableStructureChanged();
         lessonTableModel.fireTableDataChanged();
     }
