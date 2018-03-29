@@ -37,7 +37,7 @@ public class DegreeProject {
     private static void setCustomLookAndFeel() {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
-            UIManager.put("OptionPane.yesButtonText"   , "Да");
+            UIManager.put("OptionPane.yesButtonText"   , "Так");
             UIManager.put("OptionPane.noButtonText"    , "Ні");
             UIManager.put("OptionPane.cancelButtonText", "Відміна");
             UIManager.put("OptionPane.okButtonText"    , "Готово");

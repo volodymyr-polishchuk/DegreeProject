@@ -27,7 +27,7 @@ public class ScheduleChoiceDialog extends JDialog {
 
     public ScheduleChoiceDialog(Connection connection) {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(300, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
         setModal(true);
@@ -59,8 +59,6 @@ public class ScheduleChoiceDialog extends JDialog {
     public void onChoice(String args) {
         String year = args.split(" ")[2];
         ArrayList<ScheduleUnit> units = new ArrayList<>();
-        HashSet<Group> groups = new HashSet<>();
-//        HashMap<Integer, String> department = new HashMap<>();
         try (Statement st = connection.createStatement()) {
             ResultSet rsKey = st.executeQuery("SELECT * FROM schedules WHERE period = '" + year + "';");
             int key = 0;

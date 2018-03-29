@@ -46,11 +46,11 @@ public class LessonsPanel extends JPanel{
     private JButton nextPeriodButton;
     private JLabel periodLabel;
     private JButton rButton;
-    private JButton cButton;
     private ButtonGroup buttonGroup;
     private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
     private PopupMenu tablePopupMenu = new PopupMenu();
+    private Point cursor = new Point();
     /**
      * Кількість пар в одному дні
      */
@@ -221,7 +221,6 @@ public class LessonsPanel extends JPanel{
                 e.printStackTrace();
             }
         }
-
     }
 
     private void prevPeriodButtonClick(ActionEvent event) {
@@ -467,8 +466,9 @@ public class LessonsPanel extends JPanel{
         });
 
         lessonTableModel.addTableModelListener(this::tableModelChange);
-        tablePopupMenu.add(new MenuItem("Редагувати"));
-        tablePopupMenu.add(new MenuItem("Очистити"));
+        tablePopupMenu.add(new MenuItem("Редагувати")).addActionListener(e -> {});
+        tablePopupMenu.add(new MenuItem("Очистити")).addActionListener(
+                e -> lessonTableModel.setValueAt(new EmptyStudyPair(), jTable.rowAtPoint(cursor), jTable.columnAtPoint(cursor)));
         jTable.add(tablePopupMenu);
     }
 
@@ -809,11 +809,31 @@ public class LessonsPanel extends JPanel{
             int column = jTable.columnAtPoint(e.getPoint());
             lessonTableModel.setValueAt(nowStudyPair, row, column);
             analyzeTable(row, column);
+        } else if (e.getButton() == MouseEvent.BUTTON2) {
+            int row = jTable.rowAtPoint(e.getPoint());
+            int column = jTable.columnAtPoint(e.getPoint());
+            Object o = jTable.getValueAt(row, column);
+            if (o instanceof StudyPairLonely) {
+                StudyPairLonely lonely = (StudyPairLonely) o;
+                lessonCBox.setSelectedItem(lonely.getLesson());
+                teacherCBox.setSelectedItem(lonely.getTeacher());
+                auditoryCBox.setSelectedItem(lonely.getAuditory());
+            } else if (o instanceof StudyPairDouble) {
+                StudyPairDouble pairDouble = (StudyPairDouble) o;
+                if (!pairDouble.getNumerator().equals(nowStudyPair) && !pairDouble.getNumerator().isEmpty()) {
+                    lessonCBox.setSelectedItem(pairDouble.getNumerator().getLesson());
+                    teacherCBox.setSelectedItem(pairDouble.getNumerator().getTeacher());
+                    auditoryCBox.setSelectedItem(pairDouble.getNumerator().getAuditory());
+                } else if (!pairDouble.getDenominator().equals(nowStudyPair) && !pairDouble.getDenominator().isEmpty()) {
+                    lessonCBox.setSelectedItem(pairDouble.getDenominator().getLesson());
+                    teacherCBox.setSelectedItem(pairDouble.getDenominator().getTeacher());
+                    auditoryCBox.setSelectedItem(pairDouble.getDenominator().getAuditory());
+                }
+            }
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             tablePopupMenu.show(jTable, e.getX(), e.getY());
-        } /*else if (!e.isPopupTrigger()) {
-
-        }*/
+            cursor = e.getPoint();
+        }
     }
 
     private void analyzeTable(int row, int column) {
