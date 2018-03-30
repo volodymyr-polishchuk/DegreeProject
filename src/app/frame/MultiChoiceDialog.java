@@ -2,6 +2,8 @@ package app.frame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ public class MultiChoiceDialog<E> extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private JLabel selectedItemsLabel;
+    private JButton choiceAllButton;
     private List<E> inList;
     private boolean closeFlag = false;
 
@@ -48,7 +51,19 @@ public class MultiChoiceDialog<E> extends JDialog {
         });
         selectedList.forEach(e -> mainList.addSelectionInterval(listModel.indexOf(e), listModel.indexOf(e)));
         selectedItemsLabel.setText(mainList.getSelectedIndices().length + " елементів обрано");
-        mainList.addListSelectionListener(e -> selectedItemsLabel.setText(mainList.getSelectedIndices().length + " елементів обрано"));
+        mainList.addListSelectionListener(e -> {
+            selectedItemsLabel.setText(mainList.getSelectedIndices().length + " елементів обрано");
+            choiceAllButton.setText("Обрати все");
+        });
+        choiceAllButton.addActionListener(e -> {
+            if (choiceAllButton.getText().equals("Обрати все")) {
+                mainList.addSelectionInterval(0, mainList.getModel().getSize() - 1);
+                choiceAllButton.setText("Прибрати все");
+            } else {
+                mainList.removeSelectionInterval(0, mainList.getModel().getSize() - 1);
+                choiceAllButton.setText("Обрати все");
+            }
+        });
     }
 
     public List<E> showAndGetData() {

@@ -42,6 +42,16 @@ public class LessonChoiceDialog extends JDialog {
         });
 
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        jList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+                    buttonOK.doClick();
+                }
+            }
+        });
     }
 
     private void listData() {

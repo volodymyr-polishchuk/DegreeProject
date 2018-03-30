@@ -46,9 +46,9 @@ public class SchedulePanel extends JPanel{
         setName(name);
         setLayout(new GridLayout());
         add(mainPanel);
-        InitialTable();
+        initialTable();
         settingGroupButton.addActionListener(this::settingGroupClick);
-        InitialYearsPanel();
+        initialYearsPanel();
         initialComboBox();
         saveButton.addActionListener(this::saveButtonClick);
         exportButton.addActionListener(this::exportButtonClick);
@@ -183,7 +183,7 @@ public class SchedulePanel extends JPanel{
         });
     }
 
-    private void InitialYearsPanel() {
+    private void initialYearsPanel() {
         yearsLabel.setText(Calendar.getInstance().get(Calendar.YEAR) + "-" + (Calendar.getInstance().get(Calendar.YEAR) + 1));
         prevYearButton.addActionListener(e -> {
             String[] lines = yearsLabel.getText().split("-");
@@ -209,7 +209,7 @@ public class SchedulePanel extends JPanel{
         });
     }
 
-    private void InitialTable() {
+    private void initialTable() {
         tableModel = new SchedulerTableModel();
         tableModel.addTableModelListener(event -> {
             jTable.setRowHeight(0, 70);
@@ -234,7 +234,20 @@ public class SchedulePanel extends JPanel{
             int col = 0;
             @Override
             public void mouseClicked(MouseEvent e) {
-                mouseClickEvent(e);
+                switch (e.getButton()) {
+                    case MouseEvent.BUTTON1: mouseClickEvent(e);
+                        break;
+                    case MouseEvent.BUTTON2: {
+                        int row = jTable.rowAtPoint(e.getPoint());
+                        int col = jTable.columnAtPoint(e.getPoint());
+                        try {
+                            Week week = (Week) jTable.getValueAt(row, col);
+                            jComboBox.setSelectedItem(week);
+                        } catch (ClassCastException ex) {
+                            ex.printStackTrace();
+                        }
+                    } break;
+                }
             }
 
             @Override

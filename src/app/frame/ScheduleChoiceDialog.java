@@ -7,6 +7,8 @@ import app.schedules.ScheduleUnit;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,6 +55,16 @@ public class ScheduleChoiceDialog extends JDialog {
 
         cancelButton.addActionListener(e -> {
             dispose();
+        });
+        jList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+                    choiceButton.doClick();
+                }
+            }
         });
     }
 

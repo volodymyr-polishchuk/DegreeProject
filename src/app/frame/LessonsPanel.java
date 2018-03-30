@@ -466,7 +466,9 @@ public class LessonsPanel extends JPanel{
         });
 
         lessonTableModel.addTableModelListener(this::tableModelChange);
-        tablePopupMenu.add(new MenuItem("Редагувати")).addActionListener(e -> {});
+        tablePopupMenu.add(new MenuItem("Редагувати")).addActionListener(e -> {
+
+        });
         tablePopupMenu.add(new MenuItem("Очистити")).addActionListener(
                 e -> lessonTableModel.setValueAt(new EmptyStudyPair(), jTable.rowAtPoint(cursor), jTable.columnAtPoint(cursor)));
         jTable.add(tablePopupMenu);
