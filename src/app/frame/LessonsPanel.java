@@ -807,11 +807,35 @@ public class LessonsPanel extends JPanel{
 
     private void mouseTableClick(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
+
             int row = jTable.rowAtPoint(e.getPoint());
             int column = jTable.columnAtPoint(e.getPoint());
+
+            String warningLog = "";
+            HashMap<StudyPair.Forbidden, HashSet<Point>> hashMap = lessonTableModel.getfMap();
+            for (HashMap.Entry<StudyPair.Forbidden, HashSet<Point>> item : hashMap.entrySet()) {
+                for (Point point : item.getValue()) {
+                    if (point.getX() == row) {
+                        warningLog += item.getKey().name() + "; ";
+                    }
+                }
+            }
+            if (warningLog.length() > 0) {
+                if (JOptionPane.showConfirmDialog(
+                        null,
+                        "Знайдено " + warningLog + ". Продовжити?",
+                        "Повідомлення",
+                        JOptionPane.YES_NO_OPTION)
+                        != JOptionPane.YES_OPTION) {
+                    return;
+                }
+
+            }
             lessonTableModel.setValueAt(nowStudyPair, row, column);
             analyzeTable(row, column);
+
         } else if (e.getButton() == MouseEvent.BUTTON2) {
+
             int row = jTable.rowAtPoint(e.getPoint());
             int column = jTable.columnAtPoint(e.getPoint());
             Object o = jTable.getValueAt(row, column);
@@ -832,9 +856,12 @@ public class LessonsPanel extends JPanel{
                     auditoryCBox.setSelectedItem(pairDouble.getDenominator().getAuditory());
                 }
             }
+
         } else if (e.getButton() == MouseEvent.BUTTON3) {
+
             tablePopupMenu.show(jTable, e.getX(), e.getY());
             cursor = e.getPoint();
+
         }
     }
 

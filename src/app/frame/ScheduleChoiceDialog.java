@@ -7,6 +7,7 @@ import app.schedules.ScheduleUnit;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -14,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -23,7 +23,7 @@ public class ScheduleChoiceDialog extends JDialog {
     private JButton choiceButton;
     private JButton cancelButton;
     private JList<String> jList;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
     private Connection connection;
 
@@ -35,7 +35,7 @@ public class ScheduleChoiceDialog extends JDialog {
         setModal(true);
         setTitle("Перегляд/редагування графіку навчання");
 
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         jList.setModel(listModel);
         this.connection = connection;
 
@@ -66,6 +66,8 @@ public class ScheduleChoiceDialog extends JDialog {
                 }
             }
         });
+
+        contentPane.registerKeyboardAction(e -> cancelButton.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     public void onChoice(String args) {
