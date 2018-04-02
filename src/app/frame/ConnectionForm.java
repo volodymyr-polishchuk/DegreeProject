@@ -287,17 +287,8 @@ public class ConnectionForm extends JFrame{
             statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('6', 'Екзаменаційна сесія', -5317, 'С');");
             statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('7', 'Дипломне проектування', -16777216, 'Ш');");
             statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('8', 'Державна атестація', -43230, 'Д');");
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/asfsc_weeks.sql"), Charset.forName("UTF-8")));
-//            reader.lines().forEach(s -> {
-//                try {
-//                    statement.execute(s);
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//            reader.close();
             jProgressBar.setValue(20);
-        } catch (SQLException /*| IOException*/ e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
