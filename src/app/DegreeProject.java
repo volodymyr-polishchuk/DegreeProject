@@ -50,14 +50,19 @@ public class DegreeProject {
         new Thread(() -> {
             try {
                 while (true) {
-                    Thread.sleep(1000 * 20);
+                    Thread.sleep(1000 * 10);
                     if (!databaseData.getConnection().isValid(10)) {
-                        int r = JOptionPane.showConfirmDialog(null, "З'єднання розірвано!\nДа - зачекати, Ні - вийти", "Повідомлення", JOptionPane.YES_NO_OPTION);
+                        int r = JOptionPane.showConfirmDialog(null, "З'єднання розірвано!\n"
+                                + UIManager.get("OptionPane.yesButtonText") + " - зачекати, "
+                                + UIManager.get("OptionPane.noButtonText") + " - вийти", "Повідомлення", JOptionPane.YES_NO_OPTION);
                         if (r == JOptionPane.NO_OPTION) {
                             DegreeProject.mainForm.getMainFormMenuBar().MenuItemReconnect(null);
+                            return;
+                        } else {
+                            if (DegreeProject.databaseData.reconnect()) {
+                                JOptionPane.showMessageDialog(null, "З'єднання відновлено", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                            }
                         }
-                        else Thread.sleep(1000 * 10);
-                        return;
                     }
                 }
             } catch (SQLException | InterruptedException e) {

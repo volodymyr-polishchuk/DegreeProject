@@ -29,7 +29,7 @@ public class MainFormMenuBar extends JMenuBar {
         programMenu.add(new JMenuItem("Виконати підключення до іншого сервера")).addActionListener(this::MenuItemReconnect);
         programMenu.add(new JMenuItem("Налаштування")).addActionListener(this::MenuItemSetting);
         programMenu.add(new JPopupMenu.Separator());
-        programMenu.add(new JMenuItem("Консоль"));
+        programMenu.add(new JMenuItem("Консоль")).addActionListener(e -> new SQLConsole(DegreeProject.databaseData.getConnection()).setVisible(true));
         programMenu.add(new JPopupMenu.Separator());
         programMenu.add(new JMenuItem("Вихід")).addActionListener(this::MenuItemExit);
         add(programMenu);
