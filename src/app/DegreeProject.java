@@ -83,8 +83,8 @@ public class DegreeProject {
             }
         });
         try {
-            WEEKLIST = new WeekList(databaseData.getConnection());
-            GROUPLIST = new GroupList(databaseData.getConnection());
+            WEEKLIST = new WeekList();
+            GROUPLIST = new GroupList();
         } catch (SQLException e) {
             e.printStackTrace();
         }

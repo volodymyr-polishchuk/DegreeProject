@@ -811,24 +811,41 @@ public class LessonsPanel extends JPanel{
             int row = jTable.rowAtPoint(e.getPoint());
             int column = jTable.columnAtPoint(e.getPoint());
 
-            String warningLog = "";
+//            String warningLog = "";
+            HashSet<StudyPair.Forbidden> forbiddens = new HashSet<>();
             HashMap<StudyPair.Forbidden, HashSet<Point>> hashMap = lessonTableModel.getfMap();
             for (HashMap.Entry<StudyPair.Forbidden, HashSet<Point>> item : hashMap.entrySet()) {
                 for (Point point : item.getValue()) {
                     if (point.getX() == row) {
-                        warningLog += item.getKey().name() + "; ";
+                        forbiddens.add(item.getKey());
+//                        warningLog += item.getKey().name() + "; ";
                     }
                 }
             }
-            if (warningLog.length() > 0) {
-                if (JOptionPane.showConfirmDialog(
-                        null,
-                        "Знайдено " + warningLog + ". Продовжити?",
-                        "Повідомлення",
-                        JOptionPane.YES_NO_OPTION)
-                        != JOptionPane.YES_OPTION) {
-                    return;
+            if (!forbiddens.isEmpty()) {
+                if (forbiddens.contains(StudyPair.Forbidden.ROW_FORBIDDEN)) {
+                    int r = JOptionPane.showConfirmDialog(
+                            null,
+                            "Ви намагаєтеся встановити аудиторію або виклачадача, \nякий зайнятий у цей час. Продовжити?",
+                            "Повідомлення", JOptionPane.YES_NO_OPTION
+                    );
+                    if (r == JOptionPane.NO_OPTION) return;
+                } else if (forbiddens.contains(StudyPair.Forbidden.DAY_FORBIDDEN)) {
+                    int r = JOptionPane.showConfirmDialog(
+                            null,
+                            "Викладач виявив бажання залишатися вільним в цей час. Продовжити?",
+                            "Повідомлення", JOptionPane.YES_NO_OPTION
+                    );
+                    if (r == JOptionPane.NO_OPTION) return;
                 }
+//                if (JOptionPane.showConfirmDialog(
+//                        null,
+//                        "Знайдено " + warningLog + ". Продовжити?",
+//                        "Повідомлення",
+//                        JOptionPane.YES_NO_OPTION)
+//                        != JOptionPane.YES_OPTION) {
+//                    return;
+//                }
 
             }
             lessonTableModel.setValueAt(nowStudyPair, row, column);

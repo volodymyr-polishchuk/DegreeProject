@@ -19,7 +19,6 @@ public class DatabaseData {
 
     public boolean reconnect() {
         try {
-//            this.connection.
             this.connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "/" + this.databaseName + "?useSSL=false",
                     this.user, this.password);
             return true;

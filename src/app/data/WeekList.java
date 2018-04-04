@@ -1,5 +1,7 @@
 package app.data;
 
+import app.DegreeProject;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -9,16 +11,14 @@ import java.util.ArrayList;
 
 public class WeekList {
     private ArrayList<Week> list = new ArrayList<>();
-    private Connection connection;
 
-    public WeekList(Connection connection) throws SQLException {
-        this.connection = connection;
+    public WeekList() throws SQLException {
         loadFromDatabase();
     }
 
     private void loadFromDatabase() throws SQLException {
         //Завантажуємо з бази даних дані
-        Statement statement = connection.createStatement();
+        Statement statement = DegreeProject.databaseData.getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM weeks");
         list.clear();
         while (resultSet.next()) {

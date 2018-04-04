@@ -1,5 +1,7 @@
 package app.data;
 
+import app.DegreeProject;
+
 import javax.swing.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,17 +14,15 @@ import java.util.ArrayList;
  **/
 public class GroupList {
     ArrayList<Group> list;
-    Connection connection;
 
-    public GroupList(Connection connection) throws SQLException {
-        this.connection = connection;
+    public GroupList() throws SQLException {
         list = new ArrayList<>();
         loadFromDatabase();
     }
 
     private void loadFromDatabase() {
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = DegreeProject.databaseData.getConnection().createStatement();
             ResultSet rs = statement.executeQuery("SELECT * FROM groups JOIN departments ON departments.k = groups.department");
             list.clear();
             while (rs.next()) {
