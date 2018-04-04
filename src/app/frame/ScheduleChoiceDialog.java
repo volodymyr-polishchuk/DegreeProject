@@ -7,12 +7,14 @@ import app.schedules.ScheduleUnit;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -21,19 +23,19 @@ public class ScheduleChoiceDialog extends JDialog {
     private JButton choiceButton;
     private JButton cancelButton;
     private JList<String> jList;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
     private Connection connection;
 
     public ScheduleChoiceDialog(Connection connection) {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(300, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
         setModal(true);
         setTitle("Перегляд/редагування графіку навчання");
 
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         jList.setModel(listModel);
         this.connection = connection;
 
@@ -54,13 +56,23 @@ public class ScheduleChoiceDialog extends JDialog {
         cancelButton.addActionListener(e -> {
             dispose();
         });
+        jList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+                    choiceButton.doClick();
+                }
+            }
+        });
+
+        contentPane.registerKeyboardAction(e -> cancelButton.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     public void onChoice(String args) {
         String year = args.split(" ")[2];
         ArrayList<ScheduleUnit> units = new ArrayList<>();
-        HashSet<Group> groups = new HashSet<>();
-//        HashMap<Integer, String> department = new HashMap<>();
         try (Statement st = connection.createStatement()) {
             ResultSet rsKey = st.executeQuery("SELECT * FROM schedules WHERE period = '" + year + "';");
             int key = 0;

@@ -23,15 +23,21 @@ public class DegreeProject {
     public static String defaultDB = "asfsc";
 
     public static void main(String[] args) throws IOException, SQLException {
-        setCustomLookAndFeel();
-        ConnectionForm connectionForm = new ConnectionForm(true);
-        connectionForm.setVisible(true);
+        try {
+            setCustomLookAndFeel();
+            ConnectionForm connectionForm = new ConnectionForm(true);
+            connectionForm.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            throw e;
+        }
     }
 
     private static void setCustomLookAndFeel() {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
-            UIManager.put("OptionPane.yesButtonText"   , "Да");
+            UIManager.put("OptionPane.yesButtonText"   , "Так");
             UIManager.put("OptionPane.noButtonText"    , "Ні");
             UIManager.put("OptionPane.cancelButtonText", "Відміна");
             UIManager.put("OptionPane.okButtonText"    , "Готово");
@@ -44,14 +50,19 @@ public class DegreeProject {
         new Thread(() -> {
             try {
                 while (true) {
-                    Thread.sleep(1000 * 20);
+                    Thread.sleep(1000 * 10);
                     if (!databaseData.getConnection().isValid(10)) {
-                        int r = JOptionPane.showConfirmDialog(null, "З'єднання розірвано!\nДа - зачекати, Ні - вийти", "Повідомлення", JOptionPane.YES_NO_OPTION);
+                        int r = JOptionPane.showConfirmDialog(null, "З'єднання розірвано!\n"
+                                + UIManager.get("OptionPane.yesButtonText") + " - зачекати, "
+                                + UIManager.get("OptionPane.noButtonText") + " - вийти", "Повідомлення", JOptionPane.YES_NO_OPTION);
                         if (r == JOptionPane.NO_OPTION) {
                             DegreeProject.mainForm.getMainFormMenuBar().MenuItemReconnect(null);
+                            return;
+                        } else {
+                            if (DegreeProject.databaseData.reconnect()) {
+                                JOptionPane.showMessageDialog(null, "З'єднання відновлено", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                            }
                         }
-                        else Thread.sleep(1000 * 10);
-                        return;
                     }
                 }
             } catch (SQLException | InterruptedException e) {
@@ -72,8 +83,8 @@ public class DegreeProject {
             }
         });
         try {
-            WEEKLIST = new WeekList(databaseData.getConnection());
-            GROUPLIST = new GroupList(databaseData.getConnection());
+            WEEKLIST = new WeekList();
+            GROUPLIST = new GroupList();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,11 +1,14 @@
 package app.frame;
 
 import app.DegreeProject;
+import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -20,7 +23,7 @@ public class SettingForm extends JDialog {
     private JComboBox<LAFItem> LAFComboBox;
     private JButton dropDatabaseButton;
     private JButton clearDatabaseButton;
-    private JTextField databaseNameTextField;
+//    private JTextField databaseNameTextField;
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -41,7 +44,7 @@ public class SettingForm extends JDialog {
         saveButton.addActionListener(e -> dispose());
         cancelButton.addActionListener(e -> dispose());
 
-        databaseNameTextField.setText(DegreeProject.defaultDB);
+//        databaseNameTextField.setText(DegreeProject.defaultDB);
 
         dropDatabaseButton.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(null, "Ви намагаєтеся видалити базу даних!\nЦі дії відмінити не можливо!\nПродовжити?", "Увага", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -55,7 +58,26 @@ public class SettingForm extends JDialog {
                 }
             }
         });
+
+        clearDatabaseButton.addActionListener(this::clearDatabaseData);
     }
+
+    private void clearDatabaseData(ActionEvent event) {
+        int result = JOptionPane.showConfirmDialog(null, "Ви намагаєтеся видалити всі дані!\nПродовжити?", "Увага", JOptionPane.YES_NO_CANCEL_OPTION);
+        if (result != JOptionPane.YES_OPTION) return;
+        try (Statement statement = DegreeProject.databaseData.getConnection().createStatement();
+             PreparedStatement preparedStatement = DegreeProject.databaseData.getConnection().prepareStatement("DELETE FROM ?")) {
+            ResultSet resultSet = statement.executeQuery("SHOW TABLES;");
+
+            while (resultSet.next()) {
+                preparedStatement.setString(1, resultSet.getString(1));
+            }
+
+            JOptionPane.showMessageDialog(null, "Всі дані успішно видалено!", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+     }
 
     private void lafChoice(ActionEvent event) {
         try {

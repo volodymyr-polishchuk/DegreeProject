@@ -5,6 +5,7 @@ import app.data.*;
 import app.lessons.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
@@ -44,9 +45,12 @@ public class LessonsPanel extends JPanel{
     private JButton prevPeriodButton;
     private JButton nextPeriodButton;
     private JLabel periodLabel;
+    private JButton rButton;
     private ButtonGroup buttonGroup;
     private LessonTableModel lessonTableModel;
     private StudyPair nowStudyPair;
+    private PopupMenu tablePopupMenu = new PopupMenu();
+    private Point cursor = new Point();
     /**
      * Кількість пар в одному дні
      */
@@ -71,11 +75,11 @@ public class LessonsPanel extends JPanel{
         nowStudyPair = new EmptyStudyPair();
         setLayout(new GridLayout());
         add(contentPane);
-        InitialTable();
-        InitialGroupButton();
+        initialTable();
+        initialGroupButton();
         settingButton.addActionListener(this::settingGroupClick);
         saveButton.addActionListener(this::saveButtonClick);
-        InitialData();
+        initialData();
         button1.addActionListener(this::setButtonClick);
         button2.addActionListener(this::setButtonClick);
         button3.addActionListener(this::setButtonClick);
@@ -85,6 +89,7 @@ public class LessonsPanel extends JPanel{
         nextPeriodButton.addActionListener(this::nextPeriodButtonClick);
         prevPeriodButton.addActionListener(this::prevPeriodButtonClick);
         exportButton.addActionListener(this::exportButtonClick);
+        rButton.addActionListener(e -> initialData());
     }
 
     public LessonsPanel(String title) {
@@ -207,6 +212,7 @@ public class LessonsPanel extends JPanel{
                         "Повідомлення",
                         JOptionPane.YES_NO_CANCEL_OPTION
                 );
+                DegreeProject.mainForm.setStatusBar("Дані успішно збережено до файлу " + chooser.getSelectedFile().getPath());
                 if (r == JOptionPane.YES_OPTION) {
                     Desktop.getDesktop().open(chooser.getSelectedFile());
                 }
@@ -215,7 +221,6 @@ public class LessonsPanel extends JPanel{
                 e.printStackTrace();
             }
         }
-
     }
 
     private void prevPeriodButtonClick(ActionEvent event) {
@@ -338,52 +343,18 @@ public class LessonsPanel extends JPanel{
 
     private void settingGroupClick(ActionEvent e) {
         DegreeProject.GROUPLIST.refresh();
-        int[] choice = new int[DegreeProject.GROUPLIST.GetAllWeek().size()];
-        int count = 0;
-        ArrayList<Group> tList = DegreeProject.GROUPLIST.GetAllWeek();
-        for (int i = 0; i < tList.size(); i++) {
-            for (int j = 0; j < lessonTableModel.units.size(); j++) {
-                if (tList.get(i).equals(lessonTableModel.units.get(j).getGroup())) {
-                    choice[count++] = i;
-                }
-            }
-        }
-        choice = Arrays.copyOf(choice, count);
-        new GroupChoiceDialog(DegreeProject.GROUPLIST.GetAllWeek(), choice, this::afterSettingGroup);
-    }
-
-    private void afterSettingGroup(ArrayList<Group> list) {
-        ArrayList<LessonsUnit> listFromTable = new ArrayList<>(lessonTableModel.units);
-        LessonsUnit tLessonUnit;
-
-        for (int i = lessonTableModel.units.size() - 1; i >= 0; i--) {
-            tLessonUnit = lessonTableModel.units.remove(i);
-            for (Group group : list) {
-                if (tLessonUnit.getGroup().equals(group)) {
-                    listFromTable.add(tLessonUnit);
-                }
-            }
-        }
-
-        Group tGroup;
-        boolean b = false;
-        for (Group group : list) {
-            tGroup = group;
-            for (LessonsUnit lessonsUnit : listFromTable) {
-                if (lessonsUnit.getGroup().equals(tGroup)) {
-                    b = true;
-                }
-            }
-            if (!b) listFromTable.add(new LessonsUnit(tGroup, PAIR_IN_DAY, DAY_AT_WEEK));
-            b = false;
-        }
-        Collections.sort(listFromTable, (o1, o2) -> o1.getGroup().getName().compareTo(o2.getGroup().getName()));
-        lessonTableModel.units.addAll(listFromTable);
+        ArrayList<Group> groups = new ArrayList<>();
+        lessonTableModel.units.forEach(lu -> groups.add(lu.getGroup()));
+        ArrayList<Group> outlast = (ArrayList<Group>) new MultiChoiceDialog<>(DegreeProject.GROUPLIST.getList(), groups).showAndGetData();
+        ArrayList<LessonsUnit> outlastLessonsUnits = new ArrayList<>();
+        lessonTableModel.units.stream().filter(lessonsUnit -> outlast.remove(lessonsUnit.getGroup())).forEach(outlastLessonsUnits::add);
+        outlast.forEach(item -> outlastLessonsUnits.add(new LessonsUnit(item, PAIR_IN_DAY, DAY_AT_WEEK)));
+        lessonTableModel.units = outlastLessonsUnits;
         lessonTableModel.fireTableStructureChanged();
         lessonTableModel.fireTableDataChanged();
     }
 
-    private void InitialData() {
+    private void initialData() {
         lessonCBox.addActionListener(e -> {
             if(lessonCBox.getSelectedItem() instanceof Lesson) {
                 Lesson lesson = (Lesson) lessonCBox.getSelectedItem();
@@ -452,7 +423,7 @@ public class LessonsPanel extends JPanel{
         lessonTableModel.updateForbids(nowStudyPair);
     }
 
-    private void InitialGroupButton() {
+    private void initialGroupButton() {
         Border out = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY);
         Border outCenter = BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY);
         Border in = BorderFactory.createEmptyBorder(3, 5, 3, 5);
@@ -472,7 +443,7 @@ public class LessonsPanel extends JPanel{
         return lessonTableModel;
     }
 
-    private void InitialTable() {
+    private void initialTable() {
         lessonTableModel = new LessonTableModel();
         jTable.setModel(lessonTableModel);
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -495,6 +466,12 @@ public class LessonsPanel extends JPanel{
         });
 
         lessonTableModel.addTableModelListener(this::tableModelChange);
+        tablePopupMenu.add(new MenuItem("Редагувати")).addActionListener(e -> {
+
+        });
+        tablePopupMenu.add(new MenuItem("Очистити")).addActionListener(
+                e -> lessonTableModel.setValueAt(new EmptyStudyPair(), jTable.rowAtPoint(cursor), jTable.columnAtPoint(cursor)));
+        jTable.add(tablePopupMenu);
     }
 
     private void tableModelChange(TableModelEvent event) {
@@ -541,7 +518,7 @@ public class LessonsPanel extends JPanel{
                 "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
             };
             final int trCell = 0;
-            final int trRow = 2;
+            final int trRow = 3;
             HSSFWorkbook workbook = new HSSFWorkbook();
             HSSFSheet sheet = workbook.createSheet("Розклад занять за період " + period);
 
@@ -577,6 +554,25 @@ public class LessonsPanel extends JPanel{
             headerCellStyle.cloneStyleFrom(dataCellStyle);
             headerCellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
             headerCellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+            Font headerFont = workbook.createFont();
+            headerFont.setFontHeightInPoints((short) 28);
+            headerCellStyle.setFont(headerFont);
+
+            HSSFCellStyle topHeaderCellStyle = workbook.createCellStyle();
+            topHeaderCellStyle.cloneStyleFrom(headerCellStyle);
+            Font topHeaderFont = workbook.createFont();
+            topHeaderFont.setFontHeightInPoints((short) 32);
+            topHeaderCellStyle.setFont(topHeaderFont);
+
+            if (trRow >= 3) {
+                sheet.addMergedRegion(new CellRangeAddress(trRow - 3, trRow - 2, trCell, trCell + COLUMN_REPEAT * units.size()));
+                Cell cell = sheet.createRow(trRow - 3).createCell(0);
+                cell.setCellStyle(topHeaderCellStyle);
+                String[] lines = periodLabel.getText().split("/");
+                int s = Integer.parseInt(lines[1]);
+                int year = Integer.parseInt(lines[0].split("-")[0]);
+                cell.setCellValue("Розклад занять за " + (s == 1 ? "I" : "II") + " півріччя " + year + " - " + (year + 1));
+            }
 
             HSSFRow headerRow = sheet.createRow(trRow - 1);
             for (int i = 0; i < units.size() * COLUMN_REPEAT; i++) {
@@ -810,10 +806,80 @@ public class LessonsPanel extends JPanel{
     }
 
     private void mouseTableClick(MouseEvent e) {
-        int row = jTable.rowAtPoint(e.getPoint());
-        int column = jTable.columnAtPoint(e.getPoint());
-        lessonTableModel.setValueAt(nowStudyPair, row, column);
-        analyzeTable(row, column);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+
+            int row = jTable.rowAtPoint(e.getPoint());
+            int column = jTable.columnAtPoint(e.getPoint());
+
+//            String warningLog = "";
+            HashSet<StudyPair.Forbidden> forbiddens = new HashSet<>();
+            HashMap<StudyPair.Forbidden, HashSet<Point>> hashMap = lessonTableModel.getfMap();
+            for (HashMap.Entry<StudyPair.Forbidden, HashSet<Point>> item : hashMap.entrySet()) {
+                for (Point point : item.getValue()) {
+                    if (point.getX() == row) {
+                        forbiddens.add(item.getKey());
+//                        warningLog += item.getKey().name() + "; ";
+                    }
+                }
+            }
+            if (!forbiddens.isEmpty()) {
+                if (forbiddens.contains(StudyPair.Forbidden.ROW_FORBIDDEN)) {
+                    int r = JOptionPane.showConfirmDialog(
+                            null,
+                            "Ви намагаєтеся встановити аудиторію або виклачадача, \nякий зайнятий у цей час. Продовжити?",
+                            "Повідомлення", JOptionPane.YES_NO_OPTION
+                    );
+                    if (r == JOptionPane.NO_OPTION) return;
+                } else if (forbiddens.contains(StudyPair.Forbidden.DAY_FORBIDDEN)) {
+                    int r = JOptionPane.showConfirmDialog(
+                            null,
+                            "Викладач виявив бажання залишатися вільним в цей час. Продовжити?",
+                            "Повідомлення", JOptionPane.YES_NO_OPTION
+                    );
+                    if (r == JOptionPane.NO_OPTION) return;
+                }
+//                if (JOptionPane.showConfirmDialog(
+//                        null,
+//                        "Знайдено " + warningLog + ". Продовжити?",
+//                        "Повідомлення",
+//                        JOptionPane.YES_NO_OPTION)
+//                        != JOptionPane.YES_OPTION) {
+//                    return;
+//                }
+
+            }
+            lessonTableModel.setValueAt(nowStudyPair, row, column);
+            analyzeTable(row, column);
+
+        } else if (e.getButton() == MouseEvent.BUTTON2) {
+
+            int row = jTable.rowAtPoint(e.getPoint());
+            int column = jTable.columnAtPoint(e.getPoint());
+            Object o = jTable.getValueAt(row, column);
+            if (o instanceof StudyPairLonely) {
+                StudyPairLonely lonely = (StudyPairLonely) o;
+                lessonCBox.setSelectedItem(lonely.getLesson());
+                teacherCBox.setSelectedItem(lonely.getTeacher());
+                auditoryCBox.setSelectedItem(lonely.getAuditory());
+            } else if (o instanceof StudyPairDouble) {
+                StudyPairDouble pairDouble = (StudyPairDouble) o;
+                if (!pairDouble.getNumerator().equals(nowStudyPair) && !pairDouble.getNumerator().isEmpty()) {
+                    lessonCBox.setSelectedItem(pairDouble.getNumerator().getLesson());
+                    teacherCBox.setSelectedItem(pairDouble.getNumerator().getTeacher());
+                    auditoryCBox.setSelectedItem(pairDouble.getNumerator().getAuditory());
+                } else if (!pairDouble.getDenominator().equals(nowStudyPair) && !pairDouble.getDenominator().isEmpty()) {
+                    lessonCBox.setSelectedItem(pairDouble.getDenominator().getLesson());
+                    teacherCBox.setSelectedItem(pairDouble.getDenominator().getTeacher());
+                    auditoryCBox.setSelectedItem(pairDouble.getDenominator().getAuditory());
+                }
+            }
+
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+
+            tablePopupMenu.show(jTable, e.getX(), e.getY());
+            cursor = e.getPoint();
+
+        }
     }
 
     private void analyzeTable(int row, int column) {

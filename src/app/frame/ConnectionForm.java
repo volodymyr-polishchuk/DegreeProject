@@ -278,17 +278,17 @@ public class ConnectionForm extends JFrame{
             statement.execute(addPrimaryKeyLessonsData5);
             statement.execute("INSERT INTO departments (name) VALUE ('Будівельне відділення')");
             statement.execute("INSERT INTO departments (name) VALUE ('Відділення економіки-програмування')");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/asfsc_weeks.sql"), Charset.forName("UTF-8")));
-            reader.lines().forEach(s -> {
-                try {
-                    statement.execute(s);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            });
-            reader.close();
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('0', 'Навчання', -1, ' ');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('1', 'Канікули', -14575885, 'K');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('2', 'Технологічна практика', -772554, 'Т');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('3', 'Навчальна практика', -1499549, 'Н');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('4', 'Переддипломна практика', -16728876, 'П');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('5', 'Геодезетична практика', -7617718, 'Г');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('6', 'Екзаменаційна сесія', -5317, 'С');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('7', 'Дипломне проектування', -16777216, 'Ш');");
+            statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('8', 'Державна атестація', -43230, 'Д');");
             jProgressBar.setValue(20);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
