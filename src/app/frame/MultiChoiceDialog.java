@@ -64,6 +64,7 @@ public class MultiChoiceDialog<E> extends JDialog {
                 choiceAllButton.setText("Обрати все");
             }
         });
+        setTitle("Оберіть потрібні елементи");
     }
 
     public List<E> showAndGetData() {

@@ -173,7 +173,9 @@ public class MainForm extends JFrame {
     }
 
     public void addEmptyLessonsSchedule() {
-        addTab(new LessonsPanel("Розклад занять"), "Розклад занять");
+        LessonsPanel panel = new LessonsPanel("Розклад занять");
+        addTab(panel, "Розклад занять");
+        panel.showSetting();
     }
 
 }

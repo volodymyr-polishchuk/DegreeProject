@@ -29,6 +29,7 @@ public class ConnectionForm extends JFrame{
     private JButton connectButton;
     private JCheckBox rememberCheckBox;
     private JLabel otherConnectionLabel;
+    private JLabel createTables;
     private boolean autoConnect = false;
     private boolean doConnect = false;
 
@@ -96,6 +97,48 @@ public class ConnectionForm extends JFrame{
             public void keyReleased(KeyEvent e) {
                 super.keyReleased(e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) connectButton.doClick();
+            }
+        });
+        createTables.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                JProgressBar jProgressBar = new JProgressBar(0, 20);
+                jProgressBar.setValue(0);
+                jProgressBar.setStringPainted(true);
+
+                jProgressBar.setPreferredSize(new Dimension(200, 5));
+                JFrame jFrame = new JFrame();
+                jFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                jFrame.setLayout(new GridLayout(4, 1));
+                jFrame.setSize(200, 80);
+                jFrame.setLocationRelativeTo(null);
+                jFrame.add(Box.createVerticalGlue());
+                jFrame.add(new JLabel("Створення бази даних"));
+                jFrame.add(jProgressBar);
+                jFrame.add(Box.createVerticalGlue());
+                jFrame.setResizable(false);
+                jFrame.setUndecorated(true);
+                jFrame.setVisible(true);
+                jFrame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowOpened(WindowEvent e) {
+                        super.windowOpened(e);
+                        new Thread(() -> {
+                            try {
+                                DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
+                                        portTextField.getText(),
+                                        userTextField.getText(),
+                                        passwordField.getPassword());
+                                dataBaseCreate(DegreeProject.databaseData.getConnection(), jProgressBar);
+                                jFrame.dispose();
+                                JOptionPane.showMessageDialog(null, "База успішно створена", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
+                            }
+                        }).start();
+                    }
+                });
             }
         });
     }
@@ -229,7 +272,7 @@ public class ConnectionForm extends JFrame{
             String createGroups = "CREATE TABLE groups (name VARCHAR(256) NOT NULL, department INT(11) NOT NULL, dateofcreate DATE NOT NULL, comments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, CONSTRAINT groups_departments_k_fk FOREIGN KEY (department) REFERENCES departments (k));";
             statement.execute(createGroups);
             jProgressBar.setValue(4);
-            String addPrimaryKeyGroup = "CREATE INDEX groups_departments_k_fk ON groups (department);";
+            String addPrimaryKeyGroup = "CREATE INDEX groups_departmentskfk ON groups (department);";
             statement.execute(addPrimaryKeyGroup);
             jProgressBar.setValue(5);
             String createSchedules = "CREATE TABLE schedules (period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256), k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
@@ -253,7 +296,7 @@ public class ConnectionForm extends JFrame{
             String addPrimaryKeySchedulesData1 = "CREATE INDEX schedule ON schedules_data (schedule);";
             statement.execute(addPrimaryKeySchedulesData1);
             jProgressBar.setValue(12);
-            String addPrimaryKeySchedulesData2 = "CREATE INDEX schedules_data_ibfk_2 ON schedules_data (groups);";
+            String addPrimaryKeySchedulesData2 = "CREATE INDEX schedules_dataibfk2 ON schedules_data (groups);";
             statement.execute(addPrimaryKeySchedulesData2);
             jProgressBar.setValue(13);
             String createLessonsSchedules = "CREATE TABLE lessons_schedules (k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, period VARCHAR(256) NOT NULL, date_of_create DATE NOT NULL, coments VARCHAR(256));";

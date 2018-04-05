@@ -23,6 +23,7 @@ public class SettingForm extends JDialog {
     private JComboBox<LAFItem> LAFComboBox;
     private JButton dropDatabaseButton;
     private JButton clearDatabaseButton;
+    private JButton button1;
 //    private JTextField databaseNameTextField;
 
     public SettingForm() {
@@ -60,6 +61,12 @@ public class SettingForm extends JDialog {
         });
 
         clearDatabaseButton.addActionListener(this::clearDatabaseData);
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
     private void clearDatabaseData(ActionEvent event) {

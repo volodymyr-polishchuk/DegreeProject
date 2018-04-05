@@ -63,13 +63,16 @@ public class Lesson implements StudyData, Comparable<Lesson>{
 
         Lesson lesson = (Lesson) o;
 
-        return name != null ? name.equals(lesson.name) : lesson.name == null;
+        if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
+        return auditory != null ? auditory.equals(lesson.auditory) : lesson.auditory == null;
 
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (auditory != null ? auditory.hashCode() : 0);
+        return result;
     }
 
     @Override

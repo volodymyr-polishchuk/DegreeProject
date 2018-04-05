@@ -354,6 +354,10 @@ public class LessonsPanel extends JPanel{
         lessonTableModel.fireTableDataChanged();
     }
 
+    public void showSetting() {
+        settingButton.doClick();
+    }
+
     private void initialData() {
         lessonCBox.addActionListener(e -> {
             if(lessonCBox.getSelectedItem() instanceof Lesson) {
