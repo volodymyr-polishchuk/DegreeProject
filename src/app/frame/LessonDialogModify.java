@@ -21,7 +21,7 @@ public class LessonDialogModify extends JDialog {
     private JButton cancelButton;
     private JButton saveButton;
     private Lesson lesson;
-    private DefaultComboBoxModel<Auditory> comboBoxModel = new DefaultComboBoxModel<>();
+    private DefaultComboBoxModel<Auditory> auditoryComboBoxModel = new DefaultComboBoxModel<>();
 
     private LessonDialogModify() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -38,7 +38,7 @@ public class LessonDialogModify extends JDialog {
             dispose();
         });
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
-        auditoryComboBox.setModel(comboBoxModel);
+        auditoryComboBox.setModel(auditoryComboBoxModel);
         auditoryComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -50,7 +50,7 @@ public class LessonDialogModify extends JDialog {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
                 ResultSet rs = st.executeQuery("SELECT * FROM auditorys ORDER BY name")){
             while (rs.next()) {
-                comboBoxModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
+                auditoryComboBoxModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -63,6 +63,7 @@ public class LessonDialogModify extends JDialog {
         nameTextField.setText(lesson.getName());
         this.lesson = lesson;
         setTitle("Редагування предметів");
+        auditoryComboBox.setSelectedItem(this.lesson.getAuditory());
     }
 
     @Nullable
@@ -73,7 +74,7 @@ public class LessonDialogModify extends JDialog {
         return dialog.nameTextField.getText().isEmpty() ? null :
                 new Lesson(
                         dialog.nameTextField.getText(),
-                        dialog.comboBoxModel.getElementAt(dialog.auditoryComboBox.getSelectedIndex()));
+                        dialog.auditoryComboBoxModel.getElementAt(dialog.auditoryComboBox.getSelectedIndex()));
     }
 
     public static Lesson getModify(Lesson a) {
@@ -85,6 +86,6 @@ public class LessonDialogModify extends JDialog {
                 new Lesson(
                         dialog.lesson.getKey(),
                         dialog.nameTextField.getText(),
-                        dialog.comboBoxModel.getElementAt(dialog.auditoryComboBox.getSelectedIndex()));
+                        dialog.auditoryComboBoxModel.getElementAt(dialog.auditoryComboBox.getSelectedIndex()));
     }
 }

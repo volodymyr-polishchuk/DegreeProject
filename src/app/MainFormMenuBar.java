@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -70,7 +71,7 @@ public class MainFormMenuBar extends JMenuBar {
         add(helpMenu);
     }
 
-    private void MenuItemHelp(ActionEvent event) {
+    public void MenuItemHelp(ActionEvent event) {
         try {
             Desktop.getDesktop().browse(new URI("https://volodymyr-polishchuk.github.io/DegreeProject/"));
         } catch (IOException | URISyntaxException e) {
@@ -78,11 +79,11 @@ public class MainFormMenuBar extends JMenuBar {
         }
     }
 
-    private void MenuItemAbout(ActionEvent event) {
+    public void MenuItemAbout(ActionEvent event) {
         new AboutFrame().setVisible(true);
     }
 
-    private void MenuItemCheckUpdate(ActionEvent event) {
+    public void MenuItemCheckUpdate(ActionEvent event) {
         try {
             Desktop.getDesktop().browse(new URI("https://github.com/volodymyr-polishchuk/DegreeProject"));
         } catch (IOException | URISyntaxException e1) {
@@ -204,7 +205,7 @@ public class MainFormMenuBar extends JMenuBar {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k")
         ) {
-            TreeSet<Lesson> lessonTreeSet = new TreeSet<>();
+            HashSet<Lesson> lessonTreeSet = new HashSet<>();
             while (rs.next()) {
                 lessonTreeSet.add(
                         new Lesson(

@@ -35,7 +35,7 @@ public class DatabaseData {
         this.password = String.valueOf(password);
         this.databaseName = databaseName;
 
-        connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "/" + this.databaseName + "?useSSL=false",
+        connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "/" + this.databaseName + "?useSSL=false&useUnicode=true&characterEncoding=utf-8",
                 this.user, this.password);
     }
 
@@ -45,7 +45,7 @@ public class DatabaseData {
         this.user = user;
         this.password = String.valueOf(password);
 
-        connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "?useSSL=false", this.user, this.password);
+        connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "?useSSL=false&useUnicode=true&characterEncoding=utf-8", this.user, this.password);
     }
 
     public DatabaseData(Connection connection) {

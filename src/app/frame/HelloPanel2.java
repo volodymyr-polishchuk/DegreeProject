@@ -1,7 +1,5 @@
 package app.frame;
 
-import app.DegreeProject;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,7 +16,7 @@ public class HelloPanel2 extends JPanel {
     private JButton addAuditoryButton;
     private JButton addTeacherButton;
     private JButton addLessonButton;
-    private JButton helpButton;
+    private JButton aboutButton;
     private JButton userHelpButton;
     private MainForm owner;
 
@@ -39,6 +37,7 @@ public class HelloPanel2 extends JPanel {
         addAuditoryButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataAuditory);
         addTeacherButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataTeacher);
         addLessonButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataLesson);
-
+        aboutButton.addActionListener(owner.getMainFormMenuBar()::MenuItemAbout);
+        userHelpButton.addActionListener(owner.getMainFormMenuBar()::MenuItemHelp);
     }
 }
