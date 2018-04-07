@@ -96,7 +96,10 @@ public class SchedulePanel extends JPanel{
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
             String sqlQuery = "SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'";
-            if (statement.execute(sqlQuery)) {
+            ResultSet resultSet = statement.executeQuery(sqlQuery);
+            resultSet.last();
+            int size = resultSet.getRow();
+            if (size > 0) {
                 int rewriteOption = JOptionPane.showConfirmDialog(
                         null,
                         "В базі даних уже існує графік навчання\n\rза цей період. Перезаписати?",

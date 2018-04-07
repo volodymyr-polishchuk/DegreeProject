@@ -270,7 +270,7 @@ public class LessonsPanel extends JPanel{
             ResultSet resultSet = st.executeQuery("SELECT * FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
             if (resultSet.next()) {
                 int inputResult = JOptionPane.showConfirmDialog(null,
-                        "За даний період уже є розклад занять!\n\rПерезаписати?",
+                        "За даний період уже є розклад занять!\nПерезаписати?",
                         "Попередження", JOptionPane.YES_NO_CANCEL_OPTION);
                 if (inputResult != JOptionPane.YES_OPTION) {
                     resultSet.close();

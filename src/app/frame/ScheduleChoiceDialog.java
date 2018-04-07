@@ -102,7 +102,7 @@ public class ScheduleChoiceDialog extends JDialog {
             });
             panel.setPeriod(year);
             dispose();
-            DegreeProject.mainForm.addTab(panel, "Навчальний графік");
+            DegreeProject.mainForm.addTab(panel, "Графік навчального процесу " + year);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
