@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -81,7 +83,7 @@ public class ScheduleChoiceDialog extends JDialog {
             }
             rsKey.close();
             ResultSet rs = st.executeQuery(
-                    "SELECT * FROM schedules_data INNER JOIN groups ON schedules_data.groups = groups.k INNER JOIN departments ON groups.department = departments.k WHERE schedule = '" + key + "'");
+                    "SELECT * FROM schedules_data INNER JOIN groups ON schedules_data.groups = groups.k INNER JOIN departments ON groups.department = departments.k WHERE schedule = '" + key + "' ORDER BY groups.name");
             while (rs.next()) {
                 ScheduleUnit unit = new ScheduleUnit(
                         new Group(
@@ -95,8 +97,9 @@ public class ScheduleChoiceDialog extends JDialog {
                 }
                 units.add(unit);
             }
+            Collections.sort(units);
             rs.close();
-            SchedulePanel panel = new SchedulePanel("Навчальний графік");
+            SchedulePanel panel = new SchedulePanel("Графік навчального процесу " + year);
             units.forEach(unit -> {
                 panel.getTableModel().addScheduleUnit(unit);
             });

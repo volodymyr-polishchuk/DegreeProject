@@ -4,9 +4,6 @@ import app.data.Group;
 import app.data.Week;
 import app.data.WeekList;
 
-/**
- * Created by Vladimir on 03/01/18.
- **/
 public class ScheduleUnit implements Comparable<ScheduleUnit> {
     private Group group;
     private Week[] weeks = new Week[52];

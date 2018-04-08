@@ -5,7 +5,7 @@ import app.data.Group;
 /**
  * Created by Vladimir on 06/02/18.
  **/
-public class LessonsUnit {
+public class LessonsUnit implements Comparable<LessonsUnit> {
     private Group group;
     private StudyPair[] pairs;
     private int pairPerDay;
@@ -43,5 +43,10 @@ public class LessonsUnit {
 
     public int getDayPerWeek() {
         return dayPerWeek;
+    }
+
+    @Override
+    public int compareTo(LessonsUnit o) {
+        return this.getGroup().getName().compareTo(o.getGroup().getName());
     }
 }

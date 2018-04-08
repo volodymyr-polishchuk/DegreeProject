@@ -349,6 +349,7 @@ public class LessonsPanel extends JPanel{
         ArrayList<LessonsUnit> outlastLessonsUnits = new ArrayList<>();
         lessonTableModel.units.stream().filter(lessonsUnit -> outlast.remove(lessonsUnit.getGroup())).forEach(outlastLessonsUnits::add);
         outlast.forEach(item -> outlastLessonsUnits.add(new LessonsUnit(item, PAIR_IN_DAY, DAY_AT_WEEK)));
+        Collections.sort(outlastLessonsUnits);
         lessonTableModel.units = outlastLessonsUnits;
         lessonTableModel.fireTableStructureChanged();
         lessonTableModel.fireTableDataChanged();

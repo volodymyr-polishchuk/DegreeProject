@@ -155,6 +155,7 @@ public class SchedulePanel extends JPanel{
         ArrayList<ScheduleUnit> outlastScheduleUnits = new ArrayList<>();
         tableModel.getAllScheduleUnits().stream().filter(item -> outlastGroups.remove(item.getGroup())).forEach(outlastScheduleUnits::add);
         outlastGroups.forEach(item -> outlastScheduleUnits.add(new ScheduleUnit(item)));
+        Collections.sort(outlastScheduleUnits);
         tableModel.setUnits(outlastScheduleUnits);
         tableModel.fireTableStructureChanged();
         tableModel.fireTableDataChanged();
