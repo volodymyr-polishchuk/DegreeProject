@@ -14,7 +14,7 @@ import java.sql.Statement;
 /**
  * Created by Vladimir on 18/02/18.
  **/
-public class GroupDialogModify extends JDialog{
+public class GroupDialogModify extends JDialog {
     private JTextField nameTextField;
     private JPanel ContentPane;
     private JButton saveButton;

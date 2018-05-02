@@ -58,17 +58,50 @@ public class MainFormMenuBar extends JMenuBar {
         dataMenu.add(new JMenuItem("Предмети")).addActionListener(this::MenuItemDataLesson);
         dataMenu.add(new JPopupMenu.Separator());
         dataMenu.add(new JMenuItem("Групи")).addActionListener(this::MenuItemDataGroup);
+        dataMenu.add(new JPopupMenu.Separator());
+        dataMenu.add(new JMenuItem("Вихідні")).addActionListener(this::MenuItemDataHoliday);
+
         add(dataMenu);
 
 //          Створення меню Довідка
         JMenu helpMenu = new JMenu("Довідка");
-        //TODO Реалізувати форму допомоги користувачеві
         helpMenu.add(new JMenuItem("Допомога користувачеві")).addActionListener(this::MenuItemHelp);
         helpMenu.add(new JMenuItem("Перевірка оновлень")).addActionListener(this::MenuItemCheckUpdate);
-        //TODO Реалізувати форму Про програму
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
         helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemDataHoliday(ActionEvent event) {
+//        StudyData data = new StudyData() {
+//            @Override
+//            public String getName() {
+//                return null;
+//            }
+//
+//            @Override
+//            public void setName(String name) {
+//
+//            }
+//
+//            @Override
+//            public int getKey() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public void setKey(int key) {
+//
+//            }
+//
+//            @Override
+//            public boolean keyExist() {
+//                return false;
+//            }
+//        };
+
+//        DataModifyDialog.getInstance()
+        new HolidayDialogModify();
     }
 
     public void MenuItemHelp(ActionEvent event) {

@@ -9,12 +9,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.HashSet;
 
 /**
@@ -38,14 +36,13 @@ public class ConnectionForm extends JFrame{
         setContentPane(ContentPanel);
         pack();
         setResizable(false);
-        setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize().getWidth() - this.getWidth()) / 2),
-                (int) ((Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight()) / 2));
+        setLocationRelativeTo(null);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowOpened(WindowEvent e) {
-                super.windowOpened(e);
+            public void windowActivated(WindowEvent e) {
+                super.windowActivated(e);
                 if (doConnect && autoConnect) {
-                    connectButton.doClick();
+                    connectionButtonClick(null);
                 }
             }
         });
@@ -153,10 +150,11 @@ public class ConnectionForm extends JFrame{
         try {
             File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-                    new File(new URI(file.getParentFile().toURI() + "/database.txt")))));
+                    new File(new URI(file.getParentFile().toURI() + "/database.ini")))));
             fileDataInput = reader.readLine();
             reader.close();
         } catch (URISyntaxException | IOException e) {
+            System.out.println("File with database data not fount");
             e.printStackTrace();
         }
 
@@ -187,6 +185,7 @@ public class ConnectionForm extends JFrame{
             set.add("lessons_data");    set.add("lessons_schedules");
             set.add("schedules");       set.add("schedules_data");
             set.add("teachers");        set.add("weeks");
+            set.add("holydays");
             while (rs.next()) {
                 if (!set.contains(rs.getString(1))) {
                     JOptionPane.showMessageDialog(
@@ -244,8 +243,7 @@ public class ConnectionForm extends JFrame{
                     default: return;
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Підключення не встановлено. \n\r " +
-                                "Сервер повернув помилку:" + e1.getMessage(),
+                JOptionPane.showMessageDialog(this, "Підключення не вдалося встановити",
                         "Помилка сервера", JOptionPane.ERROR_MESSAGE);
                 e1.printStackTrace();
                 return;
@@ -253,7 +251,6 @@ public class ConnectionForm extends JFrame{
         }
 
         if (rememberCheckBox.isSelected()) rememberMe();
-//        logDate();
         DegreeProject.InitialMainFrame();
         dispose();
     }
@@ -336,28 +333,11 @@ public class ConnectionForm extends JFrame{
         }
     }
 
-    private void logDate() {
-        try {
-            File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    new File(new URI(file.getParentFile().toURI() + "/log.txt")))));
-            writer.write((new Date(System.currentTimeMillis())).toString());
-            writer.flush();
-            writer.close();
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void rememberMe() {
         try {
             File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(
-                                    new File(
-                                            new URI(file.getParentFile().toURI() + "/database.txt")
-                                    ))));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
+                                            new URI(file.getParentFile().toURI() + "/database.ini")))));
             writer.write(addressTextField.getText() + ";");
             writer.write(portTextField.getText() + ";");
             writer.write(userTextField.getText() + ";");

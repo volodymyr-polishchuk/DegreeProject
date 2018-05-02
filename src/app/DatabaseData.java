@@ -75,20 +75,4 @@ public class DatabaseData {
     public Connection getConnection() {
         return connection;
     }
-
-    public void createDatabase() {
-        try {
-            Statement st = connection.createStatement();
-            st.execute("CREATE DATABASE DegreeProjectBase");
-            st.execute("USE DegreeProjectBase;");
-            // Create table weeks
-            st.execute("CREATE TABLE weeks(mark VARCHAR(1)," +
-                    " name VARCHAR(256), " +
-                    " color INTEGER, " +
-                    " abbreviation VARCHAR(16));");
-            // TODO треба описати створення всіх баз даних
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }

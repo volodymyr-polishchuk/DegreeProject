@@ -3,7 +3,7 @@ package app;
 import app.data.GroupList;
 import app.data.WeekList;
 import app.frame.ConnectionForm;
-import app.frame.HelloPanel2;
+import app.frame.IntroFrame;
 import app.frame.MainForm;
 
 import javax.swing.*;
@@ -23,10 +23,19 @@ public class DegreeProject {
     public static String defaultDB = "asfsc";
 
     public static void main(String[] args) throws IOException, SQLException {
+        final IntroFrame introFrame = new IntroFrame();
+        introFrame.setVisible(true);
+        new Thread(() -> {
+            while (introFrame.getImagePanel().nextStep() < introFrame.getImagePanel().getMax()) {
+                try { Thread.sleep(100); } catch (InterruptedException e) {/**/}
+            }
+        }).start();
+
+        setCustomLookAndFeel();
         try {
-            setCustomLookAndFeel();
             ConnectionForm connectionForm = new ConnectionForm(true);
             connectionForm.setVisible(true);
+            introFrame.dispose();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e.getMessage());

@@ -1,12 +1,10 @@
 package app.frame;
 
 import app.DegreeProject;
-import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,8 +21,7 @@ public class SettingForm extends JDialog {
     private JComboBox<LAFItem> LAFComboBox;
     private JButton dropDatabaseButton;
     private JButton clearDatabaseButton;
-    private JButton button1;
-//    private JTextField databaseNameTextField;
+    //    private JTextField databaseNameTextField;
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -61,12 +58,6 @@ public class SettingForm extends JDialog {
         });
 
         clearDatabaseButton.addActionListener(this::clearDatabaseData);
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
     }
 
     private void clearDatabaseData(ActionEvent event) {
