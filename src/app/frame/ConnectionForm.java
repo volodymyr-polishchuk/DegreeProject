@@ -185,7 +185,7 @@ public class ConnectionForm extends JFrame{
             set.add("lessons_data");    set.add("lessons_schedules");
             set.add("schedules");       set.add("schedules_data");
             set.add("teachers");        set.add("weeks");
-            set.add("holydays");
+            set.add("holidays");
             while (rs.next()) {
                 if (!set.contains(rs.getString(1))) {
                     JOptionPane.showMessageDialog(

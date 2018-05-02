@@ -9,10 +9,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -73,35 +70,86 @@ public class MainFormMenuBar extends JMenuBar {
     }
 
     private void MenuItemDataHoliday(ActionEvent event) {
-//        StudyData data = new StudyData() {
-//            @Override
-//            public String getName() {
-//                return null;
-//            }
-//
-//            @Override
-//            public void setName(String name) {
-//
-//            }
-//
-//            @Override
-//            public int getKey() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public void setKey(int key) {
-//
-//            }
-//
-//            @Override
-//            public boolean keyExist() {
-//                return false;
-//            }
-//        };
+        try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM holidays")
+        ) {
+            TreeSet<Holiday> groupTreeSet = new TreeSet<>();
+            while (rs.next()) {
+                groupTreeSet.add(new Holiday(rs.getDate("date"), rs.getBoolean("repeats"), rs.getInt("k")));
+            }
+            Holiday[] inputData = new Holiday[groupTreeSet.size()];
+            int count = 0;
+            for (Holiday holiday : groupTreeSet) inputData[count++] = holiday;
+            StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
+                @Override
+                public StudyData add() {
+                    return HolidayDialogModify.getModify();
+                }
 
-//        DataModifyDialog.getInstance()
-        new HolidayDialogModify();
+                @Override
+                public StudyData edit(StudyData t) {
+                    return HolidayDialogModify.getModify((Holiday) t);
+                }
+
+                @Override
+                public boolean remove(StudyData t) {
+                    return true;
+                }
+
+                @Override
+                public void exit(StudyData[] t) {
+
+                }
+            }, "Налаштування вихідних");
+
+            boolean b = true;
+            if (outputData.length == inputData.length)
+                for (int i = 0; i < outputData.length; i++) {
+                    Holiday in = inputData[i];
+                    Holiday out = (Holiday) outputData[i];
+                    if (!in.equals(out)) {
+                        b = false;
+                        break;
+                    }
+                }
+            else b = false;
+            if (b) return;
+
+            for (Holiday in : inputData) {
+                boolean bool = true;
+                for (StudyData out : outputData) {
+                    if (in.equals(out)) {
+                        bool = false;
+                        break;
+                    }
+                }
+                if (bool) st.execute("DELETE FROM holidays WHERE k LIKE '" + in.getKey() + "'");
+            }
+            PreparedStatement preparedStatement = DegreeProject.databaseData.getConnection().prepareStatement(
+                    "INSERT INTO holidays(date, repeats, k) VALUE (?, ?, ?) ON DUPLICATE KEY UPDATE date = ?, repeats = ?");
+            PreparedStatement preparedStatementElse = DegreeProject.databaseData.getConnection().prepareStatement(
+                    "INSERT INTO holidays(date, repeats) VALUE (?, ?)");
+            for (StudyData item : outputData) {
+                Holiday holiday = (Holiday)item;
+                if (item.keyExist()) {
+                    preparedStatement.setDate(1, new java.sql.Date(holiday.getDate().getTime()));
+                    preparedStatement.setBoolean(2, holiday.getRepeat());
+                    preparedStatement.setInt(3, holiday.getKey());
+                    preparedStatement.execute();
+                } else {
+                    preparedStatementElse.setDate(1, new java.sql.Date(holiday.getDate().getTime()));
+                    preparedStatementElse.setBoolean(2, holiday.getRepeat());
+                    preparedStatementElse.execute();
+                }
+            }
+            preparedStatement.close();
+            preparedStatementElse.close();
+            DegreeProject.mainForm.setStatusBar("Дані успішно збережено до бази даних");
+            JOptionPane.showMessageDialog(null, "Дані успішно змінено");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void MenuItemHelp(ActionEvent event) {

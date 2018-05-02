@@ -1,5 +1,6 @@
 package app.frame;
 
+import app.data.Holiday;
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -11,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 public class HolidayDialogModify extends JDialog {
@@ -19,11 +21,9 @@ public class HolidayDialogModify extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JPanel datePickerPanel;
-    private JButton додатиButton;
-    private JList list1;
-    private JButton видалитиButton;
+    private JCheckBox repeatCheckBox;
 
-    public HolidayDialogModify() {
+    private HolidayDialogModify() {
         initialDatePicker();
         datePickerPanel.setLayout(new FlowLayout());
         datePickerPanel.add(jDatePicker);
@@ -48,7 +48,6 @@ public class HolidayDialogModify extends JDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         pack();
-        setVisible(true);
     }
 
     private void initialDatePicker() {
@@ -72,8 +71,35 @@ public class HolidayDialogModify extends JDialog {
         dispose();
     }
 
+    public static Holiday getModify() {
+        HolidayDialogModify dialogModify = new HolidayDialogModify();
+        dialogModify.setVisible(true);
+        //
+        Calendar calendar = (Calendar) dialogModify.jDatePicker.getJFormattedTextField().getValue();
+        return new Holiday(calendar.getTime(), dialogModify.repeatCheckBox.isSelected());
+    }
+
+    public static Holiday getModify(final Holiday holiday) {
+        HolidayDialogModify dialogModify = new HolidayDialogModify();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(holiday.getDate());
+        dialogModify.jDatePicker.getJFormattedTextField().setValue(calendar);
+        dialogModify.repeatCheckBox.setSelected(holiday.getRepeat());
+        dialogModify.setVisible(true);
+        //
+        Calendar calendar2 = (Calendar) dialogModify.jDatePicker.getJFormattedTextField().getValue();
+        holiday.setDate(calendar2.getTime());
+        holiday.setRepeat(dialogModify.repeatCheckBox.isSelected());
+        return holiday;
+    }
+
     public static void main(String[] args) {
         HolidayDialogModify dialog = new HolidayDialogModify();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(System.currentTimeMillis()));
+        calendar.set(2015, Calendar.SEPTEMBER, 5);
+
+        dialog.jDatePicker.getJFormattedTextField().setValue(calendar);
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
