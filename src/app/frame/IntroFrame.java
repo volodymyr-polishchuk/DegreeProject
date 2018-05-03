@@ -40,7 +40,7 @@ public class IntroFrame extends JFrame {
         private Color[] colors = {new Color(103, 58, 183), new Color(95, 167, 241), new Color(163, 255, 219)};
 
 
-        ImagePanel() {
+        public ImagePanel() {
             super();
             try {
                 introImage = ImageIO.read(getClass().getResourceAsStream("/resource/intro.png"));

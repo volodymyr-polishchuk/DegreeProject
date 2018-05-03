@@ -2,10 +2,7 @@ package app.frame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,14 +64,16 @@ public class MultiChoiceDialog<E> extends JDialog {
             }
         });
         setTitle("Оберіть потрібні елементи");
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        closeFlag = false;
+        dispose();
     }
 
     public List<E> showAndGetData() {
         this.setVisible(true);
         return closeFlag ? this.mainList.getSelectedValuesList() : this.inList;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new MultiChoiceDialog<>(Arrays.asList("1", "2", "3", "4"), Arrays.asList("1", "2")).showAndGetData());
     }
 }

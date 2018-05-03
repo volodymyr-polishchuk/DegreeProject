@@ -1,6 +1,7 @@
 package app.lessons;
 
 import app.data.Group;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Vladimir on 06/02/18.
@@ -46,7 +47,7 @@ public class LessonsUnit implements Comparable<LessonsUnit> {
     }
 
     @Override
-    public int compareTo(LessonsUnit o) {
+    public int compareTo(@NotNull LessonsUnit o) {
         return this.getGroup().getName().compareTo(o.getGroup().getName());
     }
 }

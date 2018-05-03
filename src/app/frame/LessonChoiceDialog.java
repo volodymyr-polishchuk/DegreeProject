@@ -77,17 +77,10 @@ public class LessonChoiceDialog extends JDialog {
         dispose();
     }
 
-    public static void main(String[] args) {
-        LessonChoiceDialog dialog = new LessonChoiceDialog(DegreeProject.databaseData.getConnection());
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
-
     private class ListItem {
         private String period;
 
-        public ListItem(String period) {
+        ListItem(String period) {
             this.period = period;
         }
 
@@ -95,9 +88,9 @@ public class LessonChoiceDialog extends JDialog {
             return period;
         }
 
-        public void setPeriod(String period) {
-            this.period = period;
-        }
+//        public void setPeriod(String period) {
+//            this.period = period;
+//        }
 
         @Override
         public String toString() {

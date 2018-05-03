@@ -12,10 +12,10 @@ public class StudyPairDouble extends StudyPair {
     private StudyPairLonely numerator;
     private StudyPairLonely denominator;
 
-    public StudyPairDouble() {
-        numerator = new StudyPairLonely();
-        denominator = new StudyPairLonely();
-    }
+//    public StudyPairDouble() {
+//        numerator = new StudyPairLonely();
+//        denominator = new StudyPairLonely();
+//    }
 
     public StudyPairDouble(StudyPairLonely numerator, StudyPairLonely denominator) {
         this.numerator = numerator;

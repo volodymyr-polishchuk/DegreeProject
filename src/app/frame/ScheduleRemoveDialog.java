@@ -3,6 +3,7 @@ package app.frame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ public class ScheduleRemoveDialog extends JDialog{
     private JButton removeButton;
     private JButton cancelButton;
     private JList<String> jList;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private Connection connection;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
 
@@ -27,7 +28,7 @@ public class ScheduleRemoveDialog extends JDialog{
         setModal(true);
         setTitle("Видалення графіку навчання");
 
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         jList.setModel(listModel);
         this.connection = connection;
 
@@ -45,6 +46,11 @@ public class ScheduleRemoveDialog extends JDialog{
         cancelButton.addActionListener(e -> dispose());
 
         removeButton.addActionListener(this::removeClick);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        dispose();
     }
 
     private void removeClick(ActionEvent event) {

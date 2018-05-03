@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -33,18 +32,18 @@ public class MainForm extends JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         setTitle("Система автоматизації складання розкладу занять");
         InitJToolBar(toolBar);
-        addTab(new HelloPanel2("Головне меню програми", this));
+        addTab(new HelloPanel("Головне меню програми", this));
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                onClose(e);
+                onClose();
             }
         });
         setVisible(true);
 
     }
 
-    private void onClose(WindowEvent e) {
+    private void onClose() {
         int result = JOptionPane.showConfirmDialog(null, "Всі незбережені зміни будуть видалені! \nПродовжити?", "Попередження", JOptionPane.YES_NO_CANCEL_OPTION);
         if (result == JOptionPane.YES_OPTION) {
             System.exit(0);
@@ -59,11 +58,11 @@ public class MainForm extends JFrame {
         tabbedPane.remove(tabbedPane.getSelectedIndex());
     }
 
-    public void addTab(JPanel jPanel) {
+    private void addTab(JPanel jPanel) {
         tabbedPane.add(jPanel);
     }
 
-    public void addTab(JPanel jPanel, String title) {
+    void addTab(JPanel jPanel, String title) {
         tabbedPane.add(jPanel);
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);

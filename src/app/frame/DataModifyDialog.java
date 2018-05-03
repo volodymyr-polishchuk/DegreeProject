@@ -6,6 +6,7 @@ import app.data.StudyData;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -19,7 +20,7 @@ public class DataModifyDialog extends JDialog {
     private JButton cancelButton;
     private JList<StudyData> jList;
     private DefaultListModel<StudyData> listModel = new DefaultListModel<>();
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private JButton saveButton;
     private DataModifyInterface anInterface;
     private boolean isChange;
@@ -32,7 +33,7 @@ public class DataModifyDialog extends JDialog {
         setSize(new Dimension(400, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         setModal(true);
 
         for (StudyData t : arr) {
@@ -65,6 +66,7 @@ public class DataModifyDialog extends JDialog {
                 super.windowClosing(e);
             }
         });
+        contentPane.registerKeyboardAction(e -> cancelButtonClick(new ActionEvent(this, 0, "")), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     public static StudyData[] getInstance(StudyData[] studyData, DataModifyInterface anInterface, String title) {

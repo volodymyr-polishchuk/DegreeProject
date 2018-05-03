@@ -13,6 +13,8 @@ public class Holiday implements StudyData, Comparable<Holiday> {
     private int key = -1;
     private Calendar calendar;
     private boolean repeat;
+    // TODO Треба реалізувати коментар для можливості позначення вихідного
+    private String comments;
 
     public Holiday(Date date, boolean repeat) {
         this(date, repeat, -1);

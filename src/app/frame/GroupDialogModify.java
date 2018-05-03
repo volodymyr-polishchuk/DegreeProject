@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,7 +17,7 @@ import java.sql.Statement;
  **/
 public class GroupDialogModify extends JDialog {
     private JTextField nameTextField;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private JButton saveButton;
     private JButton cancelButton;
     private Group group;
@@ -32,7 +33,7 @@ public class GroupDialogModify extends JDialog {
         setResizable(false);
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         saveButton.addActionListener(e -> dispose());
         cancelButton.addActionListener(e -> {
             nameTextField.setText("");
@@ -57,6 +58,13 @@ public class GroupDialogModify extends JDialog {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+    }
+
+    private void onCancel() {
+        this.nameTextField.setText("");
+        dispose();
     }
 
     private GroupDialogModify(Group group) {

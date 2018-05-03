@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -72,7 +71,7 @@ public class ScheduleChoiceDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> cancelButton.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public void onChoice(String args) {
+    private void onChoice(String args) {
         String year = args.split(" ")[2];
         ArrayList<ScheduleUnit> units = new ArrayList<>();
         try (Statement st = connection.createStatement()) {

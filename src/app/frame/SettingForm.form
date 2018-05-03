@@ -182,6 +182,7 @@
         </constraints>
         <properties>
           <text value="Скасувати"/>
+          <visible value="false"/>
         </properties>
       </component>
     </children>

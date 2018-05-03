@@ -15,13 +15,15 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.*;
 import java.awt.Color;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -79,7 +81,11 @@ public class LessonsPanel extends JPanel{
         initialGroupButton();
         settingButton.addActionListener(this::settingGroupClick);
         saveButton.addActionListener(this::saveButtonClick);
-        initialData();
+        boolean isExistData = initialData();
+        if (!isExistData) JOptionPane.showMessageDialog(null, "В системі відсутні даної одної \n" +
+                "з категорій (предмети/викладачі/аудиторії), \n" +
+                "додайте хоча б по одному елементу до кожного, \n" +
+                "щоб продовжити роботу", "Помилка", JOptionPane.WARNING_MESSAGE);
         button1.addActionListener(this::setButtonClick);
         button2.addActionListener(this::setButtonClick);
         button3.addActionListener(this::setButtonClick);
@@ -92,12 +98,12 @@ public class LessonsPanel extends JPanel{
         rButton.addActionListener(e -> initialData());
     }
 
-    public LessonsPanel(String title) {
+    LessonsPanel(String title) {
         this();
         setName(title);
     }
 
-    public LessonsPanel(String title, String period) {
+    LessonsPanel(String title, String period) {
         this(title);
         try {
             periodLabel.setText(period);
@@ -354,11 +360,12 @@ public class LessonsPanel extends JPanel{
         lessonTableModel.fireTableDataChanged();
     }
 
-    public void showSetting() {
+    void showSetting() {
         settingButton.doClick();
     }
 
-    private void initialData() {
+    private boolean initialData() {
+        boolean check1 = false, check2 = false, check3 = false;
         lessonCBox.addActionListener(e -> {
             if(lessonCBox.getSelectedItem() instanceof Lesson) {
                 Lesson lesson = (Lesson) lessonCBox.getSelectedItem();
@@ -374,12 +381,12 @@ public class LessonsPanel extends JPanel{
             ResultSet rs = s.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k ORDER BY lessons.name");
             while (rs.next()) {
                 lessonModel.addElement(
-                        new Lesson(
-                                rs.getInt("lessons.k"),
-                                rs.getString("lessons.name"),
+                        new Lesson(rs.getInt("lessons.k"), rs.getString("lessons.name"),
                                 new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name")))
                 );
+                check1 = true;
             }
+
             DefaultComboBoxModel<Teacher> teacherModel = new DefaultComboBoxModel<>();
             teacherCBox.setModel(teacherModel);
             rs = s.executeQuery("SELECT * FROM teachers ORDER BY name");
@@ -387,6 +394,7 @@ public class LessonsPanel extends JPanel{
                 teacherModel.addElement(
                         new Teacher(rs.getInt("k"), rs.getString("name"), Preference.parsePreference(rs.getString("preferences")))
                 );
+                check2 = true;
             }
 
             DefaultComboBoxModel<Auditory> auditoryModel = new DefaultComboBoxModel<>();
@@ -394,12 +402,14 @@ public class LessonsPanel extends JPanel{
             rs = s.executeQuery("SELECT * FROM auditorys ORDER BY name");
             while (rs.next()) {
                 auditoryModel.addElement(new Auditory(rs.getInt("k"), rs.getString("name")));
+                check3 = true;
             }
             rs.close();
             lessonTableModel.updateForbids(nowStudyPair);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return check1 && check2 && check3;
     }
 
     private void setButtonClick(ActionEvent event) {
@@ -443,7 +453,7 @@ public class LessonsPanel extends JPanel{
         buttonGroup.add(button3);
     }
 
-    public LessonTableModel getLessonTableModel() {
+    private LessonTableModel getLessonTableModel() {
         return lessonTableModel;
     }
 
@@ -517,7 +527,7 @@ public class LessonsPanel extends JPanel{
         private ArrayList<LessonsUnit> units = new ArrayList<>();
         private HashMap<app.lessons.StudyPair.Forbidden, HashSet<Point>> fMap = new HashMap<>();
 
-        public void export(File file, String period) throws IOException {
+        void export(File file, String period) throws IOException {
             final String[] daysName = new String[]{
                 "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
             };
@@ -667,11 +677,11 @@ public class LessonsPanel extends JPanel{
             workbook.close();
         }
 
-        public HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {
+        HashMap<StudyPair.Forbidden, HashSet<Point>> getfMap() {
             return fMap;
         }
 
-        public StudyPair.Forbidden getForbidden(LessonTableModel lessonTableModel, int row, int column) {
+        StudyPair.Forbidden getForbidden(LessonTableModel lessonTableModel, int row, int column) {
             StudyPair.Forbidden forbidden = StudyPair.Forbidden.UNKNOWN_FORBIDDEN;
             HashMap<StudyPair.Forbidden, HashSet<Point>> map = lessonTableModel.getfMap();
             if (map.get(StudyPair.Forbidden.ROW_FORBIDDEN) != null) {
@@ -694,7 +704,7 @@ public class LessonsPanel extends JPanel{
             return forbidden;
         }
 
-        public void updateForbids(StudyPair studyPair) {
+        void updateForbids(StudyPair studyPair) {
             fMap.clear();
             StudyPair.Forbidden[] forbidsArr;
             for (int col = 0; col < units.size(); col++) {
@@ -842,15 +852,6 @@ public class LessonsPanel extends JPanel{
                     );
                     if (r == JOptionPane.NO_OPTION) return;
                 }
-//                if (JOptionPane.showConfirmDialog(
-//                        null,
-//                        "Знайдено " + warningLog + ". Продовжити?",
-//                        "Повідомлення",
-//                        JOptionPane.YES_NO_OPTION)
-//                        != JOptionPane.YES_OPTION) {
-//                    return;
-//                }
-
             }
             lessonTableModel.setValueAt(nowStudyPair, row, column);
             analyzeTable(row, column);

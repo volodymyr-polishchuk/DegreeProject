@@ -1,60 +1,43 @@
 package app.frame;
 
-import app.DegreeProject;
-
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 /**
- * Created by Vladimir on 23/01/18.
+ * Created by Vladimir on 22/02/18.
  **/
-@Deprecated
 public class HelloPanel extends JPanel {
     private JPanel contentPane;
-    private JList list1;
-    private JButton перейтиButton;
-    private JButton перейтиButton1;
-    private JButton перейтиButton2;
-    private JLabel jLabelDatabaseName;
-    private JLabel jLabelLastLog;
+    private JButton createScheduleButton;
+    private JButton viewLessonsButton;
+    private JButton createLessonsButton;
+    private JButton viewScheduleButton;
+    private JButton addGroupButton;
+    private JButton addAuditoryButton;
+    private JButton addTeacherButton;
+    private JButton addLessonButton;
+    private JButton aboutButton;
+    private JButton userHelpButton;
+    private MainForm owner;
 
-    public HelloPanel(String name) {
-        setName(name);
+    HelloPanel(String title, MainForm owner) {
+        this.owner = owner;
         setLayout(new GridLayout());
+        setName(title);
         add(contentPane);
-        initialLabels();
+        initialButtons();
     }
 
-    private void initialLabels() {
-        jLabelDatabaseName.setText(DegreeProject.databaseData.getDatabaseName());
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(
-                    new URI(getClass().getProtectionDomain().getCodeSource().getLocation() + "/log.txt")
-            ))));
-            String lastDate;
-            lastDate = reader.readLine();
-            if (!(lastDate != null && lastDate.isEmpty())) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH).parse(lastDate));
-                lastDate = "";
-                lastDate += calendar.get(Calendar.DAY_OF_MONTH) + "/";
-                lastDate += calendar.get(Calendar.MONTH) + "/";
-                lastDate += calendar.get(Calendar.YEAR);
-            } else {
-                lastDate = "невідомо";
-            }
-            jLabelLastLog.setText(lastDate);
-        } catch (IOException | URISyntaxException | ParseException e) {
-            e.printStackTrace();
-        }
+    private void initialButtons() {
+        createScheduleButton.addActionListener(owner.getMainFormMenuBar()::MenuItemCreateSchedule);
+        viewScheduleButton.addActionListener(owner.getMainFormMenuBar()::MenuItemViewSchedule);
+        createLessonsButton.addActionListener(owner.getMainFormMenuBar()::MenuItemCreateLessons);
+        viewLessonsButton.addActionListener(owner.getMainFormMenuBar()::MenuItemViewLessons);
+        addGroupButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataGroup);
+        addAuditoryButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataAuditory);
+        addTeacherButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataTeacher);
+        addLessonButton.addActionListener(owner.getMainFormMenuBar()::MenuItemDataLesson);
+        aboutButton.addActionListener(owner.getMainFormMenuBar()::MenuItemAbout);
+        userHelpButton.addActionListener(owner.getMainFormMenuBar()::MenuItemHelp);
     }
-
-
 }

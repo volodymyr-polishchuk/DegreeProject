@@ -309,6 +309,10 @@ public class ConnectionForm extends JFrame{
             jProgressBar.setValue(19);
             String addPrimaryKeyLessonsData5 = "CREATE INDEX teacher ON lessons_data (teacher);";
             statement.execute(addPrimaryKeyLessonsData5);
+
+            String createHolidays = "CREATE TABLE holidays (date DATE NOT NULL, repeats TINYINT(1) DEFAULT '0' NOT NULL, k INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT);";
+            statement.execute(createHolidays);
+
             statement.execute("INSERT INTO departments (name) VALUE ('Будівельне відділення')");
             statement.execute("INSERT INTO departments (name) VALUE ('Відділення економіки-програмування')");
             statement.execute("INSERT INTO weeks (mark, name, color, abbreviation) VALUES ('0', 'Навчання', -1, ' ');");
