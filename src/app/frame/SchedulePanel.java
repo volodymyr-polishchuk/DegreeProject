@@ -85,6 +85,10 @@ public class SchedulePanel extends JPanel{
 
     public void setPeriod(String line) {
         yearsLabel.setText(line);
+        String[] lines = yearsLabel.getText().split("-");
+        Calendar c = Calendar.getInstance();
+        c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
+        tableModel.setPeriods(c.getTime());
         tableModel.fireTableStructureChanged();
     }
 
@@ -193,7 +197,7 @@ public class SchedulePanel extends JPanel{
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) - 1);
             Calendar c = Calendar.getInstance();
-            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
@@ -204,7 +208,7 @@ public class SchedulePanel extends JPanel{
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) + 1);
             Calendar c = Calendar.getInstance();
-            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);

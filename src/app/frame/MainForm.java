@@ -1,10 +1,14 @@
 package app.frame;
 
+import app.DegreeProject;
 import app.MainFormMenuBar;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -17,18 +21,34 @@ public class MainForm extends JFrame {
     private JToolBar toolBar;
     private MainFormMenuBar menuBar;
 
+
     public MainForm() {
         menuBar = new MainFormMenuBar(this);
         setJMenuBar(menuBar);
-
+        if (DegreeProject.icon != null) setIconImage(DegreeProject.icon);
+        setMinimumSize(new Dimension(1024, 720));
         setContentPane(mainPanel);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setExtendedState(MAXIMIZED_BOTH);
         setTitle("Система автоматизації складання розкладу занять");
         InitJToolBar(toolBar);
-        setVisible(true);
         addTab(new HelloPanel2("Головне меню програми", this));
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onClose(e);
+            }
+        });
+        setVisible(true);
+
+    }
+
+    private void onClose(WindowEvent e) {
+        int result = JOptionPane.showConfirmDialog(null, "Всі незбережені зміни будуть видалені! \nПродовжити?", "Попередження", JOptionPane.YES_NO_CANCEL_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
     }
 
     public MainFormMenuBar getMainFormMenuBar() {

@@ -135,6 +135,8 @@ public class MainFormMenuBar extends JMenuBar {
                     preparedStatement.setDate(1, new java.sql.Date(holiday.getDate().getTime()));
                     preparedStatement.setBoolean(2, holiday.getRepeat());
                     preparedStatement.setInt(3, holiday.getKey());
+                    preparedStatement.setDate(4, new java.sql.Date(holiday.getDate().getTime()));
+                    preparedStatement.setBoolean(5, holiday.getRepeat());
                     preparedStatement.execute();
                 } else {
                     preparedStatementElse.setDate(1, new java.sql.Date(holiday.getDate().getTime()));

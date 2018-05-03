@@ -34,6 +34,7 @@ public class ConnectionForm extends JFrame{
     public ConnectionForm() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setContentPane(ContentPanel);
+        if (DegreeProject.icon != null) this.setIconImage(DegreeProject.icon);
         pack();
         setResizable(false);
         setLocationRelativeTo(null);
@@ -174,25 +175,17 @@ public class ConnectionForm extends JFrame{
     private void connectionButtonClick(ActionEvent event) {
         try {
             DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
-                    portTextField.getText(),
-                    userTextField.getText(),
-                    passwordField.getPassword(),
-                    DegreeProject.defaultDB);
+                    portTextField.getText(), userTextField.getText(),
+                    passwordField.getPassword(), DegreeProject.defaultDB);
             ResultSet rs = DegreeProject.databaseData.getConnection().createStatement().executeQuery("SHOW TABLES");
             HashSet<String> set = new HashSet<>();
-            set.add("auditorys");       set.add("departments");
-            set.add("groups");          set.add("lessons");
-            set.add("lessons_data");    set.add("lessons_schedules");
-            set.add("schedules");       set.add("schedules_data");
-            set.add("teachers");        set.add("weeks");
-            set.add("holidays");
+            set.add("auditorys");       set.add("departments");         set.add("groups");          set.add("lessons");
+            set.add("lessons_data");    set.add("lessons_schedules");   set.add("schedules");       set.add("schedules_data");
+            set.add("teachers");        set.add("weeks");               set.add("holidays");
             while (rs.next()) {
                 if (!set.contains(rs.getString(1))) {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "База даних не відповідає потрібній структурі!",
-                            "Помилка",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "База даних не відповідає потрібній структурі!",
+                            "Помилка", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (SQLException e1) {
@@ -243,8 +236,8 @@ public class ConnectionForm extends JFrame{
                     default: return;
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Підключення не вдалося встановити",
-                        "Помилка сервера", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Підключення встановити не вдалося",
+                        "Помилка підключення", JOptionPane.ERROR_MESSAGE);
                 e1.printStackTrace();
                 return;
             }

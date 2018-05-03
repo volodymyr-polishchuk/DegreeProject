@@ -80,7 +80,7 @@ public class Holiday implements StudyData, Comparable<Holiday> {
         Holiday holiday = (Holiday) o;
 
         if (repeat != holiday.repeat) return false;
-        return calendar != null ? calendar.equals(holiday.calendar) : holiday.calendar == null;
+        return calendar != null ? calendar.getTime() == holiday.calendar.getTime() : holiday.calendar == null;
 
     }
 

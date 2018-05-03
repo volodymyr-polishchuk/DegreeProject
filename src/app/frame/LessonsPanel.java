@@ -113,7 +113,6 @@ public class LessonsPanel extends JPanel{
             String sqlGetAll = "SELECT * FROM lessons_data INNER JOIN groups ON groups = groups.k INNER JOIN departments ON groups.department = departments.k \n" +
                     "INNER JOIN lessons ON lessons_data.lesson = lessons.k INNER JOIN teachers ON lessons_data.teacher = teachers.k\n" +
                     "INNER JOIN auditorys ON lessons_data.auditory = auditorys.k WHERE lessons_data.lessons_schedule LIKE ?;";
-            System.out.println(k);
             ps = DegreeProject.databaseData.getConnection().prepareStatement(sqlGetAll);
             ps.setInt(1, k);
             rs = ps.executeQuery();

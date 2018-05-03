@@ -6,9 +6,13 @@ import app.frame.ConnectionForm;
 import app.frame.IntroFrame;
 import app.frame.MainForm;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -21,8 +25,23 @@ public class DegreeProject {
     public static GroupList GROUPLIST;
     public static MainForm mainForm;
     public static String defaultDB = "asfsc";
+    public static Image icon;
 
     public static void main(String[] args) throws IOException, SQLException {
+        loadIcon();
+        loadConnectionForm();
+    }
+
+    private static void loadIcon() {
+        try {
+            icon = ImageIO.read(ClassLoader.class.getResourceAsStream("/resource/icon/icon2.png"));
+        } catch (IOException e) {
+            icon = null;
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadConnectionForm() {
         final IntroFrame introFrame = new IntroFrame();
         introFrame.setVisible(true);
         new Thread(() -> {
@@ -30,7 +49,6 @@ public class DegreeProject {
                 try { Thread.sleep(100); } catch (InterruptedException e) {/**/}
             }
         }).start();
-
         setCustomLookAndFeel();
         try {
             ConnectionForm connectionForm = new ConnectionForm(true);
@@ -46,6 +64,7 @@ public class DegreeProject {
     private static void setCustomLookAndFeel() {
         try {
             UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             UIManager.put("OptionPane.yesButtonText"   , "Так");
             UIManager.put("OptionPane.noButtonText"    , "Ні");
             UIManager.put("OptionPane.cancelButtonText", "Відміна");

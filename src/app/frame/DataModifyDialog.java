@@ -22,6 +22,7 @@ public class DataModifyDialog extends JDialog {
     private JPanel ContentPane;
     private JButton saveButton;
     private DataModifyInterface anInterface;
+    private boolean isChange;
 
     private DataModifyDialog(StudyData[] arr, DataModifyInterface anInterface, String title) {
         this.anInterface = anInterface;
@@ -68,12 +69,17 @@ public class DataModifyDialog extends JDialog {
 
     public static StudyData[] getInstance(StudyData[] studyData, DataModifyInterface anInterface, String title) {
         DataModifyDialog dialog = new DataModifyDialog(studyData, anInterface, title);
+        dialog.isChange = false;
         dialog.setVisible(true);
-        StudyData[] arr = new StudyData[dialog.listModel.getSize()];
-        for (int i = 0; i < dialog.listModel.getSize(); i++) {
-            arr[i] = dialog.listModel.get(i);
+        if (dialog.isChange) {
+            StudyData[] arr = new StudyData[dialog.listModel.getSize()];
+            for (int i = 0; i < dialog.listModel.getSize(); i++) {
+                arr[i] = dialog.listModel.get(i);
+            }
+            return arr;
+        } else {
+            return studyData;
         }
-        return arr;
     }
 
 
@@ -83,6 +89,7 @@ public class DataModifyDialog extends JDialog {
             arr[i] = listModel.get(i);
         }
         anInterface.exit(arr);
+        isChange = false;
         dispose();
     }
 
@@ -92,6 +99,7 @@ public class DataModifyDialog extends JDialog {
             arr[i] = listModel.get(i);
         }
         anInterface.exit(arr);
+        isChange = true;
         dispose();
     }
 
