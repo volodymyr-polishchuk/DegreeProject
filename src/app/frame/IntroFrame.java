@@ -70,8 +70,7 @@ public class IntroFrame extends JFrame {
             g.drawImage(introImage, 0, 0, null);
             Graphics2D g2 = (Graphics2D) g;
             gradientPaint = new LinearGradientPaint(
-                    minPosition.x,
-                    minPosition.y,
+                    minPosition.x, minPosition.y,
                     minPosition.x + (int) ((maxPosition.x - minPosition.x) * (now / ((max - min) * 1f))),
                     maxPosition.y,
                     fractions,

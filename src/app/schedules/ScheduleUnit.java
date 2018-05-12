@@ -8,8 +8,10 @@ public class ScheduleUnit implements Comparable<ScheduleUnit> {
     private Group group;
     private Week[] weeks = new Week[52];
 
+
     public ScheduleUnit(Group group) {
-        this.group = new Group(group.getKey(), group.getDepartment(), group.getName());
+//        this.group = new Group(group.getKey(), group.getDepartment(), group.getName(), group.getComments());
+        this.group = group;
         for (int i = 0; i < 52; i++) {
             weeks[i] = new Week();
         }

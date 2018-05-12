@@ -3,6 +3,7 @@ package app.frame;
 import app.*;
 import app.data.Group;
 import app.data.Period;
+import app.data.SchedulerTableCellRendererComponent;
 import app.data.Week;
 import app.schedules.ScheduleUnit;
 import app.schedules.SchedulerTableModel;
@@ -236,7 +237,9 @@ public class SchedulePanel extends JPanel{
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTable.getTableHeader().setReorderingAllowed(false);
         jTable.getTableHeader().setResizingAllowed(false);
-        jTable.setDefaultRenderer(Object.class, Week.getInstanceTableCellRendererComponent());
+        jTable.setDefaultRenderer(Object.class, new SchedulerTableCellRendererComponent());
+        jTable.setShowGrid(false);
+        jTable.setIntercellSpacing(new Dimension(0, 0));
         tableModel.fireTableDataChanged();
         jTable.addMouseListener(new MouseListener() {
             int col = 0;
@@ -342,8 +345,8 @@ public class SchedulePanel extends JPanel{
         int count = 0;
         for (int i = 0; i < 52; i++) {
             tPeriod = tableModel.getPeriod(i);
-            if (!(tScheduleUnit.getWeek(i).getName().equals("Канікули") ||
-                    tScheduleUnit.getWeek(i).getName().equals("Не визначено"))) {
+            if (!(tScheduleUnit.getWeek(i).getName().equals(Week.HOLIDAY_NAME) ||
+                    tScheduleUnit.getWeek(i).getName().equals(Week.UNKNOWN_NAME))) {
                 count += tPeriod.getWorkDay();
                 // TODO треба переробити, бо якщо значення зміняться все піде крахом
             }

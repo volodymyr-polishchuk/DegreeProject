@@ -26,10 +26,7 @@
               <component id="5a60b" class="javax.swing.JList" binding="jList">
                 <constraints/>
                 <properties>
-                  <model>
-                    <item value="Українська мова"/>
-                    <item value="Математатика"/>
-                  </model>
+                  <model/>
                 </properties>
               </component>
             </children>

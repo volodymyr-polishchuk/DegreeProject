@@ -88,7 +88,9 @@ public class ScheduleChoiceDialog extends JDialog {
                         new Group(
                                 rs.getInt("groups.k"),
                                 new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
-                                rs.getString("groups.name"))
+                                rs.getString("groups.name"),
+                                rs.getString("groups.comments")
+                        )
                 );
                 String weeks = rs.getString("data");
                 for (int i = 0; i < 52; i++) {

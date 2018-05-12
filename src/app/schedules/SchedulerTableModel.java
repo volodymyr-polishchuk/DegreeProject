@@ -265,7 +265,7 @@ public class SchedulerTableModel extends AbstractTableModel {
                 case 0: return "<html><b>Період</b></html>";
                 case 1: return "<html><b>Робочих днів</b></html>";
                 case 2: return "<html><b>Тиждень</b></html>";
-                default: return units.get(rowIndex - 3).getGroup().getName();
+                default: return units.get(rowIndex - 3).getGroup();
             }
             default: switch (rowIndex) {
                 case 0:  {

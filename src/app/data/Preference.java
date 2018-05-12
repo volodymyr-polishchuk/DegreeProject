@@ -1,94 +1,67 @@
 package app.data;
 
+import java.util.Arrays;
+
 /**
  * Created by Vladimir on 17/02/18.
  **/
 public class Preference {
-    private boolean Monday, Tuesday, Wednesday, Thursday, Friday, Saturday;
+    private static final int MONDAY = 0, TUESDAY = 1, WEDNESDAY = 2, THURSDAY = 3, FRIDAY = 4, SATURDAY = 5, COUNT = 6;
+    private boolean[] days;
 
     public Preference(boolean monday, boolean tuesday, boolean wednesday, boolean thursday, boolean friday, boolean saturday) {
-        Monday = monday;
-        Tuesday = tuesday;
-        Wednesday = wednesday;
-        Thursday = thursday;
-        Friday = friday;
-        Saturday = saturday;
+        days = new boolean[COUNT];
+        days[MONDAY] = monday;
+        days[TUESDAY] = tuesday;
+        days[WEDNESDAY] = wednesday;
+        days[THURSDAY] = thursday;
+        days[FRIDAY] = friday;
+        days[SATURDAY] = saturday;
     }
 
     public boolean getByIndex(int index) {
-        switch (index) {
-            case 0: return isMonday();
-            case 1: return isTuesday();
-            case 2: return isWednesday();
-            case 3: return isThursday();
-            case 4: return isFriday();
-            case 5: return isSaturday();
-            default: throw new IllegalArgumentException("Must be 0..5 (0 - Monday, 1 - Tuesday,..., 5 - Saturday), but get {" + index + "}");
+        if (index >= 0 && index <= SATURDAY) {
+            return days[index];
+        } else {
+            throw new IllegalArgumentException("Must be 0..5 (0 - Monday, 1 - Tuesday,..., 5 - Saturday), but get {" + index + "}");
         }
     }
 
     public boolean isMonday() {
-        return Monday;
-    }
-
-    public void setMonday(boolean monday) {
-        Monday = monday;
+        return days[MONDAY];
     }
 
     public boolean isTuesday() {
-        return Tuesday;
-    }
-
-    public void setTuesday(boolean tuesday) {
-        Tuesday = tuesday;
+        return days[TUESDAY];
     }
 
     public boolean isWednesday() {
-        return Wednesday;
-    }
-
-    public void setWednesday(boolean wednesday) {
-        Wednesday = wednesday;
+        return days[WEDNESDAY];
     }
 
     public boolean isThursday() {
-        return Thursday;
-    }
-
-    public void setThursday(boolean thursday) {
-        Thursday = thursday;
+        return days[THURSDAY];
     }
 
     public boolean isFriday() {
-        return Friday;
-    }
-
-    public void setFriday(boolean friday) {
-        Friday = friday;
+        return days[FRIDAY];
     }
 
     public boolean isSaturday() {
-        return Saturday;
-    }
-
-    public void setSaturday(boolean saturday) {
-        Saturday = saturday;
+        return days[SATURDAY];
     }
 
     public String getData() {
-        return String.valueOf(deParseChar(Monday)) + deParseChar(Tuesday) + deParseChar(Wednesday) +
-                deParseChar(Thursday) + deParseChar(Friday) + deParseChar(Saturday);
+        return String.valueOf(deParseChar(isMonday())) + deParseChar(isTuesday()) + deParseChar(isWednesday()) +
+                deParseChar(isThursday()) + deParseChar(isFriday()) + deParseChar(isSaturday());
     }
 
     public static Preference parsePreference(String line) {
         if (line.length() != 6) throw new IllegalArgumentException("Argument must be 6 char, but get: {" + line + "}");
         return new Preference(
-                parseChar(line.charAt(0)),
-                parseChar(line.charAt(1)),
-                parseChar(line.charAt(2)),
-                parseChar(line.charAt(3)),
-                parseChar(line.charAt(4)),
-                parseChar(line.charAt(5))
+                parseChar(line.charAt(0)), parseChar(line.charAt(1)),
+                parseChar(line.charAt(2)), parseChar(line.charAt(3)),
+                parseChar(line.charAt(4)), parseChar(line.charAt(5))
         );
 
     }
@@ -104,12 +77,12 @@ public class Preference {
     @Override
     public String toString() {
         return "Preference{" +
-                "M=" + Monday +
-                ", T=" + Tuesday +
-                ", W=" + Wednesday +
-                ", T=" + Thursday +
-                ", F=" + Friday +
-                ", S=" + Saturday +
+                "M=" + isMonday() +
+                ", T=" + isTuesday() +
+                ", W=" + isWednesday() +
+                ", T=" + isThursday() +
+                ", F=" + isFriday() +
+                ", S=" + isSaturday() +
                 '}';
     }
 
@@ -120,23 +93,12 @@ public class Preference {
 
         Preference that = (Preference) o;
 
-        if (Monday != that.Monday) return false;
-        if (Tuesday != that.Tuesday) return false;
-        if (Wednesday != that.Wednesday) return false;
-        if (Thursday != that.Thursday) return false;
-        if (Friday != that.Friday) return false;
-        return Saturday == that.Saturday;
+        return Arrays.equals(days, that.days);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (Monday ? 1 : 0);
-        result = 31 * result + (Tuesday ? 1 : 0);
-        result = 31 * result + (Wednesday ? 1 : 0);
-        result = 31 * result + (Thursday ? 1 : 0);
-        result = 31 * result + (Friday ? 1 : 0);
-        result = 31 * result + (Saturday ? 1 : 0);
-        return result;
+        return Arrays.hashCode(days);
     }
 }

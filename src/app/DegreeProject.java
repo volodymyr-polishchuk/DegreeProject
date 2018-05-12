@@ -25,7 +25,7 @@ public class DegreeProject {
     public static GroupList GROUPLIST;
     public static MainForm mainForm;
     public static String defaultDB = "asfsc";
-    public static Image icon;
+    public static Image mainIcon;
 
     public static void main(String[] args) throws IOException, SQLException {
         loadIcon();
@@ -33,7 +33,7 @@ public class DegreeProject {
     }
 
     private static void loadIcon() {
-        icon = new ImageLoad("/resource/icon/icon2.png").getImage();
+        mainIcon = new ImageLoad("/resource/icon/icon2.png").getImage();
     }
 
     private static class ImageLoad {

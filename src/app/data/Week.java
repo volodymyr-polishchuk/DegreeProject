@@ -1,6 +1,5 @@
 package app.data;
 
-import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.sql.ResultSet;
@@ -10,6 +9,9 @@ import java.sql.SQLException;
  * Created by Vladimir on 03/01/18.
  **/
 public class Week {
+    public static final String HOLIDAY_NAME = "Канікули";
+    public static final String UNKNOWN_NAME = "Не визначено";
+
     private char mark;
     private String name;
     private Color color;
@@ -17,7 +19,7 @@ public class Week {
 
     public Week() {
         this.mark = 'X';
-        this.name = "Не визначено";
+        this.name = UNKNOWN_NAME;
         this.color = Color.WHITE;
         this.abbreviation = "X";
     }
@@ -57,35 +59,6 @@ public class Week {
 
     public String getAbbreviation() {
         return abbreviation;
-    }
-
-    public static DefaultTableCellRenderer getInstanceTableCellRendererComponent() {
-        return new TableCellRendererComponent();
-    }
-
-    // Для визначення того як потрібно відмальовувати цей компонент в таблиці JTable
-    private static class TableCellRendererComponent extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setHorizontalAlignment(CENTER);
-            if (row >= 3 && column >= 1) {
-                try {
-                    Week w = (Week)value;
-                    label.setBackground(w.getColor());
-                } catch (ClassCastException e) {
-                    label.setBackground(Color.WHITE);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                label.setBackground(new Color(238, 238, 238));
-            }
-            if ((isSelected || hasFocus) && row >= 3) {
-                label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(122, 138, 153)));
-            }
-            return label;
-        }
     }
 
     @Override

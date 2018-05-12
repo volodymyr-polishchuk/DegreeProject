@@ -19,7 +19,7 @@ import java.util.HashSet;
  * Created by Vladimir on 26/12/17.
  **/
 public class ConnectionForm extends JFrame{
-    private JPanel ContentPanel;
+    private JPanel contentPane;
     private JTextField addressTextField;
     private JTextField portTextField;
     private JTextField userTextField;
@@ -33,8 +33,8 @@ public class ConnectionForm extends JFrame{
 
     public ConnectionForm() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setContentPane(ContentPanel);
-        if (DegreeProject.icon != null) this.setIconImage(DegreeProject.icon);
+        setContentPane(contentPane);
+        if (DegreeProject.mainIcon != null) this.setIconImage(DegreeProject.mainIcon);
         pack();
         setResizable(false);
         setLocationRelativeTo(null);

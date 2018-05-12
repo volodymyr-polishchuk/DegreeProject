@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Vladimir on 31/01/18.
@@ -825,26 +826,20 @@ public class LessonsPanel extends JPanel{
             int row = jTable.rowAtPoint(e.getPoint());
             int column = jTable.columnAtPoint(e.getPoint());
 
-//            String warningLog = "";
-            HashSet<StudyPair.Forbidden> forbiddens = new HashSet<>();
+            HashSet<StudyPair.Forbidden> forbiddenHashSet = new HashSet<>();
             HashMap<StudyPair.Forbidden, HashSet<Point>> hashMap = lessonTableModel.getfMap();
             for (HashMap.Entry<StudyPair.Forbidden, HashSet<Point>> item : hashMap.entrySet()) {
-                for (Point point : item.getValue()) {
-                    if (point.getX() == row) {
-                        forbiddens.add(item.getKey());
-//                        warningLog += item.getKey().name() + "; ";
-                    }
-                }
+                forbiddenHashSet.addAll(item.getValue().stream().filter(point -> point.getX() == row).map(point -> item.getKey()).collect(Collectors.toList()));
             }
-            if (!forbiddens.isEmpty()) {
-                if (forbiddens.contains(StudyPair.Forbidden.ROW_FORBIDDEN)) {
+            if (!forbiddenHashSet.isEmpty()) {
+                if (forbiddenHashSet.contains(StudyPair.Forbidden.ROW_FORBIDDEN)) {
                     int r = JOptionPane.showConfirmDialog(
                             null,
                             "Ви намагаєтеся встановити аудиторію або виклачадача, \nякий зайнятий у цей час. Продовжити?",
                             "Повідомлення", JOptionPane.YES_NO_OPTION
                     );
                     if (r == JOptionPane.NO_OPTION) return;
-                } else if (forbiddens.contains(StudyPair.Forbidden.DAY_FORBIDDEN)) {
+                } else if (forbiddenHashSet.contains(StudyPair.Forbidden.DAY_FORBIDDEN)) {
                     int r = JOptionPane.showConfirmDialog(
                             null,
                             "Викладач виявив бажання залишатися вільним в цей час. Продовжити?",
@@ -907,11 +902,11 @@ public class LessonsPanel extends JPanel{
         groupNameLabel.setText(unit.getGroup().getName());
         workHourInWeekLabel.setText(pairCountNumerator == pairCountDenominator ?
                 (pairCountNumerator * 2) + " годин; в середньому на день " + ((pairCountDenominator * 2 + pairCountNumerator * 2) / 10) :
-                "(Ч) " + (pairCountNumerator * 2) + " годин; (З) " + (pairCountDenominator * 2) + " годин;  в середньому на день " + ((pairCountDenominator * 2 + pairCountNumerator * 2) / 10)
+                "(Ч) " + (pairCountNumerator * 2) + " годин; (З) " + (pairCountDenominator * 2) + " годин; в середньому на день " + ((pairCountDenominator * 2 + pairCountNumerator * 2) / 10)
         );
         studyPairInWeekLabel.setText(pairCountNumerator == pairCountDenominator ?
                 (pairCountNumerator) + " пар; в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10) :
-                "(Ч) " + (pairCountNumerator) + " годин; (З) " + (pairCountDenominator) + " годин;  в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10)
+                "(Ч) " + (pairCountNumerator) + " годин; (З) " + (pairCountDenominator) + " годин; в середньому на день " + ((pairCountDenominator + pairCountNumerator) / 10)
         );
     }
 }
