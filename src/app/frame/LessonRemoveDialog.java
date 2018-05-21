@@ -9,7 +9,7 @@ import java.sql.*;
 /**
  * Created by Vladimir on 03/03/18.
  **/
-public class LessonsRemoveDialog extends JDialog {
+public class LessonRemoveDialog extends JDialog {
     private JList<LessonsPeriod> jList;
     private DefaultListModel<LessonsPeriod> listModel = new DefaultListModel<>();
     private JButton removeButton;
@@ -17,7 +17,7 @@ public class LessonsRemoveDialog extends JDialog {
     private JPanel contentPane;
     private Connection connection;
 
-    public LessonsRemoveDialog(Connection connection) {
+    public LessonRemoveDialog(Connection connection) {
         this.connection = connection;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(true);

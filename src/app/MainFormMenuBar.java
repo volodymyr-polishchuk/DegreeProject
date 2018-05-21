@@ -175,7 +175,7 @@ public class MainFormMenuBar extends JMenuBar {
     }
 
     public void MenuItemRemoveLessons(ActionEvent event) {
-        LessonsRemoveDialog removeDialog = new LessonsRemoveDialog(DegreeProject.databaseData.getConnection());
+        LessonRemoveDialog removeDialog = new LessonRemoveDialog(DegreeProject.databaseData.getConnection());
         removeDialog.setVisible(true);
     }
 

@@ -38,13 +38,6 @@ public class Week {
         this.abbreviation = resultSet.getString("abbreviation");
     }
 
-    private Week (Week week) {
-        this.mark = week.getMark();
-        this.name = week.getName();
-        this.color = week.getColor();
-        this.abbreviation = week.getAbbreviation();
-    }
-
     public char getMark() {
         return mark;
     }

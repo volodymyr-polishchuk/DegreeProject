@@ -51,7 +51,7 @@ public class SchedulerTableCellRendererComponent extends DefaultTableCellRendere
 
         // Обробка виділеної стрічки
         if ((isSelected || hasFocus) && row >= 3) {
-            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(122, 138, 153)));
+            label.setBorder(BorderFactory.createMatteBorder(1, 0, 2, 1, new Color(122, 138, 153)));
         }
         return label;
     }
