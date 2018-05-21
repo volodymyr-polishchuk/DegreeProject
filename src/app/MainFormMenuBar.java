@@ -418,6 +418,14 @@ public class MainFormMenuBar extends JMenuBar {
                         bool = false;
                         break;
                     }
+                    //Обробка випадку з Preference
+                    if (out instanceof Teacher) {
+                        boolean equals = ((Teacher) (out)).getPreference().equals(in.getPreference());
+                        if (out.getKey() == in.getKey() && out.keyExist() && in.keyExist() && !equals) {
+                            bool = false;
+                            break;
+                        }
+                    }
                 }
                 if (bool) st.execute("DELETE FROM teachers WHERE k LIKE '" + in.getKey() + "'");
             }

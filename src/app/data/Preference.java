@@ -94,7 +94,6 @@ public class Preference {
         Preference that = (Preference) o;
 
         return Arrays.equals(days, that.days);
-
     }
 
     @Override

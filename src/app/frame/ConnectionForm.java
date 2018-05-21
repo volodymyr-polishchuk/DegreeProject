@@ -44,6 +44,7 @@ public class ConnectionForm extends JFrame{
                 super.windowActivated(e);
                 if (doConnect && autoConnect) {
                     connectionButtonClick(null);
+                    autoConnect = false;
                 }
             }
         });
