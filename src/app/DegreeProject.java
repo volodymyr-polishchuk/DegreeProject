@@ -28,8 +28,8 @@ public class DegreeProject {
     public static Image mainIcon;
 
     public static void main(String[] args) throws IOException, SQLException {
-        loadIcon();
-        loadConnectionForm();
+        loadIcon(); // Завантаження ресурсів
+        loadConnectionForm(); // Завантаження форми
     }
 
     private static void loadIcon() {
@@ -59,8 +59,7 @@ public class DegreeProject {
         new Thread(() -> {
             while (introFrame.getImagePanel().nextStep() < introFrame.getImagePanel().getMax()) {
                 try { Thread.sleep(100); } catch (InterruptedException e) {/**/}
-            }
-        }).start();
+            }}).start();
         setCustomLookAndFeel();
         try {
             ConnectionForm connectionForm = new ConnectionForm(true);

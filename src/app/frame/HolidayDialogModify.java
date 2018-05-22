@@ -77,6 +77,7 @@ public class HolidayDialogModify extends JDialog {
     public static Holiday getModify() {
         HolidayDialogModify dialogModify = new HolidayDialogModify();
         dialogModify.isChange = false;
+        dialogModify.setTitle("Додавання вихідного");
         dialogModify.setVisible(true);
         //
         Calendar calendar = (Calendar) dialogModify.jDatePicker.getJFormattedTextField().getValue();
@@ -90,6 +91,7 @@ public class HolidayDialogModify extends JDialog {
         dialogModify.jDatePicker.getJFormattedTextField().setValue(calendar);
         dialogModify.repeatCheckBox.setSelected(holiday.getRepeat());
         dialogModify.isChange = false;
+        dialogModify.setTitle("Редагування вихідного");
         dialogModify.setVisible(true);
         //
         if (dialogModify.isChange) {

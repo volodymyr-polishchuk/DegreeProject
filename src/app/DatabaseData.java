@@ -33,6 +33,10 @@ public class DatabaseData {
         this.user = user;
         this.password = String.valueOf(password);
         this.databaseName = databaseName;
+        createConnectionWithSchema();
+    }
+
+    private void createConnectionWithSchema() throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://" + this.address + ":" + this.port + "/" + this.databaseName + "?useSSL=false&useUnicode=true&characterEncoding=utf-8",
                 this.user, this.password);
     }

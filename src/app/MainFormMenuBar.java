@@ -368,35 +368,16 @@ public class MainFormMenuBar extends JMenuBar {
              ResultSet rs = st.executeQuery("SELECT * FROM teachers")) {
             TreeSet<Teacher> teacherTreeSet = new TreeSet<>();
             while (rs.next()) {
-                teacherTreeSet.add(
-                        new Teacher(
-                                rs.getInt("k"),
-                                rs.getString("name"),
-                                Preference.parsePreference(rs.getString("preferences"))));
-            }
+                teacherTreeSet.add(new Teacher(rs.getInt("k"), rs.getString("name"),
+                        Preference.parsePreference(rs.getString("preferences"))));}
             Teacher[] inputData = new Teacher[teacherTreeSet.size()];
             int count = 0;
             for (Teacher teacher : teacherTreeSet) inputData[count++] = teacher;
             StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
-                @Override
-                public StudyData add() {
-                    return TeacherDialogModify.getModify();
-                }
-
-                @Override
-                public StudyData edit(StudyData t) {
-                    return TeacherDialogModify.getModify((Teacher) t);
-                }
-
-                @Override
-                public boolean remove(StudyData t) {
-                    return true;
-                }
-
-                @Override
-                public void exit(StudyData[] t) {
-
-                }
+                public StudyData add() {return TeacherDialogModify.getModify();}
+                public StudyData edit(StudyData t) {return TeacherDialogModify.getModify((Teacher) t);}
+                public boolean remove(StudyData t) {return true;}
+                public void exit(StudyData[] t) {}
             }, "Налаштування викладачів");
 
             boolean b = true;
@@ -416,8 +397,7 @@ public class MainFormMenuBar extends JMenuBar {
                 for (StudyData out : outputData) {
                     if (in.equals(out)) {
                         bool = false;
-                        break;
-                    }
+                        break;}
                     //Обробка випадку з Preference
                     if (out instanceof Teacher) {
                         boolean equals = ((Teacher) (out)).getPreference().equals(in.getPreference());

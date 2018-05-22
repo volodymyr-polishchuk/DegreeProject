@@ -179,74 +179,90 @@ public class ConnectionForm extends JFrame{
                     portTextField.getText(), userTextField.getText(),
                     passwordField.getPassword(), DegreeProject.defaultDB);
             ResultSet rs = DegreeProject.databaseData.getConnection().createStatement().executeQuery("SHOW TABLES");
-            HashSet<String> set = new HashSet<>();
-            set.add("auditorys");       set.add("departments");         set.add("groups");          set.add("lessons");
-            set.add("lessons_data");    set.add("lessons_schedules");   set.add("schedules");       set.add("schedules_data");
-            set.add("teachers");        set.add("weeks");               set.add("holidays");
-            while (rs.next()) {
-                if (!set.contains(rs.getString(1))) {
-                    JOptionPane.showMessageDialog(null, "База даних не відповідає потрібній структурі!",
-                            "Помилка", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+            DatabaseStructureChecker(rs);
         } catch (SQLException e1) {
-            if (e1.getSQLState().equals("42000")) {
-                int r = JOptionPane.showConfirmDialog(null, "База даних '" + DegreeProject.defaultDB + "' потрібна для роботи не знайдена! \n\r" +
-                        "Створити нову базу?", "Налаштування бази даних", JOptionPane.YES_NO_CANCEL_OPTION);
-                switch (r) {
-                    case JOptionPane.YES_OPTION: {
-                        JProgressBar jProgressBar = new JProgressBar(0, 20);
-                        jProgressBar.setValue(0);
-                        jProgressBar.setStringPainted(true);
-
-                        jProgressBar.setPreferredSize(new Dimension(200, 5));
-                        JFrame jFrame = new JFrame();
-                        jFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                        jFrame.setLayout(new GridLayout(4, 1));
-                        jFrame.setSize(200, 80);
-                        jFrame.setLocationRelativeTo(null);
-                        jFrame.add(Box.createVerticalGlue());
-                        jFrame.add(new JLabel("Створення бази даних"));
-                        jFrame.add(jProgressBar);
-                        jFrame.add(Box.createVerticalGlue());
-                        jFrame.setResizable(false);
-                        jFrame.setUndecorated(true);
-                        jFrame.setVisible(true);
-                        jFrame.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowOpened(WindowEvent e) {
-                                super.windowOpened(e);
-                                new Thread(() -> {
-                                    try {
-                                        DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
-                                                portTextField.getText(),
-                                                userTextField.getText(),
-                                                passwordField.getPassword());
-                                        DegreeProject.databaseData.getConnection().createStatement().execute("CREATE DATABASE " + DegreeProject.defaultDB + ";");
-                                        DegreeProject.databaseData.getConnection().createStatement().execute("USE " + DegreeProject.defaultDB + ";");
-                                        dataBaseCreate(DegreeProject.databaseData.getConnection(), jProgressBar);
-                                        jFrame.dispose();
-                                        JOptionPane.showMessageDialog(null, "База успішно створена", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
-                                    } catch (SQLException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }).start();
-                            }
-                        });
-                    }
-                    default: return;
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Підключення встановити не вдалося",
-                        "Помилка підключення", JOptionPane.ERROR_MESSAGE);
-                e1.printStackTrace();
-                return;
-            }
+            SQLExceptionHandler(e1);
         }
 
         if (rememberCheckBox.isSelected()) rememberMe();
         DegreeProject.InitialMainFrame();
         dispose();
+    }
+
+    private void DatabaseStructureChecker(ResultSet rs) throws SQLException {
+        HashSet<String> set = new HashSet<>();
+        set.add("auditorys");
+        set.add("departments");
+        set.add("groups");
+        set.add("lessons");
+        set.add("lessons_data");
+        set.add("lessons_schedules");
+        set.add("schedules");
+        set.add("schedules_data");
+        set.add("teachers");
+        set.add("weeks");
+        set.add("holidays");
+        while (rs.next()) {
+            if (!set.contains(rs.getString(1))) {
+                JOptionPane.showMessageDialog(null, "База даних не відповідає потрібній структурі!",
+                        "Помилка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void SQLExceptionHandler(SQLException e1) {
+        if (e1.getSQLState().equals("42000")) {
+            int r = JOptionPane.showConfirmDialog(null, "База даних '" + DegreeProject.defaultDB + "' потрібна для роботи не знайдена! \n\r" +
+                    "Створити нову базу?", "Налаштування бази даних", JOptionPane.YES_NO_CANCEL_OPTION);
+            switch (r) {
+                case JOptionPane.YES_OPTION: {
+                    JProgressBar jProgressBar = new JProgressBar(0, 20);
+                    jProgressBar.setValue(0);
+                    jProgressBar.setStringPainted(true);
+
+                    jProgressBar.setPreferredSize(new Dimension(200, 5));
+                    JFrame jFrame = new JFrame();
+                    jFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                    jFrame.setLayout(new GridLayout(4, 1));
+                    jFrame.setSize(200, 80);
+                    jFrame.setLocationRelativeTo(null);
+                    jFrame.add(Box.createVerticalGlue());
+                    jFrame.add(new JLabel("Створення бази даних"));
+                    jFrame.add(jProgressBar);
+                    jFrame.add(Box.createVerticalGlue());
+                    jFrame.setResizable(false);
+                    jFrame.setUndecorated(true);
+                    jFrame.setVisible(true);
+                    jFrame.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowOpened(WindowEvent e) {
+                            super.windowOpened(e);
+                            new Thread(() -> {
+                                try {
+                                    DegreeProject.databaseData = new DatabaseData(addressTextField.getText(),
+                                            portTextField.getText(),
+                                            userTextField.getText(),
+                                            passwordField.getPassword());
+                                    DegreeProject.databaseData.getConnection().createStatement().execute("CREATE DATABASE " + DegreeProject.defaultDB + ";");
+                                    DegreeProject.databaseData.getConnection().createStatement().execute("USE " + DegreeProject.defaultDB + ";");
+                                    dataBaseCreate(DegreeProject.databaseData.getConnection(), jProgressBar);
+                                    jFrame.dispose();
+                                    JOptionPane.showMessageDialog(null, "База успішно створена", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
+                                } catch (SQLException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }).start();
+                        }
+                    });
+                }
+                default: return;
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Підключення встановити не вдалося",
+                    "Помилка підключення", JOptionPane.ERROR_MESSAGE);
+            e1.printStackTrace();
+            return;
+        }
     }
 
     private void dataBaseCreate(Connection connection, JProgressBar jProgressBar) {

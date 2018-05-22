@@ -14,13 +14,11 @@ public class SchedulerTableCellRendererComponent extends DefaultTableCellRendere
     private static final int
             COLUMN_NAMES = 0, COLUMNS_DATA = 1;
     private static final Color borderColor = new Color(164, 164, 164);
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         label.setHorizontalAlignment(CENTER);
         label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, borderColor));
-
         // Обробка таблиці в місці даних
         if (row >= ROW_DATA && column >= COLUMNS_DATA) {
             label.setBackground(Color.WHITE);
@@ -30,7 +28,6 @@ public class SchedulerTableCellRendererComponent extends DefaultTableCellRendere
                 label.setToolTipText(w.getName());
             }
         }
-
         // Обробка таблиці в місці підписів
         if ((row == ROW_PERIODS || row == ROW_WORK_DAYS || row == ROW_WEEK_COUNT) && column == COLUMN_NAMES) {
             label.setBackground(UIManager.getColor("Panel.background"));
@@ -38,7 +35,6 @@ public class SchedulerTableCellRendererComponent extends DefaultTableCellRendere
                 label.setToolTipText((String)value);
             }
         }
-
         // Підписи груп
         if (row >= ROW_DATA && column == COLUMN_NAMES) {
             label.setBackground(UIManager.getColor("Panel.background"));
@@ -48,7 +44,6 @@ public class SchedulerTableCellRendererComponent extends DefaultTableCellRendere
                 label.setToolTipText(g.getComments());
             }
         }
-
         // Обробка виділеної стрічки
         if ((isSelected || hasFocus) && row >= 3) {
             label.setBorder(BorderFactory.createMatteBorder(1, 0, 2, 1, new Color(122, 138, 153)));
