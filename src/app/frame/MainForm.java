@@ -2,6 +2,7 @@ package app.frame;
 
 import app.DegreeProject;
 import app.MainFormMenuBar;
+import app.data.loading.SemesterLoadPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -183,6 +184,11 @@ public class MainForm extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addEmptySemesterLoading() {
+        SemesterLoadPanel panel = new SemesterLoadPanel("Семестрове навантаження");
+        addTab(panel, panel.getName());
     }
 
     public void addEmptyStudySchedule() {

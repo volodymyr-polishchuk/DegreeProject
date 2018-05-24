@@ -182,6 +182,7 @@ public class ConnectionForm extends JFrame{
             DatabaseStructureChecker(rs);
         } catch (SQLException e1) {
             SQLExceptionHandler(e1);
+            return;
         }
 
         if (rememberCheckBox.isSelected()) rememberMe();

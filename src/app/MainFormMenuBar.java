@@ -48,6 +48,10 @@ public class MainFormMenuBar extends JMenuBar {
         lessonsMenu.add(new JMenuItem("Видалити розклад")).addActionListener(this::MenuItemRemoveLessons);
         add(lessonsMenu);
 
+        JMenu semesterLoadingMenu = new JMenu("Навантаження");
+        semesterLoadingMenu.add(new JMenuItem("Створити навантаження")).addActionListener(this::MenuItemCreateSemesterLoading);
+        add(semesterLoadingMenu);
+
 //          Створення меню Дані
         JMenu dataMenu = new JMenu("Дані");
         dataMenu.add(new JMenuItem("Аудиторії")).addActionListener(this::MenuItemDataAuditory);
@@ -67,6 +71,10 @@ public class MainFormMenuBar extends JMenuBar {
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
         helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemCreateSemesterLoading(ActionEvent event) {
+        this.mainForm.addEmptySemesterLoading();
     }
 
     private void MenuItemDataHoliday(ActionEvent event) {
