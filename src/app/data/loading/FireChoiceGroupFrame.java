@@ -6,8 +6,6 @@ import app.data.Group;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.sql.ResultSet;
@@ -64,7 +62,7 @@ public abstract class FireChoiceGroupFrame extends JFrame {
     private void initialList() {
         groupJList = new JList<>();
         listModel = new DefaultListModel<>();
-        String sqlQuery = "SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k ORDER BY groups.name";
+        String sqlQuery = "SELECT * FROM groups INNER JOIN departments ON groups.department = departments.k ORDER BY departments.name, groups.name";
         try {
             ResultSet resultSet = DegreeProject.databaseData.getConnection().createStatement().executeQuery(sqlQuery);
             while (resultSet.next()) {
@@ -78,6 +76,15 @@ public abstract class FireChoiceGroupFrame extends JFrame {
             e.printStackTrace();
         }
         groupJList.setModel(listModel);
+        DefaultListCellRenderer listCellRenderer = new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setToolTipText(((Group)value).getComments());
+                return label;
+            }
+        };
+        groupJList.setCellRenderer(listCellRenderer);
     }
 
     abstract void onChoice(Group group);

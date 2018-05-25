@@ -8,6 +8,7 @@ import java.util.ArrayList;
  * Created by Vladimir on 23/05/18.
  **/
 public class GroupLoad {
+    private int key = -1;
     private Group group;
     private int weekCount;
     private ArrayList<LoadUnit> loadUnits;
@@ -40,5 +41,25 @@ public class GroupLoad {
 
     public void setLoadUnits(ArrayList<LoadUnit> loadUnits) {
         this.loadUnits = loadUnits;
+    }
+
+    public float getWeekLoadingSum() {
+        float sum = 0;
+        for (LoadUnit item : loadUnits) {
+            sum += item.getWeekLoad();
+        }
+        return sum;
+    }
+
+    public boolean keyExists() {
+        return key > -1;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 }

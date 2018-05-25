@@ -65,7 +65,7 @@ public class LoadingTableModel extends DefaultTableModel {
     }
 
     LoadUnit removeRecord(int index) {
-        if (index > 0 && index < groupLoad.getLoadUnits().size() && groupLoad != null)
+        if (index >= 0 && index < groupLoad.getLoadUnits().size() && groupLoad != null)
             return groupLoad.getLoadUnits().remove(index);
         else
             return null;

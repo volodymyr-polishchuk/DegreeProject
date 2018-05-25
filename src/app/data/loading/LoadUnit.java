@@ -7,6 +7,7 @@ import app.data.Teacher;
  * Created by Vladimir on 23/05/18.
  **/
 public class LoadUnit {
+    private int key = -1;
     private GroupLoad owner;
 
     private Lesson lesson;
@@ -101,5 +102,17 @@ public class LoadUnit {
 
     public float getWeekLoad() {
         return ((float) getClassroom()) / owner.getWeekCount();
+    }
+
+    public boolean keyExists() {
+        return key > -1;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 }

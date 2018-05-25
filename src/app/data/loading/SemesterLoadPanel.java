@@ -21,7 +21,6 @@ public class SemesterLoadPanel extends JPanel {
     private JList<GroupLoad> groupList;
     private JTable mainTable;
     private JButton addGroupButton;
-    private JButton editGroupButton;
     private JButton removeGroupButton;
     private JTextField periodTextField;
     private JButton prevPeriodButton;
@@ -33,8 +32,9 @@ public class SemesterLoadPanel extends JPanel {
     private JComboBox<Integer> weekCountComboBox;
     private JButton moveRecordUpButton;
     private JButton moveRecordDownButton;
-    private JButton зберегтиButton;
-    private JButton експортуватиButton;
+    private JButton saveButton;
+    private JButton exportButton;
+    private JLabel weekLoadingCountLabel;
 
     private LoadingTableModel loadingTableModel;
     private SemesterLoad semesterLoad;
@@ -78,7 +78,6 @@ public class SemesterLoadPanel extends JPanel {
             };
             frame.setVisible(true);
         });
-        editGroupButton.addActionListener(e -> System.out.println("SemesterLoadPanel.initialGroupListButtons"));
 
         removeGroupButton.addActionListener(e -> {
             if (groupList.getSelectedIndex() >= 0) {
@@ -124,10 +123,17 @@ public class SemesterLoadPanel extends JPanel {
         addTableRecordButton.addActionListener(e -> {
             loadingTableModel.addNewRecord();
             loadingTableModel.fireTableDataChanged();
+            mainTable.setRowSelectionInterval(loadingTableModel.getRowCount() - 1, loadingTableModel.getRowCount() - 1);
         });
         removeTableRecordButton.addActionListener(e -> {
+            int select = mainTable.getSelectedRow();
             loadingTableModel.removeRecord(mainTable.getSelectedRow());
             loadingTableModel.fireTableDataChanged();
+            if (select < loadingTableModel.getRowCount() && loadingTableModel.getRowCount() > 0)
+                mainTable.setRowSelectionInterval(select, select);
+            else if (loadingTableModel.getRowCount() > 0) {
+                mainTable.setRowSelectionInterval(select - 1, select - 1);
+            }
         });
         moveRecordUpButton.addActionListener(e -> {
             if (loadingTableModel.moveRecordUp(mainTable.getSelectedRow())) {
@@ -143,7 +149,13 @@ public class SemesterLoadPanel extends JPanel {
                 mainTable.setRowSelectionInterval(select + 1, select + 1);
             }
         });
-
+        saveButton.addActionListener(e -> {
+            try {
+                semesterLoad.writeToDatabase();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        });
     }
 
     private void initialWeekCountComboBox() {
@@ -179,8 +191,9 @@ public class SemesterLoadPanel extends JPanel {
 
     private void updatePanelData() {
         if (loadingTableModel.getGroupLoad() != null) {
-            groupNameLabel.setText(loadingTableModel.getGroupLoad().getGroup().getName());
+            groupNameLabel.setText(loadingTableModel.getGroupLoad().getGroup().getName() + " - " + loadingTableModel.getGroupLoad().getGroup().getDepartment().getName());
             weekCountComboBox.setSelectedItem(loadingTableModel.getGroupLoad().getWeekCount());
+            weekLoadingCountLabel.setText(String.format("%.2f", loadingTableModel.getGroupLoad().getWeekLoadingSum()));
         }
     }
 
@@ -201,7 +214,7 @@ public class SemesterLoadPanel extends JPanel {
 
         JComboBox<Teacher> teacherJComboBox = new JComboBox<>();
         try {
-            String sqlQuery = "SELECT * FROM teachers";
+            String sqlQuery = "SELECT * FROM teachers ORDER BY teachers.name";
             ResultSet resultSet = DegreeProject.databaseData.getConnection().createStatement().executeQuery(sqlQuery);
             while (resultSet.next()) {
                 Teacher teacher = new Teacher(
@@ -219,7 +232,6 @@ public class SemesterLoadPanel extends JPanel {
         JComboBox<String> formControlComboBox = new JComboBox<>(new String[]{"ДПА", "Екзамен", "Залік", "відсутній"});
         formControlComboBox.setEditable(true);
         mainTable.getColumnModel().getColumn(LoadingTableModel.CONTROL_FORM_COLUMN).setCellEditor(new DefaultCellEditor(formControlComboBox));
-
     }
 
     private void updateColumnSize() {
