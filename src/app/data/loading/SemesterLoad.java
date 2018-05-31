@@ -3,6 +3,7 @@ package app.data.loading;
 import app.DegreeProject;
 import app.data.Group;
 
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -115,7 +116,13 @@ public class SemesterLoad {
 
         if (!keyExists()) {
             writeToDatabaseWhenKeyNotExists();
+        } else {
+            writeToDatabaseWhenKeyExists();
         }
+    }
+
+    private void writeToDatabaseWhenKeyExists() {
+
     }
 
     private void writeToDatabaseWhenKeyNotExists() throws SQLException {
@@ -126,7 +133,11 @@ public class SemesterLoad {
         ResultSet resultSet = preparedStatement.executeQuery();
         //Якщо є, то я удаляю
         if (resultSet.next()) {
-            deleteSemesterLoadFromDatabase(resultSet.getInt("semester_load.k"));
+            int confirmResult = JOptionPane.showConfirmDialog(null, "Ви намагаєтеся зберегти навантаження за період\nякий присутній в базі даних. Перезаписати?", "Увага", JOptionPane.OK_CANCEL_OPTION);
+            if (confirmResult == JOptionPane.YES_OPTION)
+                deleteSemesterLoadFromDatabase(resultSet.getInt("semester_load.k"));
+            else
+                return;
         }
         resultSet.close();
         preparedStatement.close();
@@ -181,8 +192,12 @@ public class SemesterLoad {
 
     }
 
-    private void deleteSemesterLoadFromDatabase(int key) {
-
+    private void deleteSemesterLoadFromDatabase(int key) throws SQLException {
+        String deleteSemesterLoadSQL = "DELETE FROM semester_load WHERE k LIKE ?";
+        PreparedStatement preparedStatement = DegreeProject.databaseData.getConnection().prepareStatement(deleteSemesterLoadSQL);
+        preparedStatement.setInt(1, key);
+        preparedStatement.execute();
+        preparedStatement.closeOnCompletion();
     }
 
 }

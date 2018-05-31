@@ -58,7 +58,7 @@ public class DegreeProject {
         introFrame.setVisible(true);
         new Thread(() -> {
             while (introFrame.getImagePanel().nextStep() < introFrame.getImagePanel().getMax()) {
-                try { Thread.sleep(100); } catch (InterruptedException e) {/**/}
+                try { Thread.sleep(30); } catch (InterruptedException e) {/**/}
             }}).start();
         setCustomLookAndFeel();
         try {
