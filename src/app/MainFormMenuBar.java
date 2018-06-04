@@ -1,6 +1,8 @@
 package app;
 
 import app.data.*;
+import app.data.loading.SemesterLoad;
+import app.data.loading.SemesterLoadPanel;
 import app.frame.*;
 
 import javax.swing.*;
@@ -10,8 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
-import java.util.HashSet;
-import java.util.TreeSet;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * Created by Vladimir on 03/03/18.
@@ -37,19 +39,23 @@ public class MainFormMenuBar extends JMenuBar {
         scheduleMenu.add(new JMenuItem("Створити навчальний графік")).addActionListener(this::MenuItemCreateSchedule);
         scheduleMenu.add(new JPopupMenu.Separator());
         scheduleMenu.add(new JMenuItem("Переглянути/редагувати графік")).addActionListener(this::MenuItemViewSchedule);
-        scheduleMenu.add(new JMenuItem("Видалити графік")).addActionListener(this::MenuItemRemoveSchedule);
+        scheduleMenu.add(new JMenuItem("Видалити навчальний графік")).addActionListener(this::MenuItemRemoveSchedule);
         add(scheduleMenu);
 
 //          Створення меню Розклад занять
         JMenu lessonsMenu = new JMenu("Розклад занять");
         lessonsMenu.add(new JMenuItem("Створити розклад занять")).addActionListener(this::MenuItemCreateLessons);
+        lessonsMenu.add(new JMenuItem("Створити розклад занять з навантаженням")).addActionListener(this::MenuItemCreateLessonsWithLoad);
         lessonsMenu.add(new JPopupMenu.Separator());
         lessonsMenu.add(new JMenuItem("Переглянути/редагувати розклад")).addActionListener(this::MenuItemViewLessons);
-        lessonsMenu.add(new JMenuItem("Видалити розклад")).addActionListener(this::MenuItemRemoveLessons);
+        lessonsMenu.add(new JMenuItem("Видалити розклад занять")).addActionListener(this::MenuItemRemoveLessons);
         add(lessonsMenu);
 
         JMenu semesterLoadingMenu = new JMenu("Навантаження");
         semesterLoadingMenu.add(new JMenuItem("Створити навантаження")).addActionListener(this::MenuItemCreateSemesterLoading);
+        semesterLoadingMenu.add(new JPopupMenu.Separator());
+        semesterLoadingMenu.add(new JMenuItem("Переглянути/редагувати навантаження")).addActionListener(this::MenuItemViewSemesterLoading);
+        semesterLoadingMenu.add(new JMenuItem("Видалити навантаження")).addActionListener(this::MenuItemRemoveSemesterLoading);
         add(semesterLoadingMenu);
 
 //          Створення меню Дані
@@ -71,6 +77,28 @@ public class MainFormMenuBar extends JMenuBar {
         JMenuItem MenuItemAbout = new JMenuItem("Про програму");
         helpMenu.add(MenuItemAbout).addActionListener(this::MenuItemAbout);
         add(helpMenu);
+    }
+
+    private void MenuItemCreateLessonsWithLoad(ActionEvent event) {
+        LoadChoiceDialog dialog = new LoadChoiceDialog(DegreeProject.databaseData.getConnection()) {
+            @Override
+            protected void onOK() {
+                ListItem item = getJList().getSelectedValue();
+                DegreeProject.mainForm.addTab(new LessonsPanel("Розклад занять за навантаженням", new SemesterLoad(item.getKey())), "Розклад занять за навантаженням");
+                dispose();
+            }
+        };
+        dialog.setVisible(true);
+    }
+
+    private void MenuItemRemoveSemesterLoading(ActionEvent event) {
+        LoadRemoveDialog removeDialog = new LoadRemoveDialog(DegreeProject.databaseData.getConnection());
+        removeDialog.setVisible(true);
+    }
+
+    private void MenuItemViewSemesterLoading(ActionEvent event) {
+        LoadChoiceDialog dialog = new LoadChoiceDialog(DegreeProject.databaseData.getConnection());
+        dialog.setVisible(true);
     }
 
     private void MenuItemCreateSemesterLoading(ActionEvent event) {
@@ -250,7 +278,7 @@ public class MainFormMenuBar extends JMenuBar {
             for (Group in : inputData) {
                 boolean bool = true;
                 for (StudyData out : outputData) {
-                    if (in.equals(out)) {
+                    if (/*in.equals(out)*/in.getKey() == out.getKey() || !out.keyExist()) {
                         bool = false;
                         break;
                     }
@@ -294,46 +322,31 @@ public class MainFormMenuBar extends JMenuBar {
 
     public void MenuItemDataLesson(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k")
+             ResultSet rs = st.executeQuery("SELECT * FROM lessons INNER JOIN auditorys ON lessons.auditory = auditorys.k ORDER BY lessons.name")
         ) {
-            HashSet<Lesson> lessonTreeSet = new HashSet<>();
+            ArrayList<Lesson> inputArray = new ArrayList<>();
             while (rs.next()) {
-                lessonTreeSet.add(
-                        new Lesson(
-                                rs.getInt("k"),
-                                rs.getString("name"),
-                                new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name"))
-                        )
-                );
+                inputArray.add(new Lesson(rs.getInt("k"), rs.getString("name"), new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name"))));
             }
-            Lesson[] inputData = new Lesson[lessonTreeSet.size()];
-            int count = 0;
-            for (Lesson lesson : lessonTreeSet) inputData[count++] = lesson;
+            Lesson[] inputData = new Lesson[inputArray.size()];
+            inputData = inputArray.toArray(inputData);
 //                Ключі для аудиторії задаються не тільки тут, а й LessonsModify, тому при зміні структури ключа варто змінити і там
             StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
-                @Override
                 public StudyData add() {
                     return LessonDialogModify.getModify();
                 }
-
-                @Override
                 public StudyData edit(StudyData t) {
                     return LessonDialogModify.getModify((Lesson) t);
                 }
-
-                @Override
                 public boolean remove(StudyData t) {
                     return true;
                 }
-
-                @Override
-                public void exit(StudyData[] t) {
-
-                }
+                public void exit(StudyData[] t) {}
             }, "Налаштування предметів");
 
+//          Перевірка чи щось змінилося
             boolean b = true;
-            if (outputData.length == inputData.length)
+            if (outputData.length == inputData.length) {
                 for (int i = 0; i < outputData.length; i++) {
                     Lesson in = inputData[i];
                     Lesson out = (Lesson) outputData[i];
@@ -342,17 +355,19 @@ public class MainFormMenuBar extends JMenuBar {
                         break;
                     }
                 }
-            else b = false;
+            } else b = false;
+//          Якщо нічого не змінилося, тоді виходимо з методу
             if (b) return;
+//          Якщо всетаки змінилося тоді вибираємо тих що треба видалити
             for (Lesson in : inputData) {
-                boolean bool = true;
+                boolean isLessonDelete = true;
                 for (StudyData out : outputData) {
-                    if (in.equals(out)) {
-                        bool = false;
+                    if (/*in.equals(out)*/ in.getKey() == out.getKey() || !out.keyExist()) {
+                        isLessonDelete = false;
                         break;
                     }
                 }
-                if (bool) st.execute("DELETE FROM lessons WHERE k LIKE '" + in.getKey() + "'");
+                if (isLessonDelete) st.execute("DELETE FROM lessons WHERE k LIKE '" + in.getKey() + "'");
             }
 
             for (StudyData item : outputData) {
@@ -373,7 +388,7 @@ public class MainFormMenuBar extends JMenuBar {
 
     public void MenuItemDataTeacher(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM teachers")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM teachers ORDER BY name")) {
             TreeSet<Teacher> teacherTreeSet = new TreeSet<>();
             while (rs.next()) {
                 teacherTreeSet.add(new Teacher(rs.getInt("k"), rs.getString("name"),
@@ -403,7 +418,7 @@ public class MainFormMenuBar extends JMenuBar {
             for (Teacher in : inputData) {
                 boolean bool = true;
                 for (StudyData out : outputData) {
-                    if (in.equals(out)) {
+                    if (/*in.equals(out)*/in.getKey() == out.getKey() || !out.keyExist()) {
                         bool = false;
                         break;}
                     //Обробка випадку з Preference
@@ -438,7 +453,7 @@ public class MainFormMenuBar extends JMenuBar {
 
     public void MenuItemDataAuditory(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM auditorys")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM auditorys ORDER BY name")) {
             TreeSet<Auditory> auditoryTreeSet = new TreeSet<>();
             while (rs.next()) {
                 auditoryTreeSet.add(new Auditory(rs.getInt("k"), rs.getString("name")));
@@ -483,7 +498,7 @@ public class MainFormMenuBar extends JMenuBar {
             for (Auditory in : inputData) {
                 boolean bool = true;
                 for (StudyData out : outputData) {
-                    if (in.equals(out)) {
+                    if (/*in.equals(out)*/in.getKey() == out.getKey() || !out.keyExist()) {
                         bool = false;
                         break;
                     }

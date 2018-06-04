@@ -131,6 +131,7 @@ public class LoadingTableModel extends DefaultTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (rowIndex >= groupLoad.getLoadUnits().size()) return;
         LoadUnit unit = groupLoad.getLoadUnits().get(rowIndex);
         switch (columnIndex) {
             case LESSON_COLUMN:

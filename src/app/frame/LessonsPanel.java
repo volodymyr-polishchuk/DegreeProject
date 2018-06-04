@@ -2,6 +2,9 @@ package app.frame;
 
 import app.DegreeProject;
 import app.data.*;
+import app.data.loading.GroupLoad;
+import app.data.loading.LoadUnit;
+import app.data.loading.SemesterLoad;
 import app.lessons.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
@@ -54,6 +57,8 @@ public class LessonsPanel extends JPanel{
     private StudyPair nowStudyPair;
     private PopupMenu tablePopupMenu = new PopupMenu();
     private Point cursor = new Point();
+
+    private SemesterLoad semesterLoad = null;
     /**
      * Кількість пар в одному дні
      */
@@ -114,12 +119,22 @@ public class LessonsPanel extends JPanel{
             ps.setString(1, period);
             ResultSet rs = ps.executeQuery();
             int k = -1;
-            while (rs.next()) k = rs.getInt("k");
+            if (rs.next()) {
+                k = rs.getInt("k");
+                int semesterLoadKey = rs.getInt("semester_load");
+                if (!rs.wasNull()) {
+                    semesterLoad = new SemesterLoad(semesterLoadKey);
+                    settingButton.setEnabled(false);
+                }
+            } else {
+                throw new SQLException("Не вдалося знайти жодного ключа за період " + period);
+            }
 
             if (k == -1) throw new IllegalArgumentException("Period not found {" + period + "}");
             String sqlGetAll = "SELECT * FROM lessons_data INNER JOIN groups ON groups = groups.k INNER JOIN departments ON groups.department = departments.k \n" +
                     "INNER JOIN lessons ON lessons_data.lesson = lessons.k INNER JOIN teachers ON lessons_data.teacher = teachers.k\n" +
-                    "INNER JOIN auditorys ON lessons_data.auditory = auditorys.k WHERE lessons_data.lessons_schedule LIKE ?;";
+                    "INNER JOIN auditorys AS teachers_auditorys ON lessons.auditory = teachers_auditorys.k \n" +
+                    "INNER JOIN auditorys AS lessons_auditory ON lessons_data.auditory = lessons_auditory.k WHERE lessons_data.lessons_schedule LIKE ?;";
             ps = DegreeProject.databaseData.getConnection().prepareStatement(sqlGetAll);
             ps.setInt(1, k);
             rs = ps.executeQuery();
@@ -129,9 +144,9 @@ public class LessonsPanel extends JPanel{
             while (rs.next()) {
                 Group group = new Group(rs.getInt("groups.k"), new Department(rs.getInt("departments.k"), rs.getString("departments.name")), rs.getString("groups.name"));
                 StudyPairLonely pairLonely = new StudyPairLonely(
-                        new Lesson(rs.getInt("lessons.k"), rs.getString("lessons.name"), new Auditory("")),
+                        new Lesson(rs.getInt("lessons.k"), rs.getString("lessons.name"), new Auditory(rs.getInt("teachers_auditorys.k"), rs.getString("teachers_auditorys.name"))),
                         new Teacher(rs.getInt("teachers.k"), rs.getString("teachers.name"), Preference.parsePreference(rs.getString("teachers.preferences"))),
-                        new Auditory(rs.getInt("auditorys.k"), rs.getString("auditorys.name"))
+                        new Auditory(rs.getInt("lessons_auditory.k"), rs.getString("lessons_auditory.name"))
                 );
                 StudyPairLonely pairEmpty = new StudyPairLonely(new Lesson(""), new Teacher(""), new Auditory(""));
                 String[] line = rs.getString("pair_number").split("/");
@@ -201,6 +216,17 @@ public class LessonsPanel extends JPanel{
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public LessonsPanel(String title, SemesterLoad semesterLoad) {
+        this(title);
+        for (GroupLoad groupLoad : semesterLoad.getGroupLoads()) {
+            lessonTableModel.units.add(new LessonsUnit(groupLoad.getGroup(), PAIR_IN_DAY, DAY_AT_WEEK));
+            lessonTableModel.fireTableStructureChanged();
+            lessonTableModel.fireTableDataChanged();
+        }
+        this.semesterLoad = semesterLoad;
+        settingButton.setEnabled(false);
     }
 
     private void exportButtonClick(ActionEvent event) {
@@ -286,8 +312,12 @@ public class LessonsPanel extends JPanel{
                 st.execute("DELETE FROM lessons_schedules WHERE period LIKE '" + periodLabel.getText() + "'");
             }
             resultSet.close();
-
-            String sql = "INSERT INTO lessons_schedules(period, date_of_create, coments) VALUE (?, ?, ?)";
+            String sql;
+            if (semesterLoad != null) {
+                sql = "INSERT INTO lessons_schedules(period, date_of_create, coments, semester_load) VALUE (?, ?, ?, ?)";
+            } else {
+                sql = "INSERT INTO lessons_schedules(period, date_of_create, coments) VALUE (?, ?, ?)";
+            }
             PreparedStatement preparedStatement = DegreeProject.databaseData.getConnection().prepareStatement(sql);
             preparedStatement.setString(1, periodLabel.getText());
             preparedStatement.setDate(2, new Date(System.currentTimeMillis()));
@@ -297,6 +327,9 @@ public class LessonsPanel extends JPanel{
                 return;
             }
             preparedStatement.setString(3, comment);
+            if (semesterLoad != null) {
+                preparedStatement.setInt(4, semesterLoad.getKey());
+            }
             preparedStatement.execute();
 
             int k = -1;
@@ -481,8 +514,14 @@ public class LessonsPanel extends JPanel{
         });
 
         lessonTableModel.addTableModelListener(this::tableModelChange);
-        tablePopupMenu.add(new MenuItem("Редагувати")).addActionListener(e -> {
-
+        tablePopupMenu.add(new MenuItem("Копіювати")).addActionListener(e -> {
+            Object o = lessonTableModel.getValueAt(jTable.rowAtPoint(cursor), jTable.columnAtPoint(cursor));
+            if (o instanceof StudyPairLonely) {
+                StudyPairLonely lonely = (StudyPairLonely)o;
+                lessonCBox.setSelectedItem(lonely.getLesson());
+                teacherCBox.setSelectedItem(lonely.getTeacher());
+                auditoryCBox.setSelectedItem(lonely.getAuditory());
+            }
         });
         tablePopupMenu.add(new MenuItem("Очистити")).addActionListener(
                 e -> lessonTableModel.setValueAt(new EmptyStudyPair(), jTable.rowAtPoint(cursor), jTable.columnAtPoint(cursor)));
@@ -848,6 +887,20 @@ public class LessonsPanel extends JPanel{
                     if (r == JOptionPane.NO_OPTION) return;
                 }
             }
+            if (semesterLoad != null) {
+                LoadingCheckResult result = checkSemesterLoad(nowStudyPair, row, column);
+
+                if (result.getResult() == LoadingCheckResults.GROUP_FAULT) {
+                    JOptionPane.showMessageDialog(null, "Помилка роботи. Перезавантажте систему");
+                } else if (result.getResult() == LoadingCheckResults.LESSON_NOT_USE_IN_THIS) {
+                    JOptionPane.showMessageDialog(null, "Даний не може бути використаний для цієї групи");
+                } else if (result.getResult() == LoadingCheckResults.MORE) {
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Встановлення предмету перевищує заданий ліміт на тиждень.\n" +
+                            "Рекомендовано: " + result.getRecommendLoad() + "; на даний момент: " + result.getNowLoad() + ";" +
+                            "\nпісля встановлення буде: " + result.getNextLoad() + "\nПродовжити?", "Увага", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (dialogResult != JOptionPane.YES_OPTION) return;
+                }
+            }
             lessonTableModel.setValueAt(nowStudyPair, row, column);
             analyzeTable(row, column);
 
@@ -880,6 +933,86 @@ public class LessonsPanel extends JPanel{
             cursor = e.getPoint();
 
         }
+    }
+
+    private LoadingCheckResult checkSemesterLoad(StudyPair nowStudyPair, int row, int column) {
+        LessonsUnit unit = getLessonTableModel().units.get(column / COLUMN_REPEAT);
+        GroupLoad groupLoad = semesterLoad.getGroupLoadByGroup(unit.getGroup());
+        if (groupLoad == null) return new LoadingCheckResult(LoadingCheckResults.GROUP_FAULT, -1, -1, -1);
+
+        Lesson lesson = null;
+        float modification = 0;
+        if (nowStudyPair instanceof StudyPairLonely) {
+            lesson = ((StudyPairLonely)nowStudyPair).getLesson();
+            modification = 1;
+        } else if (nowStudyPair instanceof StudyPairDouble) {
+            StudyPairDouble pairDouble = (StudyPairDouble)nowStudyPair;
+            if (!pairDouble.getNumerator().isEmpty()) {
+                lesson = pairDouble.getNumerator().getLesson();
+                modification = 0.5f;
+            } else {
+                lesson = pairDouble.getDenominator().getLesson();
+                modification = 0.5f;
+            }
+        }
+
+        LoadUnit loadUnit = groupLoad.getLoadUnitByLesson(lesson);
+        if (loadUnit == null) return new LoadingCheckResult(LoadingCheckResults.LESSON_NOT_USE_IN_THIS, -1, -1, -1);
+
+        float count = 0;
+        for (StudyPair pair : unit.getPairs()) {
+            if (pair instanceof StudyPairLonely) {
+                StudyPairLonely lonely = (StudyPairLonely) pair;
+                if (lonely.isEmpty()) continue;
+                count += lonely.getLesson().equals(lesson) ? 1 : 0;
+            } else if (pair instanceof StudyPairDouble) {
+                StudyPairLonely numerator = ((StudyPairDouble)pair).getNumerator();
+                StudyPairLonely denominator = ((StudyPairDouble)pair).getDenominator();
+                if (!numerator.isEmpty()) {
+                    count += numerator.getLesson().equals(lesson) ? 0.5 : 0;
+                }
+                if (!denominator.isEmpty()) {
+                    count += denominator.getLesson().equals(lesson) ? 0.5 : 0;
+                }
+            }
+        }
+
+        if (count + modification > loadUnit.getWeekLoad()) return new LoadingCheckResult(LoadingCheckResults.MORE, loadUnit.getWeekLoad(), count, count + modification);
+        return new LoadingCheckResult(LoadingCheckResults.GOOD, loadUnit.getWeekLoad(), count, count + modification);
+    }
+
+    private class LoadingCheckResult {
+        private LoadingCheckResults result;
+        private float recommendLoad;
+        private float nowLoad;
+        private float nextLoad;
+
+        public LoadingCheckResult(LoadingCheckResults result, float recommendLoad, float nowLoad, float nextLoad) {
+            this.result = result;
+            this.recommendLoad = recommendLoad;
+            this.nowLoad = nowLoad;
+            this.nextLoad = nextLoad;
+        }
+
+        public LoadingCheckResults getResult() {
+            return result;
+        }
+
+        public float getRecommendLoad() {
+            return recommendLoad;
+        }
+
+        public float getNowLoad() {
+            return nowLoad;
+        }
+
+        public float getNextLoad() {
+            return nextLoad;
+        }
+    }
+
+    private enum LoadingCheckResults {
+        GOOD, MORE, GROUP_FAULT, LESSON_NOT_USE_IN_THIS
     }
 
     private void analyzeTable(int row, int column) {

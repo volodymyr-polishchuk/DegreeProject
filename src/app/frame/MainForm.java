@@ -26,7 +26,7 @@ public class MainForm extends JFrame {
         mainMenuBar = new MainFormMenuBar(this);
         setJMenuBar(mainMenuBar);
         if (DegreeProject.mainIcon != null) setIconImage(DegreeProject.mainIcon);
-        setMinimumSize(new Dimension(1024, 720));
+//        setMinimumSize(new Dimension(1024, 720));
         setContentPane(contentPane);
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
@@ -63,7 +63,7 @@ public class MainForm extends JFrame {
         mainTabbedPane.add(jPanel);
     }
 
-    void addTab(JPanel jPanel, String title) {
+    public void addTab(JPanel jPanel, String title) {
         mainTabbedPane.add(jPanel);
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);

@@ -104,6 +104,10 @@ public class LoadUnit {
         return ((float) getClassroom()) / owner.getWeekCount();
     }
 
+    public String getWeekLoadFormatString() {
+        return String.valueOf(Math.round((getWeekLoad()) * 100) / 100.0);
+    }
+
     public boolean keyExists() {
         return key > -1;
     }

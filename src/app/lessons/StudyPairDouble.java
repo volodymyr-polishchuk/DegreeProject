@@ -40,15 +40,21 @@ public class StudyPairDouble extends StudyPair {
         switch (data) {
             case LESSON: {
                 labelTop.setText("Ч/ " + numerator.getLesson().getName());
+                labelTop.setToolTipText("Ч/ " + numerator.getLesson().getName());
                 labelBottom.setText("З\\ " + denominator.getLesson().getName());
+                labelBottom.setToolTipText("З\\ " + denominator.getLesson().getName());
             } break;
             case TEACHER: {
                 labelTop.setText(numerator.getTeacher().getName());
+                labelTop.setToolTipText(numerator.getTeacher().getName());
                 labelBottom.setText(denominator.getTeacher().getName());
+                labelBottom.setToolTipText(denominator.getTeacher().getName());
             } break;
             case AUDITORY: {
                 labelTop.setText(numerator.getAuditory().getName());
+                labelTop.setToolTipText(numerator.getAuditory().getName());
                 labelBottom.setText(denominator.getAuditory().getName());
+                labelBottom.setToolTipText(denominator.getAuditory().getName());
             } break;
         }
         panel.add(labelTop);

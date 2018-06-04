@@ -205,8 +205,8 @@ public class ConnectionForm extends JFrame{
         set.add("holidays");
         while (rs.next()) {
             if (!set.contains(rs.getString(1))) {
-                JOptionPane.showMessageDialog(null, "База даних не відповідає потрібній структурі!",
-                        "Помилка", JOptionPane.ERROR_MESSAGE);
+//                JOptionPane.showMessageDialog(null, "База даних не відповідає потрібній структурі!",
+//                        "Помилка", JOptionPane.ERROR_MESSAGE);
                 break;
                 //TODO Треба якось хитріше це провіряти
             }

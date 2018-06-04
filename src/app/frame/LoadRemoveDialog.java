@@ -9,25 +9,24 @@ import java.sql.*;
 /**
  * Created by Vladimir on 03/03/18.
  **/
-public class LessonRemoveDialog extends JDialog {
-    private JList<LessonsPeriod> jList;
-    private DefaultListModel<LessonsPeriod> listModel = new DefaultListModel<>();
+public class LoadRemoveDialog extends JDialog {
+    private JList<ListItem> jList;
+    private DefaultListModel<ListItem> listModel = new DefaultListModel<>();
     private JButton removeButton;
     private JButton cancelButton;
     private JPanel contentPane;
     private Connection connection;
 
-    public LessonRemoveDialog(Connection connection) {
+    public LoadRemoveDialog(Connection connection) {
         this.connection = connection;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(true);
         setLayout(new GridLayout());
         add(contentPane);
         getRootPane().setDefaultButton(removeButton);
-        setTitle("Видалення розкладу занять");
+        setTitle("Видалення навантаження");
         setSize(new Dimension(300, 300));
-        setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
-                (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+        setLocationRelativeTo(null);
 
         fillList();
         removeButton.addActionListener(this::removeButtonClick);
@@ -40,44 +39,35 @@ public class LessonRemoveDialog extends JDialog {
     }
 
     private void removeButtonClick(ActionEvent event) {
-        try {
-            String sqlRemoveData = "DELETE FROM lessons_data WHERE lessons_schedule = (SELECT k FROM lessons_schedules WHERE period LIKE ?)";
-            PreparedStatement ps = connection.prepareStatement(sqlRemoveData);
-            ps.setString(1, jList.getSelectedValue().getPeriod());
+        String sqlRemoveData = "DELETE FROM semester_load WHERE semester_load.k = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sqlRemoveData)){
+            ps.setInt(1, jList.getSelectedValue().getKey());
             ps.execute();
-            String sqlRemoveLessonsSchedule = "DELETE FROM lessons_schedules WHERE period LIKE ?";
-            ps = connection.prepareStatement(sqlRemoveLessonsSchedule);
-            ps.setString(1, jList.getSelectedValue().getPeriod());
-            ps.execute();
-            ps.close();
-            JOptionPane.showMessageDialog(null, "Дані успішно видалено!", "Повідомлення бази даних", JOptionPane.INFORMATION_MESSAGE);
             dispose();
+            JOptionPane.showMessageDialog(null, "Дані успішно видалено!", "Повідомлення бази даних", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
-
     }
 
     private void fillList() {
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM lessons_schedules");
-            while (resultSet.next()) {
-                listModel.addElement(new LessonsPeriod(resultSet.getString("period")));
-            }
+        String sql = "SELECT * FROM semester_load";
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {listModel.addElement(new ListItem(resultSet.getInt("k"), resultSet.getString("period")));}
             jList.setModel(listModel);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
-
     }
 
-    private class LessonsPeriod {
+    private class ListItem {
+        private int key;
         private String period;
 
-        LessonsPeriod(String period) {
+        ListItem(int key, String period) {
+            this.key = key;
             this.period = period;
         }
 
@@ -85,9 +75,13 @@ public class LessonRemoveDialog extends JDialog {
             return period;
         }
 
+        public int getKey() {
+            return key;
+        }
+
         @Override
         public String toString() {
-            return "Розклад занять за " + period;
+            return "Навантаження на " + period;
         }
 
         @Override
@@ -95,10 +89,9 @@ public class LessonRemoveDialog extends JDialog {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            LessonsPeriod that = (LessonsPeriod) o;
+            ListItem that = (ListItem) o;
 
             return period != null ? period.equals(that.period) : that.period == null;
-
         }
 
         @Override

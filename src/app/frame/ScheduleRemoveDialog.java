@@ -22,7 +22,7 @@ public class ScheduleRemoveDialog extends JDialog{
 
     public ScheduleRemoveDialog(Connection connection) throws HeadlessException {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(300, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
         setModal(true);

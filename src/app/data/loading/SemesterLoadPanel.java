@@ -7,6 +7,9 @@ import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -35,6 +38,9 @@ public class SemesterLoadPanel extends JPanel {
     private JButton saveButton;
     private JButton exportButton;
     private JLabel weekLoadingCountLabel;
+    private JPanel hiddenLeftPanel;
+    private JLabel hideLeftPanelLabel;
+    private JLabel showLeftPanelLabel;
 
     private LoadingTableModel loadingTableModel;
     private SemesterLoad semesterLoad;
@@ -53,6 +59,15 @@ public class SemesterLoadPanel extends JPanel {
         initialPeriodsButtons();
     }
 
+    public SemesterLoadPanel(String title, SemesterLoad semesterLoad) {
+        this(title);
+        this.semesterLoad = semesterLoad;
+        initialGroupListBox();
+        if (semesterLoad.getGroupLoads().size() > 0)
+            removeGroupButton.setEnabled(true);
+        updatePanelData();
+    }
+
     private void initialPeriodsButtons() {
         prevPeriodButton.addActionListener(e -> {
             periodTextField.setText(semesterLoad.prevPeriod());
@@ -66,6 +81,20 @@ public class SemesterLoadPanel extends JPanel {
     }
 
     private void initialGroupListButtons() {
+        showLeftPanelLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                leftPanel.setVisible(true);
+                hiddenLeftPanel.setVisible(false);
+            }
+        });
+        hideLeftPanelLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                leftPanel.setVisible(false);
+                hiddenLeftPanel.setVisible(true);
+            }
+        });
         addGroupButton.addActionListener(e -> {
             JFrame frame = new FireChoiceGroupFrame() {
                 @Override
@@ -110,13 +139,9 @@ public class SemesterLoadPanel extends JPanel {
                 moveRecordUpButton.setEnabled(true);
                 moveRecordDownButton.setEnabled(true);
                 weekCountComboBox.setEnabled(true);
+                exportButton.setEnabled(true);
             }
         });
-    }
-
-    public SemesterLoadPanel(String title, SemesterLoad semesterLoad) {
-        this(title);
-        this.semesterLoad = semesterLoad;
     }
 
     private void initialTableButtons() {
@@ -152,9 +177,27 @@ public class SemesterLoadPanel extends JPanel {
         saveButton.addActionListener(e -> {
             try {
                 semesterLoad.writeToDatabase();
+                JOptionPane.showMessageDialog(null, "Дані успішно збережені", "Повідомлення", JOptionPane.INFORMATION_MESSAGE);
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Сервер повернув помилку:\n" + e1.getSQLState());
             }
+        });
+        exportButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                try {
+                    semesterLoad.exportToExcel(fileChooser.getSelectedFile());
+                    int confirmResult = JOptionPane.showConfirmDialog(null, "Дані успішно збержено. Відкрити файл?", "Повідомлення", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (confirmResult == JOptionPane.YES_OPTION) {
+                        Desktop.getDesktop().open(fileChooser.getSelectedFile());
+                    }
+                } catch (IOException err) {
+                    err.printStackTrace();
+                    JOptionPane.showMessageDialog(null, err.getMessage());
+                }
+            }
+
         });
     }
 
@@ -195,6 +238,8 @@ public class SemesterLoadPanel extends JPanel {
             weekCountComboBox.setSelectedItem(loadingTableModel.getGroupLoad().getWeekCount());
             weekLoadingCountLabel.setText(String.format("%.2f", loadingTableModel.getGroupLoad().getWeekLoadingSum()));
         }
+        semesterComboBox.setSelectedIndex(semesterLoad.getSemester() ? 0 : 1);
+        periodTextField.setText(semesterLoad.getYear() + "-" + (semesterLoad.getYear() + 1));
     }
 
     private void initialCellEditor() {

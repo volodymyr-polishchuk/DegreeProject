@@ -1,6 +1,7 @@
 package app.data.loading;
 
 import app.data.Group;
+import app.data.Lesson;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,13 @@ public class GroupLoad {
             sum += item.getWeekLoad();
         }
         return sum;
+    }
+
+    public LoadUnit getLoadUnitByLesson(Lesson lesson) {
+        for (LoadUnit loadUnit : loadUnits) {
+            if (loadUnit.getLesson().equals(lesson)) return loadUnit;
+        }
+        return null;
     }
 
     public boolean keyExists() {

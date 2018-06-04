@@ -51,11 +51,17 @@ public class StudyPairLonely extends StudyPair {
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         switch (data) {
-            case LESSON: label.setText(lesson.getName());
+            case LESSON:
+                label.setText(lesson.getName());
+                label.setToolTipText(lesson.getName());
                 break;
-            case TEACHER: label.setText(teacher.getName());
+            case TEACHER:
+                label.setText(teacher.getName());
+                label.setToolTipText(teacher.getName());
                 break;
-            case AUDITORY: label.setText(auditory.getName());
+            case AUDITORY:
+                label.setText(auditory.getName());
+                label.setToolTipText(auditory.getName());
                 break;
         }
         return label;
