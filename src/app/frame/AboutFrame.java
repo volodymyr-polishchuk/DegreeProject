@@ -2,13 +2,11 @@ package app.frame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 public class AboutFrame extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
-    private JTextPane jTextPane;
 
     public AboutFrame() {
         setContentPane(contentPane);
@@ -19,10 +17,16 @@ public class AboutFrame extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
     }
 
     private void onOK() {
         // add your code here
+        dispose();
+    }
+
+    private void onCancel() {
         dispose();
     }
 

@@ -9,11 +9,7 @@ import java.awt.*;
  **/
 public class TableCellDayNameRenderer extends DefaultTableCellRenderer {
     private final int PAIR_IN_DAY;
-
-    public TableCellDayNameRenderer(int pair_in_day) {
-        PAIR_IN_DAY = pair_in_day;
-    }
-
+    public TableCellDayNameRenderer(int pair_in_day) {PAIR_IN_DAY = pair_in_day;}
     private final String[] daysName = new String[]{
             "ПОНЕДІЛОК", "ВІВТОРОК", "СЕРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦЯ", "СУБОТА", "НЕДІЛЯ"
     };
@@ -29,13 +25,10 @@ public class TableCellDayNameRenderer extends DefaultTableCellRenderer {
                     daysName[row / PAIR_IN_DAY].charAt((row * 2) % (PAIR_IN_DAY * 2))
             ));
         }
-
         JLabel labelBottom = new JLabel();
-
         if (((row * 2) + 1) % (PAIR_IN_DAY * 2) < daysName[row / PAIR_IN_DAY].length()) {
             labelBottom.setText(String.valueOf(
-                    daysName[row / PAIR_IN_DAY].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))
-            ));
+                    daysName[row / PAIR_IN_DAY].charAt(((row * 2) + 1) % (PAIR_IN_DAY * 2))));
         }
         labelBottom.setHorizontalAlignment(CENTER);
         labelBottom.setFont(new Font(labelBottom.getFont().getName(), Font.BOLD, labelBottom.getFont().getSize()));

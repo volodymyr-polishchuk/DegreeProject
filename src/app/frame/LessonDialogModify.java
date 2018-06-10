@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,7 +16,7 @@ import java.sql.Statement;
  * Created by Vladimir on 17/02/18.
  **/
 public class LessonDialogModify extends JDialog {
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private JTextField nameTextField;
     private JComboBox<Auditory> auditoryComboBox;
     private JButton cancelButton;
@@ -31,12 +32,9 @@ public class LessonDialogModify extends JDialog {
         setResizable(false);
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         saveButton.addActionListener(e -> dispose());
-        cancelButton.addActionListener(e -> {
-            nameTextField.setText("");
-            dispose();
-        });
+        cancelButton.addActionListener(e -> onCancel());
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         auditoryComboBox.setModel(auditoryComboBoxModel);
         auditoryComboBox.setRenderer(new DefaultListCellRenderer() {
@@ -56,6 +54,12 @@ public class LessonDialogModify extends JDialog {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();
         }
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        nameTextField.setText("");
+        dispose();
     }
 
     private LessonDialogModify(Lesson lesson) {

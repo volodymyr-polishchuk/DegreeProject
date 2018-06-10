@@ -3,34 +3,40 @@ package app.frame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.sql.*;
 
 /**
  * Created by Vladimir on 03/03/18.
  **/
-public class LessonsRemoveDialog extends JDialog {
+public class LessonRemoveDialog extends JDialog {
     private JList<LessonsPeriod> jList;
     private DefaultListModel<LessonsPeriod> listModel = new DefaultListModel<>();
     private JButton removeButton;
     private JButton cancelButton;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private Connection connection;
 
-    public LessonsRemoveDialog(Connection connection) {
+    public LessonRemoveDialog(Connection connection) {
         this.connection = connection;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(true);
         setLayout(new GridLayout());
-        add(ContentPane);
+        add(contentPane);
         getRootPane().setDefaultButton(removeButton);
         setTitle("Видалення розкладу занять");
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(300, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
 
         fillList();
         removeButton.addActionListener(this::removeButtonClick);
         cancelButton.addActionListener(e -> dispose());
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        dispose();
     }
 
     private void removeButtonClick(ActionEvent event) {

@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="20" y="20" width="804" height="385"/>
+      <xy x="20" y="20" width="636" height="404"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -88,6 +88,7 @@
             </constraints>
             <properties>
               <model/>
+              <toolTipText value="Предмет"/>
             </properties>
           </component>
           <component id="7fb84" class="javax.swing.JComboBox" binding="teacherCBox">
@@ -96,6 +97,7 @@
             </constraints>
             <properties>
               <model/>
+              <toolTipText value="Викладач"/>
             </properties>
           </component>
           <component id="32a4e" class="javax.swing.JComboBox" binding="auditoryCBox">
@@ -104,6 +106,7 @@
             </constraints>
             <properties>
               <model/>
+              <toolTipText value="Аудиторія"/>
             </properties>
           </component>
           <component id="1edad" class="javax.swing.JButton" binding="prevPeriodButton">
@@ -128,6 +131,7 @@
             </constraints>
             <properties>
               <text value="2017-2018/1"/>
+              <toolTipText value="Поточний період"/>
             </properties>
           </component>
           <component id="5d0e7" class="javax.swing.JButton" binding="saveButton">
@@ -159,6 +163,7 @@
               <icon value="resource/refreshIcon.png"/>
               <margin top="2" left="0" bottom="2" right="0"/>
               <text value=""/>
+              <toolTipText value="Оновити поля"/>
             </properties>
           </component>
         </children>

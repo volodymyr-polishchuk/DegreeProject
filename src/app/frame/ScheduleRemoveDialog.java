@@ -3,6 +3,7 @@ package app.frame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,19 +16,19 @@ public class ScheduleRemoveDialog extends JDialog{
     private JButton removeButton;
     private JButton cancelButton;
     private JList<String> jList;
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private Connection connection;
     private DefaultListModel<String> listModel = new DefaultListModel<>();
 
     public ScheduleRemoveDialog(Connection connection) throws HeadlessException {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(new Dimension(400, 300));
+        setSize(new Dimension(300, 300));
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
         setModal(true);
         setTitle("Видалення графіку навчання");
 
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         jList.setModel(listModel);
         this.connection = connection;
 
@@ -45,6 +46,11 @@ public class ScheduleRemoveDialog extends JDialog{
         cancelButton.addActionListener(e -> dispose());
 
         removeButton.addActionListener(this::removeClick);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        dispose();
     }
 
     private void removeClick(ActionEvent event) {

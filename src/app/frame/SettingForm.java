@@ -1,12 +1,10 @@
 package app.frame;
 
 import app.DegreeProject;
-import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,14 +21,13 @@ public class SettingForm extends JDialog {
     private JComboBox<LAFItem> LAFComboBox;
     private JButton dropDatabaseButton;
     private JButton clearDatabaseButton;
-    private JButton button1;
-//    private JTextField databaseNameTextField;
 
     public SettingForm() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(new Dimension(800, 600));
-        setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
-                (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+//        setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
+//                (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
+        setLocationRelativeTo(null);
         setContentPane(ContentPane);
         setModal(true);
 
@@ -39,13 +36,10 @@ public class SettingForm extends JDialog {
         listModel.addElement(new LAFItem("Java"));
         listModel.addElement(new LAFItem("JTattoo"));
 
-
         LAFComboBox.setModel(listModel);
         LAFComboBox.addActionListener(this::lafChoice);
         saveButton.addActionListener(e -> dispose());
         cancelButton.addActionListener(e -> dispose());
-
-//        databaseNameTextField.setText(DegreeProject.defaultDB);
 
         dropDatabaseButton.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(null, "Ви намагаєтеся видалити базу даних!\nЦі дії відмінити не можливо!\nПродовжити?", "Увага", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -61,12 +55,6 @@ public class SettingForm extends JDialog {
         });
 
         clearDatabaseButton.addActionListener(this::clearDatabaseData);
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
     }
 
     private void clearDatabaseData(ActionEvent event) {
@@ -128,9 +116,7 @@ public class SettingForm extends JDialog {
             if (o == null || getClass() != o.getClass()) return false;
 
             LAFItem lafItem = (LAFItem) o;
-
             return name != null ? name.equals(lafItem.name) : lafItem.name == null;
-
         }
 
         @Override

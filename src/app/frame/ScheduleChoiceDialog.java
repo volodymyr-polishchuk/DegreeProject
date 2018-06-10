@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by Vladimir on 15/02/18.
@@ -70,7 +71,7 @@ public class ScheduleChoiceDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> cancelButton.doClick(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public void onChoice(String args) {
+    private void onChoice(String args) {
         String year = args.split(" ")[2];
         ArrayList<ScheduleUnit> units = new ArrayList<>();
         try (Statement st = connection.createStatement()) {
@@ -81,13 +82,15 @@ public class ScheduleChoiceDialog extends JDialog {
             }
             rsKey.close();
             ResultSet rs = st.executeQuery(
-                    "SELECT * FROM schedules_data INNER JOIN groups ON schedules_data.groups = groups.k INNER JOIN departments ON groups.department = departments.k WHERE schedule = '" + key + "'");
+                    "SELECT * FROM schedules_data INNER JOIN groups ON schedules_data.groups = groups.k INNER JOIN departments ON groups.department = departments.k WHERE schedule = '" + key + "' ORDER BY groups.name");
             while (rs.next()) {
                 ScheduleUnit unit = new ScheduleUnit(
                         new Group(
                                 rs.getInt("groups.k"),
                                 new Department(rs.getInt("departments.k"), rs.getString("departments.name")),
-                                rs.getString("groups.name"))
+                                rs.getString("groups.name"),
+                                rs.getString("groups.comments")
+                        )
                 );
                 String weeks = rs.getString("data");
                 for (int i = 0; i < 52; i++) {
@@ -95,14 +98,15 @@ public class ScheduleChoiceDialog extends JDialog {
                 }
                 units.add(unit);
             }
+            Collections.sort(units);
             rs.close();
-            SchedulePanel panel = new SchedulePanel("Навчальний графік");
+            SchedulePanel panel = new SchedulePanel("Графік навчального процесу " + year);
             units.forEach(unit -> {
                 panel.getTableModel().addScheduleUnit(unit);
             });
             panel.setPeriod(year);
             dispose();
-            DegreeProject.mainForm.addTab(panel, "Навчальний графік");
+            DegreeProject.mainForm.addTab(panel, "Графік навчального процесу " + year);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             e.printStackTrace();

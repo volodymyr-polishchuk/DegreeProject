@@ -6,12 +6,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Created by Vladimir on 17/02/18.
  **/
 public class TeacherDialogModify extends JDialog{
-    private JPanel ContentPane;
+    private JPanel contentPane;
     private JTextField nameTextField;
     private JButton cancelButton;
     private JButton saveButton;
@@ -31,13 +32,16 @@ public class TeacherDialogModify extends JDialog{
         setResizable(false);
         setLocation((int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() - getWidth()) / 2,
                 (int)(Toolkit.getDefaultToolkit().getScreenSize().getHeight() - getHeight()) / 2);
-        setContentPane(ContentPane);
+        setContentPane(contentPane);
         saveButton.addActionListener(e -> dispose());
-        cancelButton.addActionListener(e -> {
-            nameTextField.setText("");
-            dispose();
-        });
+        cancelButton.addActionListener(e -> onCancel());
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onCancel() {
+        nameTextField.setText("");
+        dispose();
     }
 
     private TeacherDialogModify(Teacher teacher) {

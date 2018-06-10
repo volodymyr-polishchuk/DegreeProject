@@ -8,14 +8,10 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -265,7 +261,7 @@ public class SchedulerTableModel extends AbstractTableModel {
                 case 0: return "<html><b>Період</b></html>";
                 case 1: return "<html><b>Робочих днів</b></html>";
                 case 2: return "<html><b>Тиждень</b></html>";
-                default: return units.get(rowIndex - 3).getGroup().getName();
+                default: return units.get(rowIndex - 3).getGroup();
             }
             default: switch (rowIndex) {
                 case 0:  {

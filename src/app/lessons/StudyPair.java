@@ -7,7 +7,7 @@ import java.util.List;
  * Created by Vladimir on 06/02/18.
  **/
 public abstract class StudyPair {
-    public static StudyPair getEmptyInstance() {
+    static StudyPair getEmptyInstance() {
         return new EmptyStudyPair();
     }
 

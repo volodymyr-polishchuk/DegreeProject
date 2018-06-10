@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="app.frame.ConnectionForm">
-  <grid id="27dc6" binding="ContentPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
       <xy x="20" y="20" width="320" height="406"/>
@@ -45,6 +45,7 @@
                 <properties>
                   <labelFor value="9a54e"/>
                   <text value="Адреса:"/>
+                  <toolTipText value="Адреса сервера на якому розташова база даних програмної системи"/>
                 </properties>
               </component>
               <component id="9a54e" class="javax.swing.JTextField" binding="addressTextField">
@@ -55,6 +56,7 @@
                 </constraints>
                 <properties>
                   <text value="localhost"/>
+                  <toolTipText value="Адреса"/>
                 </properties>
               </component>
             </children>
@@ -74,6 +76,7 @@
                 <properties>
                   <labelFor value="ad9f9"/>
                   <text value="Порт:"/>
+                  <toolTipText value="Порт сервера на якому знаходиться база даних програмної системи"/>
                 </properties>
               </component>
               <component id="ad9f9" class="javax.swing.JTextField" binding="portTextField">
@@ -84,7 +87,7 @@
                 </constraints>
                 <properties>
                   <text value="3306"/>
-                  <toolTipText value="Port"/>
+                  <toolTipText value="Порт"/>
                 </properties>
               </component>
             </children>
@@ -104,6 +107,7 @@
                 <properties>
                   <labelFor value="cf41"/>
                   <text value="Користувач:"/>
+                  <toolTipText value="Ім'я користувача з правами доступа до бази даних на сервері"/>
                 </properties>
               </component>
               <component id="cf41" class="javax.swing.JTextField" binding="userTextField">
@@ -114,6 +118,7 @@
                 </constraints>
                 <properties>
                   <text value=""/>
+                  <toolTipText value="Ім'я користувача"/>
                 </properties>
               </component>
             </children>
@@ -133,6 +138,7 @@
                 <properties>
                   <labelFor value="dd858"/>
                   <text value="Пароль:"/>
+                  <toolTipText value="Пароль від користувача до бази даних на сервері"/>
                 </properties>
               </component>
               <component id="dd858" class="javax.swing.JPasswordField" binding="passwordField">
@@ -141,7 +147,9 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="Пароль"/>
+                </properties>
               </component>
             </children>
           </grid>
@@ -169,6 +177,7 @@
                     </constraints>
                     <properties>
                       <text value="З'єднатися"/>
+                      <toolTipText value="Виконати з'єднання з базою даних"/>
                     </properties>
                   </component>
                 </children>
@@ -189,6 +198,7 @@
                 </constraints>
                 <properties>
                   <text value="&amp;Запам'ятати?"/>
+                  <toolTipText value="Якщо ви встановите згоду на цьому пункті, то при наступному підключені автоматично будуть використовуватися поточні дані"/>
                 </properties>
               </component>
               <component id="e07e8" class="javax.swing.JLabel" binding="otherConnectionLabel">
@@ -198,6 +208,7 @@
                 <properties>
                   <foreground color="-16773476"/>
                   <text value="&lt;html&gt;&lt;body&gt;&lt;u&gt;Змінити базу даних&lt;/u&gt;&lt;/body&gt;&lt;/html&gt;"/>
+                  <toolTipText value="Поле для зміни ім'я бази даних у випадку, якщо ви не можете використовувати зазначене в програмній системі"/>
                 </properties>
               </component>
               <component id="aa96" class="javax.swing.JLabel" binding="createTables">

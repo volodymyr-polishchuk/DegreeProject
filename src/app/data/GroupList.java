@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by Vladimir on 17/01/18.
  **/
 public class GroupList {
-    ArrayList<Group> list;
+    private ArrayList<Group> list;
 
     public GroupList() throws SQLException {
         list = new ArrayList<>();
@@ -32,24 +32,6 @@ public class GroupList {
             JOptionPane.showMessageDialog(null, "Помилка читання даних з бази \n\r MySQL -> " + e.getSQLState());
             e.printStackTrace();
         }
-    }
-
-    public Group getByName(String name) {
-        for (Group group : list) {
-            if (group.getName().equals(name)) {
-                return group;
-            }
-        }
-        return null;
-    }
-
-    public int getIndexByName(String name) {
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getName().equals(name)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public ArrayList<Group> getList() {

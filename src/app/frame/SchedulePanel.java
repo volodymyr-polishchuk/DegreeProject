@@ -3,6 +3,7 @@ package app.frame;
 import app.*;
 import app.data.Group;
 import app.data.Period;
+import app.data.SchedulerTableCellRendererComponent;
 import app.data.Week;
 import app.schedules.ScheduleUnit;
 import app.schedules.SchedulerTableModel;
@@ -85,6 +86,10 @@ public class SchedulePanel extends JPanel{
 
     public void setPeriod(String line) {
         yearsLabel.setText(line);
+        String[] lines = yearsLabel.getText().split("-");
+        Calendar c = Calendar.getInstance();
+        c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
+        tableModel.setPeriods(c.getTime());
         tableModel.fireTableStructureChanged();
     }
 
@@ -96,7 +101,10 @@ public class SchedulePanel extends JPanel{
             ArrayList<ScheduleUnit> units = ((SchedulerTableModel)jTable.getModel()).getUnits();
 
             String sqlQuery = "SELECT * FROM schedules WHERE period LIKE '" + yearsLabel.getText() + "'";
-            if (statement.execute(sqlQuery)) {
+            ResultSet resultSet = statement.executeQuery(sqlQuery);
+            resultSet.last();
+            int size = resultSet.getRow();
+            if (size > 0) {
                 int rewriteOption = JOptionPane.showConfirmDialog(
                         null,
                         "В базі даних уже існує графік навчання\n\rза цей період. Перезаписати?",
@@ -152,6 +160,7 @@ public class SchedulePanel extends JPanel{
         ArrayList<ScheduleUnit> outlastScheduleUnits = new ArrayList<>();
         tableModel.getAllScheduleUnits().stream().filter(item -> outlastGroups.remove(item.getGroup())).forEach(outlastScheduleUnits::add);
         outlastGroups.forEach(item -> outlastScheduleUnits.add(new ScheduleUnit(item)));
+        Collections.sort(outlastScheduleUnits);
         tableModel.setUnits(outlastScheduleUnits);
         tableModel.fireTableStructureChanged();
         tableModel.fireTableDataChanged();
@@ -189,7 +198,7 @@ public class SchedulePanel extends JPanel{
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) - 1);
             Calendar c = Calendar.getInstance();
-            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) - 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
@@ -200,7 +209,7 @@ public class SchedulePanel extends JPanel{
             String[] lines = yearsLabel.getText().split("-");
             lines[0] = String.valueOf(Integer.parseInt(lines[0]) + 1);
             Calendar c = Calendar.getInstance();
-            c.set(Integer.parseInt(lines[0]) - 1, Calendar.SEPTEMBER, 1);
+            c.set(Integer.parseInt(lines[0]), Calendar.SEPTEMBER, 1);
             tableModel.setPeriods(c.getTime());
             lines[1] = String.valueOf(Integer.parseInt(lines[1]) + 1);
             yearsLabel.setText(lines[0] + "-" + lines[1]);
@@ -228,7 +237,9 @@ public class SchedulePanel extends JPanel{
         jTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTable.getTableHeader().setReorderingAllowed(false);
         jTable.getTableHeader().setResizingAllowed(false);
-        jTable.setDefaultRenderer(Object.class, Week.getInstanceTableCellRendererComponent());
+        jTable.setDefaultRenderer(Object.class, new SchedulerTableCellRendererComponent());
+        jTable.setShowGrid(false);
+        jTable.setIntercellSpacing(new Dimension(0, 0));
         tableModel.fireTableDataChanged();
         jTable.addMouseListener(new MouseListener() {
             int col = 0;
@@ -334,8 +345,8 @@ public class SchedulePanel extends JPanel{
         int count = 0;
         for (int i = 0; i < 52; i++) {
             tPeriod = tableModel.getPeriod(i);
-            if (!(tScheduleUnit.getWeek(i).getName().equals("Канікули") ||
-                    tScheduleUnit.getWeek(i).getName().equals("Не визначено"))) {
+            if (!(tScheduleUnit.getWeek(i).getName().equals(Week.HOLIDAY_NAME) ||
+                    tScheduleUnit.getWeek(i).getName().equals(Week.UNKNOWN_NAME))) {
                 count += tPeriod.getWorkDay();
                 // TODO треба переробити, бо якщо значення зміняться все піде крахом
             }
