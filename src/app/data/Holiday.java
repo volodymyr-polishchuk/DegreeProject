@@ -15,6 +15,11 @@ public class Holiday implements StudyData, Comparable<Holiday> {
     private boolean repeat;
     // TODO Треба реалізувати коментар для можливості позначення вихідного
     private String comments;
+    private final static String[] week_name;
+
+    static {
+        week_name = new String[] {"неділя", "понеділок", "вівторок", "середа", "четверг", "п'ятниця", "субота"};
+    }
 
     public Holiday(Date date, boolean repeat) {
         this(date, repeat, -1);
@@ -27,10 +32,15 @@ public class Holiday implements StudyData, Comparable<Holiday> {
         this.key = key;
     }
 
+
+
     @Override
     public String getName() {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        return format.format(calendar.getTime()) + (repeat ? " - повторювати" : "");
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+            return format.format(calendar.getTime()) + " - робочий [" + week_name[calendar.get(Calendar.DAY_OF_WEEK) - 1] + "]" + (repeat ? " - повторювати" : "");
+        else
+            return format.format(calendar.getTime()) + " - вихідний [" + week_name[calendar.get(Calendar.DAY_OF_WEEK) - 1] + "]" + (repeat ? " - повторювати" : "");
     }
 
     @Override

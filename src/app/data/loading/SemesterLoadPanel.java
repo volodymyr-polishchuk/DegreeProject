@@ -4,11 +4,13 @@ import app.DegreeProject;
 import app.data.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -185,8 +187,23 @@ public class SemesterLoadPanel extends JPanel {
         });
         exportButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setSelectedFile(new File("semester_load.xls"));
+            fileChooser.addChoosableFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.getPath().endsWith(".xls");
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Excel file";
+                }
+            });
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
+                    if (!fileChooser.getSelectedFile().getPath().endsWith(".xls")) {
+                        fileChooser.setSelectedFile(new File(fileChooser.getSelectedFile().getPath() + ".xls"));
+                    }
                     semesterLoad.exportToExcel(fileChooser.getSelectedFile());
                     int confirmResult = JOptionPane.showConfirmDialog(null, "Дані успішно збержено. Відкрити файл?", "Повідомлення", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (confirmResult == JOptionPane.YES_OPTION) {

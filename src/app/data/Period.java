@@ -7,10 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Created by Vladimir on 12/01/18.
@@ -53,11 +50,31 @@ public class Period {
             c.add(Calendar.DAY_OF_MONTH, Calendar.FRIDAY - c.get(Calendar.DAY_OF_WEEK));
             second = c.getTime();
             workDay = (int) ((second.getTime() - first.getTime()) / DAY) + 1;
+
+            Calendar tempCalendar = Calendar.getInstance();
+            Calendar firstCalendar = Calendar.getInstance();
+            firstCalendar.setTime(first);
             for (Date d : dates) {
-                if (first.getTime() < d.getTime() && second.getTime() > d.getTime()) {
-                    workDay--;
+                tempCalendar.setTime(d);
+
+                if (firstCalendar.get(Calendar.WEEK_OF_YEAR) == tempCalendar.get(Calendar.WEEK_OF_YEAR) &&
+                        firstCalendar.get(Calendar.YEAR) == tempCalendar.get(Calendar.YEAR)) {
+                    if (tempCalendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                        workDay++;
+//                        second = tempCalendar.getTime();
+                    } else if (tempCalendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                        workDay++;
+//                        first = tempCalendar.getTime();
+                    } else {
+                        workDay--;
+                    }
                 }
+//                if (first.before(tempCalendar.getTime()) && second.after(tempCalendar.getTime())) {
+//                    workDay--;
+//                }
+
             }
+
             c.add(Calendar.DAY_OF_MONTH, 3);
             arr.add(new Period(first, second, workDay));
         }

@@ -66,7 +66,7 @@ public class MainFormMenuBar extends JMenuBar {
         dataMenu.add(new JPopupMenu.Separator());
         dataMenu.add(new JMenuItem("Групи")).addActionListener(this::MenuItemDataGroup);
         dataMenu.add(new JPopupMenu.Separator());
-        dataMenu.add(new JMenuItem("Вихідні")).addActionListener(this::MenuItemDataHoliday);
+        dataMenu.add(new JMenuItem("Редагувати дні")).addActionListener(this::MenuItemDataHoliday);
 
         add(dataMenu);
 
@@ -136,7 +136,7 @@ public class MainFormMenuBar extends JMenuBar {
                 public void exit(StudyData[] t) {
 
                 }
-            }, "Налаштування вихідних");
+            }, "Налаштування днів");
 
             boolean b = true;
             if (outputData.length == inputData.length)
