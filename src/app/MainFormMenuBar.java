@@ -2,7 +2,6 @@ package app;
 
 import app.data.*;
 import app.data.loading.SemesterLoad;
-import app.data.loading.SemesterLoadPanel;
 import app.frame.*;
 
 import javax.swing.*;
@@ -11,9 +10,14 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.TreeSet;
+
+import static javax.swing.JOptionPane.YES_OPTION;
 
 /**
  * Created by Vladimir on 03/03/18.
@@ -105,7 +109,7 @@ public class MainFormMenuBar extends JMenuBar {
         this.mainForm.addEmptySemesterLoading();
     }
 
-    private void MenuItemDataHoliday(ActionEvent event) {
+    public void MenuItemDataHoliday(ActionEvent event) {
         try (Statement st = DegreeProject.databaseData.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT * FROM holidays")
         ) {
@@ -117,25 +121,16 @@ public class MainFormMenuBar extends JMenuBar {
             int count = 0;
             for (Holiday holiday : groupTreeSet) inputData[count++] = holiday;
             StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
-                @Override
                 public StudyData add() {
                     return HolidayDialogModify.getModify();
                 }
-
-                @Override
                 public StudyData edit(StudyData t) {
                     return HolidayDialogModify.getModify((Holiday) t);
                 }
-
-                @Override
                 public boolean remove(StudyData t) {
                     return true;
                 }
-
-                @Override
-                public void exit(StudyData[] t) {
-
-                }
+                public void exit(StudyData[] t) {}
             }, "Налаштування днів");
 
             boolean b = true;
@@ -241,25 +236,16 @@ public class MainFormMenuBar extends JMenuBar {
             int count = 0;
             for (Group group : groupTreeSet) inputData[count++] = group;
             StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
-                @Override
                 public StudyData add() {
                     return GroupDialogModify.getModify();
                 }
-
-                @Override
                 public StudyData edit(StudyData t) {
                     return GroupDialogModify.getModify((Group) t);
                 }
-
-                @Override
                 public boolean remove(StudyData t) {
                     return true;
                 }
-
-                @Override
-                public void exit(StudyData[] t) {
-
-                }
+                public void exit(StudyData[] t) {}
             }, "Налаштування груп");
 
             boolean b = true;
@@ -418,7 +404,7 @@ public class MainFormMenuBar extends JMenuBar {
             for (Teacher in : inputData) {
                 boolean bool = true;
                 for (StudyData out : outputData) {
-                    if (/*in.equals(out)*/in.getKey() == out.getKey() || !out.keyExist()) {
+                    if (in.getKey() == out.getKey() || !out.keyExist()) {
                         bool = false;
                         break;}
                     //Обробка випадку з Preference
@@ -462,25 +448,16 @@ public class MainFormMenuBar extends JMenuBar {
             int count = 0;
             for (Auditory auditory : auditoryTreeSet) inputData[count++] = auditory;
             StudyData[] outputData = DataModifyDialog.getInstance(inputData, new DataModifyInterface() {
-                @Override
                 public StudyData add() {
                     return AuditoryDialogModify.getModify();
                 }
-
-                @Override
                 public StudyData edit(StudyData t) {
                     return AuditoryDialogModify.getModify((Auditory) t);
                 }
-
-                @Override
                 public boolean remove(StudyData t) {
                     return true;
                 }
-
-                @Override
-                public void exit(StudyData[] t) {
-
-                }
+                public void exit(StudyData[] t) {}
             }, "Налаштування аудиторій");
 
             boolean b = true;
@@ -498,7 +475,7 @@ public class MainFormMenuBar extends JMenuBar {
             for (Auditory in : inputData) {
                 boolean bool = true;
                 for (StudyData out : outputData) {
-                    if (/*in.equals(out)*/in.getKey() == out.getKey() || !out.keyExist()) {
+                    if (in.getKey() == out.getKey() || !out.keyExist()) {
                         bool = false;
                         break;
                     }
@@ -536,23 +513,12 @@ public class MainFormMenuBar extends JMenuBar {
     }
 
     public void MenuItemCreateSchedule(ActionEvent event) {
-        try {
-            this.mainForm.addEmptyStudySchedule();
-        } catch (NoClassDefFoundError e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-            e.printStackTrace();
-        }
+        this.mainForm.addEmptyStudySchedule();
     }
 
     public void MenuItemExit(ActionEvent event) {
         int result = JOptionPane.showConfirmDialog(null, "Увага! Всі не збережені зміни будуть видалені\n\rПродовжити?", "Вихід", JOptionPane.YES_NO_CANCEL_OPTION);
-        switch (result) {
-            case JOptionPane.YES_OPTION:
-                System.exit(0);
-                break;
-            case JOptionPane.NO_OPTION: case JOptionPane.CANCEL_OPTION:
-                break;
-        }
+        if (result == YES_OPTION) System.exit(0);
     }
 
     public void MenuItemReconnect(ActionEvent event) {

@@ -178,9 +178,17 @@ public class MainForm extends JFrame {
             auditoryToolButton.addActionListener(mainMenuBar::MenuItemDataAuditory);
             jToolBar.add(auditoryToolButton);
 
+            JButton holidayToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/holiday.png"))));
+            holidayToolButton.setToolTipText("Модифікувати дні");
+            holidayToolButton.addActionListener(mainMenuBar::MenuItemDataHoliday);
+            jToolBar.add(holidayToolButton);
+
             jToolBar.add(Box.createHorizontalGlue());
 
-            jToolBar.add(new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/info.png")))));
+            JButton helpToolButton = new JButton(new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/resource/info.png"))));
+            helpToolButton.addActionListener(mainMenuBar::MenuItemHelp);
+            helpToolButton.setToolTipText("Допомога користувачеві");
+            jToolBar.add(helpToolButton);
         } catch (IOException e) {
             e.printStackTrace();
         }
