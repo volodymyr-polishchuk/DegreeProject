@@ -619,7 +619,7 @@ public class LessonsPanel extends JPanel{
             topHeaderCellStyle.setFont(topHeaderFont);
 
             if (trRow >= 3) {
-                sheet.addMergedRegion(new CellRangeAddress(trRow - 3, trRow - 2, trCell, trCell + COLUMN_REPEAT * units.size()));
+                sheet.addMergedRegion(new CellRangeAddress(trRow - 3, trRow - 2, trCell, trCell + COLUMN_REPEAT * units.size() - 1));
                 Cell cell = sheet.createRow(trRow - 3).createCell(0);
                 cell.setCellStyle(topHeaderCellStyle);
                 String[] lines = periodLabel.getText().split("/");

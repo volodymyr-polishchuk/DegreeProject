@@ -177,6 +177,28 @@ public class SchedulerTableModel extends AbstractTableModel {
                 dataCell.setCellStyle(styleHashMap.getOrDefault(units.get(i).getWeek(j), workbook.createCellStyle()));
                 dataCell.setCellValue(units.get(i).getWeek(j).getAbbreviation());
             }
+
+            // По семестрах
+            int a = 0;
+            ArrayList<Integer> list = new ArrayList<>();
+            for (int j = 0; j < 52; j++) {
+                if (units.get(i).getWeek(j).equals(DegreeProject.WEEKLIST.getWeekByName("Навчання"))) {
+                    a++;
+                } else if (units.get(i).getWeek(j).equals(DegreeProject.WEEKLIST.getWeekByName("Канікули"))) {
+                    if (a != 0)
+                        list.add(a);
+                    a = 0;
+                }
+            }
+            if (a != 0)
+                list.add(a);
+
+            for (int n = 0; n < list.size(); n++) {
+                Cell semesterCount = groupRow.createCell(n + trCell + 1 + 52);
+                semesterCount.setCellValue(list.get(n));
+                semesterCount.setCellStyle(monthStyle);
+            }
+
         }
 
         for (int i = 0; i < DegreeProject.WEEKLIST.GetAllWeek().size(); i++) {
@@ -190,7 +212,7 @@ public class SchedulerTableModel extends AbstractTableModel {
             nameCell.setCellValue(DegreeProject.WEEKLIST.GetAllWeek().get(i).getName());
         }
 
-        for (int i = trCell; i < 53 + trCell; i++) {
+        for (int i = trCell; i < 53 /*52 тижня + 1 під групу*/ + trCell /*зміщення для модифікації*/ + 2 /*за 2 семестри*/; i++) {
             sheet.autoSizeColumn(i);
         }
 
