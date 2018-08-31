@@ -22,5 +22,7 @@ public class OtherFunction {
         System.out.println(date);
         System.out.println(date1);
     }
+
+
 }
 
