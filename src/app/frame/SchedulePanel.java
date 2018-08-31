@@ -348,11 +348,11 @@ public class SchedulePanel extends JPanel{
             if (!(tScheduleUnit.getWeek(i).getName().equals(Week.HOLIDAY_NAME) ||
                     tScheduleUnit.getWeek(i).getName().equals(Week.UNKNOWN_NAME))) {
                 count += tPeriod.getWorkDay();
-                // TODO треба переробити, бо якщо значення зміняться все піде крахом
             }
         }
         studyDaysLabel.setText(count + " днів");
 
+        // Навчання по семестрах
         int a = 0;
         ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < 52; i++) {

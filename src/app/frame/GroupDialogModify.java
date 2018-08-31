@@ -1,6 +1,7 @@
 package app.frame;
 
 import app.DegreeProject;
+import app.TextFieldSQLActionListener;
 import app.data.Department;
 import app.data.Group;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +61,8 @@ public class GroupDialogModify extends JDialog {
         }
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        nameTextField.addKeyListener(TextFieldSQLActionListener.instance);
+        commentsTextField.addKeyListener(TextFieldSQLActionListener.instance);
     }
 
     private void onCancel() {

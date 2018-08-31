@@ -1,5 +1,6 @@
 package app.frame;
 
+import app.TextFieldSQLActionListener;
 import app.data.Auditory;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +30,8 @@ public class AuditoryDialogModify extends JDialog{
         cancelButton.addActionListener(e -> onCancel());
         setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        jTextField.addKeyListener(TextFieldSQLActionListener.instance);
     }
 
     private void onCancel() {
